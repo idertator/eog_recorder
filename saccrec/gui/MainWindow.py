@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
 from PyQt5.QtGui import QIcon
 
 from .SubjectDialog import SubjectDialog
+from .Signals import SignalsWindow
 
 
 class MainWindow(QMainWindow):
@@ -12,6 +13,7 @@ class MainWindow(QMainWindow):
         self.initUI()
 
         self._subjectDialog = SubjectDialog(self)
+        self._signalsWindow = SignalsWindow(self)
 
     def newMenu(self, nombre):
         menubar = self.menuBar()
@@ -24,6 +26,9 @@ class MainWindow(QMainWindow):
         exitAct.setStatusTip('Exit application')
         exitAct.triggered.connect(qApp.quit)
 
+        signalsAct = QAction('Signals',self)
+        signalsAct.triggered.connect(self.openSignalsWindow)
+
         subjectAct = QAction('Subject Info', self)
         subjectAct.triggered.connect(self.onSubjectDialogClicked)
 
@@ -33,6 +38,7 @@ class MainWindow(QMainWindow):
 
         fileMenu = self.newMenu('&File')
         fileMenu.addAction(subjectAct)
+        fileMenu.addAction(signalsAct)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAct)
 
@@ -45,3 +51,6 @@ class MainWindow(QMainWindow):
 
     def onSubjectDialogClicked(self):
         self._subjectDialog.open()
+
+    def openSignalsWindow(self):
+        self._signalsWindow.show()
