@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton
 import sys
+import time
+from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
@@ -24,29 +26,22 @@ class SignalsWindow(QMainWindow):
     
     def MyUI(self):
 
-        canvas = _Canvas(self, width=8, height=4)
-        canvas.move(0,0)
+        self._main = QtWidgets.QWidget()
+        self.setCentralWidget(self._main)
 
-        button1 = QPushButton('OK',self)
-        button1.move(100, 450)
+        layout = QtWidgets.QVBoxLayout(self._main)
 
-        button2 = QPushButton('OK 2',self)
-        button2.move(250, 450)
+        signals = FigureCanvas(Figure(figsize=(5, 3)))
+        layout.addWidget(signals)
 
-class _Canvas(FigureCanvas):
-    def __init__(self, parent = None, width = 5, height = 5, dpi = 100):
+        self._dynamic_ax = signals.figure.subplots()
+        self._timer = signals.new_timer(
+            100, [(self._update_signals, (), {})])
+        self._timer.start()
 
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-
-        FigureCanvas.__init__(self, fig)
-
-        self.setParent(parent)
-        
-        self.plot()
-
-    def plot(self):
-        x = np.array([50,30,40])
-        labels = ['Apples','Bananas','Melons']
-        ax = self.figure.add_subplot(111)
-        ax.pie(x, labels=labels)
+    def _update_signals(self):
+        self._dynamic_ax.clear()
+        t = np.linspace(0, 10, 101)
+        # Shift the sinusoid as a function of time.
+        self._dynamic_ax.plot(t, np.sin(t + time.time()))
+        self._dynamic_ax.figure.canvas.draw()
