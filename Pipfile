@@ -13,6 +13,7 @@ scipy = "*"
 scikit-learn = "*"
 openbci-interface = "*"
 numba = "*"
+pythonQwt = "*"
 
 [requires]
 python_version = "3.7"

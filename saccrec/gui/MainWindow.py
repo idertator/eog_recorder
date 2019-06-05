@@ -1,8 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QDialog
 from PyQt5.QtGui import QIcon
 
-from .SubjectDialog import SubjectDialog
+from .new_test import MagicWizard
 from .Signals import SignalsWindow
 
 
@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.initUI()
 
-        self._subjectDialog = SubjectDialog(self)
+        self._newTest = MagicWizard()
         self._signalsWindow = SignalsWindow(self)
 
     def newMenu(self, nombre):
@@ -29,8 +29,8 @@ class MainWindow(QMainWindow):
         signalsAct = QAction('Signals',self)
         signalsAct.triggered.connect(self.openSignalsWindow)
 
-        subjectAct = QAction('Subject Info', self)
-        subjectAct.triggered.connect(self.onSubjectDialogClicked)
+        subjectAct = QAction('New Test', self)
+        subjectAct.triggered.connect(self.openNewTest)
 
         aboutUs = QAction(QIcon('saccrec/gui/images/interrogacion.png'), '&About Us', self)
 
@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 
         fileMenu = self.newMenu('&File')
         fileMenu.addAction(subjectAct)
-        fileMenu.addAction(signalsAct)
+        # fileMenu.addAction(signalsAct)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAct)
 
@@ -49,8 +49,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('EyeTracker OpenBCI')
         self.show()
 
-    def onSubjectDialogClicked(self):
-        self._subjectDialog.open()
+    def openNewTest(self):
+        self._newTest.open()
 
     def openSignalsWindow(self):
         self._signalsWindow.show()
