@@ -13,6 +13,7 @@ scipy = "*"
 scikit-learn = "*"
 openbci-interface = "*"
 numba = "*"
+pythonQwt = "*"
 matplotlib = "*"
 
 [requires]
