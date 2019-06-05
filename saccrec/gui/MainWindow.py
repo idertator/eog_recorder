@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QDialog
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QSettings
 
 from .new_test import MagicWizard
 from .Signals import SignalsWindow
@@ -12,7 +13,9 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.initUI()
 
-        self._newTest = MagicWizard()
+        self.settings = QSettings('Vinculacion','EyeTracker')
+
+        self._newTest = MagicWizard(self.settings)
         self._signalsWindow = SignalsWindow(self)
 
     def newMenu(self, nombre):

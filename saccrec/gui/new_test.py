@@ -1,19 +1,31 @@
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtProperty
-from PyQt5 import QtCore, QtWidgets
-
+from PyQt5 import QtWidgets
 
 
 class MagicWizard(QtWidgets.QWizard):
-    def __init__(self, parent=None):
+    def __init__(self, settings, parent=None):
         super(MagicWizard, self).__init__(parent)
-        self.addPage(Page1(self))
-        self.addPage(Page2(self))
-        self.addPage(Page3(self))
-        self.addPage(Page4(self))
+
+        self.settings = settings
+
+        self.paginas = [Page1(self),Page2(self),Page3(self),Page4(self)]
+
+        for pagina in self.paginas:
+            self.addPage(pagina)
+
+        
         self.setWindowTitle("Nuevo Test - Registro de Datos")
         self.resize(640,480)
+
+        self.button(QtWidgets.QWizard.FinishButton).clicked.connect(self.finish_wizard)
+
+
+    def finish_wizard(self):
+        # Guardar configuracion y empezar a obtener las muestras
+
+
 
 class Page1(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
