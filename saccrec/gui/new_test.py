@@ -2,6 +2,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtProperty
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QFileDialog
 
 
 class MagicWizard(QtWidgets.QWizard):
@@ -24,7 +25,7 @@ class MagicWizard(QtWidgets.QWizard):
 
     def finish_wizard(self):
         # Guardar configuracion y empezar a obtener las muestras
-
+        pass 
 
 
 class Page1(QtWidgets.QWizardPage):
@@ -198,9 +199,16 @@ class Page4(QtWidgets.QWizardPage):
         self.boton_buscar = QtWidgets.QPushButton(self)
         self.boton_buscar.setGeometry(QtCore.QRect(420, 68, 93, 25))
         self.boton_buscar.setObjectName("boton_buscar")
+        self.boton_buscar.clicked.connect(self.file_open)
 
         self.retranslateUi(self)
         QtCore.QMetaObject.connectSlotsByName(self)
+
+
+    def file_open(self):
+        name = QFileDialog.getOpenFileName(self, 'Open File')
+        self.lineEdit.setText(name[0])
+
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
