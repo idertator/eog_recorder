@@ -3,7 +3,10 @@ from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSettings
 
+from qwt import tests
+
 from .new_test import MagicWizard
+from .ConfigWindow import ConfigWindow
 from .Signals import SignalsWindow
 
 
@@ -15,7 +18,8 @@ class MainWindow(QMainWindow):
 
         self.settings = QSettings('Vinculacion','EyeTracker')
 
-        self._newTest = MagicWizard(self.settings)
+        self._newTest = MagicWizard()
+        self._configWindow = ConfigWindow(self.settings)
         self._signalsWindow = SignalsWindow(self)
 
     def newMenu(self, nombre):
@@ -32,15 +36,19 @@ class MainWindow(QMainWindow):
         signalsAct = QAction('Signals',self)
         signalsAct.triggered.connect(self.openSignalsWindow)
 
-        subjectAct = QAction('New Test', self)
-        subjectAct.triggered.connect(self.openNewTest)
+        testAct = QAction('Nuevo Test', self)
+        testAct.triggered.connect(self.openNewTest)
+
+        configAct = QAction('Configuracion', self)
+        configAct.triggered.connect(self.openConfigWindow)
 
         aboutUs = QAction(QIcon('saccrec/gui/images/interrogacion.png'), '&About Us', self)
 
         self.statusBar()
 
         fileMenu = self.newMenu('&File')
-        fileMenu.addAction(subjectAct)
+        fileMenu.addAction(testAct)
+        fileMenu.addAction(configAct)
         # fileMenu.addAction(signalsAct)
         fileMenu.addSeparator()
         fileMenu.addAction(exitAct)
@@ -54,6 +62,9 @@ class MainWindow(QMainWindow):
 
     def openNewTest(self):
         self._newTest.open()
+
+    def openConfigWindow(self):
+        self._configWindow.open()
 
     def openSignalsWindow(self):
         self._signalsWindow.show()
