@@ -6,12 +6,10 @@ from PyQt5.QtWidgets import QFileDialog
 
 
 class MagicWizard(QtWidgets.QWizard):
-    def __init__(self, settings, parent=None):
+    def __init__(self, parent=None):
         super(MagicWizard, self).__init__(parent)
 
-        self.settings = settings
-
-        self.paginas = [Page1(self),Page2(self),Page3(self),Page4(self)]
+        self.paginas = [Page1(self),Page2(self),Page3(self)]
 
         for pagina in self.paginas:
             self.addPage(pagina)
@@ -43,7 +41,7 @@ class Page1(QtWidgets.QWizardPage):
         self.etiqueta_nombres.setGeometry(QtCore.QRect(20, 60, 71, 16))
         self.etiqueta_nombres.setObjectName("etiqueta_nombres")
         self.label_3 = QtWidgets.QLabel(self)
-        self.label_3.setGeometry(QtCore.QRect(20, 120, 131, 16))
+        self.label_3.setGeometry(QtCore.QRect(20, 120, 150, 16))
         self.label_3.setObjectName("label_3")
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(QtCore.QRect(20, 150, 55, 16))
@@ -57,6 +55,7 @@ class Page1(QtWidgets.QWizardPage):
         self.dateEdit = QtWidgets.QDateEdit(self)
         self.dateEdit.setGeometry(QtCore.QRect(180, 120, 201, 22))
         self.dateEdit.setObjectName("dateEdit")
+        self.dateEdit.setCalendarPopup(True)
         self.combo_genero = QtWidgets.QComboBox(self)
         self.combo_genero.setGeometry(QtCore.QRect(180, 90, 201, 22))
         self.combo_genero.setObjectName("combo_genero")
@@ -77,7 +76,7 @@ class Page1(QtWidgets.QWizardPage):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.etiqueta_datos.setText(_translate("Dialog", "Datos del paciente"))
-        self.etiqueta_nombres.setText(_translate("Dialog", "Nombres:"))
+        self.etiqueta_nombres.setText(_translate("Dialog", "Nombre(s):"))
         self.label_3.setText(_translate("Dialog", "Fecha de nacimiento:"))
         self.label.setText(_translate("Dialog", "Estado:"))
         self.label_2.setText(_translate("Dialog", "Genero:"))
@@ -101,7 +100,7 @@ class Page2(QtWidgets.QWizardPage):
         self.etiqueta_datos.setAutoFillBackground(False)
         self.etiqueta_datos.setObjectName("etiqueta_datos")
         self.label_5 = QtWidgets.QLabel(self)
-        self.label_5.setGeometry(QtCore.QRect(20, 80, 171, 16))
+        self.label_5.setGeometry(QtCore.QRect(20, 80, 200, 16))
         self.label_5.setObjectName("label_5")
         self.label_4 = QtWidgets.QLabel(self)
         self.label_4.setGeometry(QtCore.QRect(20, 140, 131, 16))
@@ -110,7 +109,7 @@ class Page2(QtWidgets.QWizardPage):
         self.etiqueta_nombres_2.setGeometry(QtCore.QRect(20, 50, 131, 16))
         self.etiqueta_nombres_2.setObjectName("etiqueta_nombres_2")
         self.label_6 = QtWidgets.QLabel(self)
-        self.label_6.setGeometry(QtCore.QRect(20, 110, 191, 16))
+        self.label_6.setGeometry(QtCore.QRect(20, 110, 225, 22))
         self.label_6.setObjectName("label_6")
         self.spinBox = QtWidgets.QSpinBox(self)
         self.spinBox.setGeometry(QtCore.QRect(250, 40, 61, 22))
@@ -143,47 +142,6 @@ class Page3(QtWidgets.QWizardPage):
         super(Page3, self).__init__(parent)
 
         self.etiqueta_datos = QtWidgets.QLabel(self)
-        self.etiqueta_datos.setGeometry(QtCore.QRect(10, 10, 171, 21))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.etiqueta_datos.setFont(font)
-        self.etiqueta_datos.setAutoFillBackground(False)
-        self.etiqueta_datos.setObjectName("etiqueta_datos")
-        self.screensize = QtWidgets.QLabel(self)
-        self.screensize.setGeometry(QtCore.QRect(20, 80, 171, 16))
-        self.screensize.setObjectName("puertocaptura")
-        self.puertocaptura = QtWidgets.QLabel(self)
-        self.puertocaptura.setGeometry(QtCore.QRect(20, 50, 131, 16))
-        self.puertocaptura.setObjectName("puertocaptura")
-        self.distancia_paciente = QtWidgets.QLabel(self)
-        self.distancia_paciente.setGeometry(QtCore.QRect(20, 110, 191, 16))
-        self.distancia_paciente.setObjectName("distancia_paciente")
-        self.txt_puerto_captura = QtWidgets.QSpinBox(self)
-        self.txt_puerto_captura.setGeometry(QtCore.QRect(250, 40, 62, 22))
-        self.txt_puerto_captura.setObjectName("txt_puerto_captura")
-        self.txt_screensize = QtWidgets.QSpinBox(self)
-        self.txt_screensize.setGeometry(QtCore.QRect(250, 70, 62, 22))
-        self.txt_screensize.setObjectName("txt_screensizeX")
-        self.txt_distancia_paciente = QtWidgets.QSpinBox(self)
-        self.txt_distancia_paciente.setGeometry(QtCore.QRect(250, 100, 62, 22))
-        self.txt_distancia_paciente.setObjectName("txt_distancia_paciente")
-        
-        self.retranslateUi(self)
-        QtCore.QMetaObject.connectSlotsByName(self)
-        
-    def retranslateUi(self, Dialog):
-        _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.etiqueta_datos.setText(_translate("Dialog", "Datos de configuración"))
-        self.screensize.setText(_translate("Dialog", "Tamaño de pantalla(inch):"))
-        self.puertocaptura.setText(_translate("Dialog", "Puerto de Captura:"))
-        self.distancia_paciente.setText(_translate("Dialog", "Distancia del paciente:"))
-
-class Page4(QtWidgets.QWizardPage):
-    def __init__(self, parent=None):
-        super(Page4, self).__init__(parent)
-
-        self.etiqueta_datos = QtWidgets.QLabel(self)
         self.etiqueta_datos.setGeometry(QtCore.QRect(10, 10, 241, 21))
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -191,7 +149,7 @@ class Page4(QtWidgets.QWizardPage):
         self.etiqueta_datos.setAutoFillBackground(False)
         self.etiqueta_datos.setObjectName("etiqueta_datos")
         self.label = QtWidgets.QLabel(self)
-        self.label.setGeometry(QtCore.QRect(30, 50, 55, 16))
+        self.label.setGeometry(QtCore.QRect(30, 50, 80, 16))
         self.label.setObjectName("label")
         self.lineEdit = QtWidgets.QLineEdit(self)
         self.lineEdit.setGeometry(QtCore.QRect(20, 70, 391, 22))
@@ -206,7 +164,7 @@ class Page4(QtWidgets.QWizardPage):
 
 
     def file_open(self):
-        name = QFileDialog.getOpenFileName(self, 'Open File')
+        name = QFileDialog.getSaveFileName(self, 'Open File')
         self.lineEdit.setText(name[0])
 
 
