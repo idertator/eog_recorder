@@ -27,7 +27,10 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionAbrir = QtWidgets.QAction(MainWindow)
         self.actionAbrir.setObjectName("actionAbrir")
+        self.actionIniciar = QtWidgets.QAction(MainWindow)
+        self.actionIniciar.setObjectName("actionIniciar")
         self.menuAbrir_Persona.addAction(self.actionAbrir)
+        self.menuAbrir_Persona.addAction(self.actionIniciar)
         self.menubar.addAction(self.menuAbrir_Persona.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -38,5 +41,6 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.menuAbrir_Persona.setTitle(_translate("MainWindow", "Persona"))
         self.actionAbrir.setText(_translate("MainWindow", "Abrir ..."))
+        self.actionIniciar.setText(_translate("MainWindow", "Iniciar"))
 
 

@@ -28,6 +28,7 @@
      <string>Persona</string>
     </property>
     <addaction name="actionAbrir"/>
+    <addaction name="actionIniciar"/>
    </widget>
    <addaction name="menuAbrir_Persona"/>
   </widget>
@@ -35,6 +36,11 @@
   <action name="actionAbrir">
    <property name="text">
     <string>Abrir ...</string>
+   </property>
+  </action>
+  <action name="actionIniciar">
+   <property name="text">
+    <string>Iniciar</string>
    </property>
   </action>
  </widget>
