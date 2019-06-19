@@ -5,10 +5,12 @@ from PyQt5.QtCore import QSettings
 
 from qwt import tests
 
-from .new_test import MagicWizard
-from .ConfigWindow import ConfigWindow
+from saccrec.gui.new_test import MagicWizard
+from saccrec.gui.ConfigWindow import ConfigWindow
+from saccrec.core.Settings import Settings
 from .Signals import SignalsWindow
 
+from saccrec.gui.StimulatorWindow import StimulatorWindow
 
 class MainWindow(QMainWindow):
 
@@ -16,11 +18,12 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.initUI()
 
-        self.settings = QSettings('Vinculacion','EyeTracker')
+        self.settings = Settings(self)
 
-        self._newTest = MagicWizard()
+        self._newTest = MagicWizard(self)
         self._configWindow = ConfigWindow(self.settings)
         self._signalsWindow = SignalsWindow(self)
+        self._stimulatorWindow = StimulatorWindow()
 
     def newMenu(self, nombre):
         menubar = self.menuBar()

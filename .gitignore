@@ -105,3 +105,7 @@ venv.bak/
 
 # IDE
 .vscode
+
+# GitIgnore de Wilmer
+
+PruebasWilmer/
