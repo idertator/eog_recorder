@@ -14,7 +14,7 @@ class Stimulator(QWidget):
 
         self.backgroundColor = QColor(0, 0, 0)
         self.objectColor = QColor(255, 255, 255)
-        self.objectSize = 30
+        self.objectSize = 50
         self._position = None
 
     @property
