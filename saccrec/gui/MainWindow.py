@@ -9,6 +9,7 @@ from .new_test import MagicWizard
 from .ConfigWindow import ConfigWindow
 from .Signals import SignalsWindow
 
+from saccrec.gui.StimulatorWindow import StimulatorWindow
 
 class MainWindow(QMainWindow):
 
@@ -18,9 +19,10 @@ class MainWindow(QMainWindow):
 
         self.settings = QSettings('Vinculacion','EyeTracker')
 
-        self._newTest = MagicWizard()
+        self._newTest = MagicWizard(self)
         self._configWindow = ConfigWindow(self.settings)
         self._signalsWindow = SignalsWindow(self)
+        self._stimulatorWindow = StimulatorWindow()
 
     def newMenu(self, nombre):
         menubar = self.menuBar()

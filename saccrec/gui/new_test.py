@@ -15,6 +15,8 @@ class MagicWizard(QtWidgets.QWizard):
 
         self.paginas = [Page1(self),Page2(self),Page3(self)]
 
+        self.padre = parent
+
         for pagina in self.paginas:
             self.addPage(pagina)
 
@@ -26,8 +28,7 @@ class MagicWizard(QtWidgets.QWizard):
 
 
     def finish_wizard(self):
-        # Guardar configuracion y empezar a obtener las muestras
-        pass 
+        self.padre._stimulatorWindow.showMaximized()
 
 
 class Page1(Ui_DatosPaciente, QtWidgets.QWizardPage):
