@@ -28,7 +28,8 @@ class MagicWizard(QtWidgets.QWizard):
 
 
     def finish_wizard(self):
-        self.padre._stimulatorWindow.showMaximized()
+        self.padre._stimulatorWindow.runStimulator()
+        
 
 
 class Page1(Ui_DatosPaciente, QtWidgets.QWizardPage):

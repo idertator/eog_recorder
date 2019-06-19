@@ -42,9 +42,9 @@ class Stimulator(QWidget):
 
         painter.end()
 
-class BallPosition(IntEnum):
-    Left = 0
-    Right = 1
+#class BallPosition(IntEnum):
+#    Left = 0
+#    Right = 1
 
 
 class SaccadicStimulator:
@@ -61,10 +61,10 @@ class SaccadicStimulator:
             if _sum  > duration:
                 break
         
-    def position(self, delta: int) -> BallPosition: # starts with right position
+    def isRight(self, delta: int): # starts with right position
         for value in self.values:
             if value > delta:
                 if self.values.index(value) % 2:
-                    return BallPosition(False)
+                    return True
                 else:
-                    return BallPosition(True)
+                    return False
