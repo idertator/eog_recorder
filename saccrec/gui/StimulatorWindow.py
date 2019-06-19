@@ -18,7 +18,7 @@ class StimulatorWindow(QMainWindow):
         self._stimulator = Stimulator(self)
         self._ballposition = BallPosition(60000, 1000, 1000)
         self._stimulatorTimer = QTimer()
-        self._stimulatorTimer.setInterval(60)
+        self._stimulatorTimer.setInterval(16)
         self._stimulatorTimer.timeout.connect(self.onTimerTimeout)
 
         self.setCentralWidget(self._stimulator)
