@@ -1,5 +1,6 @@
 from typing import Optional, Tuple
 from enum import IntEnum
+import random
 
 from PyQt5.QtWidgets import QWidget, QSizePolicy
 from PyQt5.QtGui import QPainter, QColor, QPen
@@ -37,17 +38,12 @@ class Stimulator(QWidget):
         if self._position is not None:
             x, y = self._position
 
-            print(x, y)
             painter.drawEllipse(x, y, self.objectSize, self.objectSize)
 
         painter.end()
 
-#class BallPosition(IntEnum):
-#    Left = 0
-#    Right = 1
 
-
-class SaccadicStimulator:
+class BallPosition:
     # duration: ms, fixation_mean_duration: ms, fixation_variation: ms
     def __init__(self, duration: int, fixation_mean_duration: int, fixation_variation: int):
         _min = fixation_mean_duration - fixation_variation

@@ -1,10 +1,11 @@
 import subprocess
+from datetime import datetime
 
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QTimer
 
 from saccrec.core.Stimulator import Stimulator
-from saccrec.core.Stimulator import SaccadicStimulator
+from saccrec.core.Stimulator import BallPosition
 
 class StimulatorWindow(QMainWindow):
     
@@ -14,6 +15,7 @@ class StimulatorWindow(QMainWindow):
         self.initUI()
 
         self._stimulator = Stimulator(self)
+        self._ballposition = BallPosition(60000, 1000, 1000)
         self._stimulatorTimer = QTimer()
         self._stimulatorTimer.setInterval(60)
         self._stimulatorTimer.timeout.connect(self.onTimerTimeout)
@@ -26,6 +28,8 @@ class StimulatorWindow(QMainWindow):
 
     def runStimulator(self):
         self.show()
+        self.initialTimeStamp = datetime.now()
+        print('Initial timestamp: '+str(self.initialTimeStamp))
         self._stimulatorTimer.start()
 
     
@@ -38,17 +42,22 @@ class StimulatorWindow(QMainWindow):
     def distanceFromCenter(self):
         return 50
 
+    @property
+    def deltatime(self):
+        difference = datetime.strptime(str(datetime.now()), "%Y-%m-%d %H:%M:%S.%f") - datetime.strptime(str(self.initialTimeStamp), "%Y-%m-%d %H:%M:%S.%f")
+        delta = difference.seconds * 1000 + int(difference.microseconds/1000)
+        return delta
+
     
     def onTimerTimeout(self, *args):
         left = self.rect().center().x() - self.distanceFromCenter
         right = self.rect().center().x() + self.distanceFromCenter
 
-        if self._stimulator.position is None:
-            self._stimulator.position = left, self.rect().center().y()
-        elif self._stimulator.position[0] == left:
+        if self._ballposition.isRight(self.deltatime):
             self._stimulator.position = right, self.rect().center().y()
-        elif self._stimulator.position[0] == right:
+        else:
             self._stimulator.position = left, self.rect().center().y()
+
 
     @property
     def screensize(self):
