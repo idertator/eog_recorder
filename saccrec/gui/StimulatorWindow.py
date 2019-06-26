@@ -16,9 +16,9 @@ class StimulatorWindow(QMainWindow):
         self.initUI()
 
         self._stimulator = Stimulator(self)
-        self._ballposition = BallPosition(60000, 1000, 1000)
+        self._ballposition = BallPosition(60000, 3000, 500)
         self._stimulatorTimer = QTimer()
-        self._stimulatorTimer.setInterval(60)
+        self._stimulatorTimer.setInterval(16)
         self._stimulatorTimer.timeout.connect(self.onTimerTimeout)
 
         self.setCentralWidget(self._stimulator)
@@ -42,8 +42,8 @@ class StimulatorWindow(QMainWindow):
     @property
     def distanceFromCenter(self):
         pantalla_diagonal = 22 # 22 pulgadas
-        angulo_vision = 20 # centimetros
-        distancia_paciente = 30 # centimetros
+        angulo_vision = 10 # grados
+        distancia_paciente = 50 # centimetros
 
         pantalla_horizontal = (pantalla_diagonal / 16) * 9 # Se toma la proporcion en ancho, se da por hecho q se usa una pantalla de relacion de aspecto 16:9
         pantalla_horizontal_cm = pantalla_horizontal * 2.54 # Pulgadas a centimetros

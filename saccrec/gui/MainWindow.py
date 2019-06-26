@@ -8,6 +8,7 @@ from qwt import tests
 from saccrec.gui.new_test import MagicWizard
 from saccrec.gui.ConfigWindow import ConfigWindow
 from saccrec.core.Settings import Settings
+from saccrec.core.Test import Test
 from .Signals import SignalsWindow
 
 from saccrec.gui.StimulatorWindow import StimulatorWindow
@@ -18,6 +19,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.initUI()
 
+        self.test = Test()
         self.settings = Settings(self)
 
         self._newTest = MagicWizard(self)

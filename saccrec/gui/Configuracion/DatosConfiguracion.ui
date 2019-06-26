@@ -56,7 +56,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Tamaño de pantalla(pulgada):</string>
+        <string>Tamaño de pantalla de ancho(centimetros):</string>
        </property>
       </widget>
      </item>
@@ -77,13 +77,36 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>Distancia del paciente (centimetros):</string>
+        <string>Tamaño de pantalla de alto(centimetros):</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Distancia del estimulo del centro (centimetros):</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
       <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
