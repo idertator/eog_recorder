@@ -48,7 +48,7 @@ class StimulatorWindow(QMainWindow):
 
     @property
     def distancePoints(self):
-        return self.padre.settings.distanceBetweenPoints
+        return float(self.padre.settings.distanceBetweenPoints)
 
 
     @property
@@ -63,7 +63,7 @@ class StimulatorWindow(QMainWindow):
 
         densidad_pixeles = self.screenpixels[0] / self.screensize[0]
 
-        return math.floor(distancia_entre_puntos * densidad_pixeles)
+        return math.floor(distance_from_mid * densidad_pixeles)
 
     @property
     def distanceFromPatient(self):

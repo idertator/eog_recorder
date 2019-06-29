@@ -1,12 +1,14 @@
 from PyQt5 import QtCore
 from PyQt5 import QtGui
-from PyQt5.QtCore import pyqtProperty
+from PyQt5.QtCore import pyqtProperty, QDate
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QFileDialog
 
-from .NewTest.DatosPacienteUI import Ui_DatosPaciente
-from .NewTest.DatosPruebaUI import Ui_DatosPrueba
-from .NewTest.DatosArchivoUI import Ui_DatosArchivo
+from saccrec.gui.NewTest.DatosPacienteUI import Ui_DatosPaciente
+from saccrec.gui.NewTest.DatosPruebaUI import Ui_DatosPrueba
+from saccrec.gui.NewTest.DatosArchivoUI import Ui_DatosArchivo
+from saccrec.core.Patient import Patient
 
 
 class MagicWizard(QtWidgets.QWizard):
@@ -28,7 +30,19 @@ class MagicWizard(QtWidgets.QWizard):
 
 
     def finish_wizard(self):
-        self.padre._stimulatorWindow.runStimulator()
+
+        QMessageBox.question(self,'Aviso','La prueba consta de 3 partes: calibración inicial, prueba y calibración final. Presione OK para continuar.', QMessageBox.Ok)
+
+        self.padre.test.patient = Patient(self.paginas[0].txtName.text,self.paginas[0].borndateDate.date, self.paginas[0].comboGenre.currentText, self.paginas[0].comboGenre.currentText)
+        
+        self.padre.test.stimulation_angle = self.paginas[1].txt_angulo.value
+        self.padre.test.mean_duration = self.paginas[1].txt_mean_duration.value
+        self.padre.test.variation = self.paginas[1].txt_variaton.value
+        self.padre.test.test_duration = self.paginas[1].txt_testduration.value
+
+        self.padre.test.output_file_path = self.paginas[2].txtPath.text
+
+        self.padre._calibrationWindow1.runStimulator()
         
 
 
@@ -39,6 +53,8 @@ class Page1(Ui_DatosPaciente, QtWidgets.QWizardPage):
         self.setupUi(self)
 
         self.txtName.setText(parent.padre.settings.initialName)
+        self.borndateDate.setDate(QDate(1990,1,1))
+        
 
 class Page2(Ui_DatosPrueba, QtWidgets.QWizardPage):
     def __init__(self, parent=None):
