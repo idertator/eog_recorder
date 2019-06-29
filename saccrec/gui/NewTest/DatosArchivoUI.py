@@ -10,12 +10,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_DatosArchivo(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(450, 300)
-        self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
+    def setupUi(self, DatosArchivo):
+        DatosArchivo.setObjectName("DatosArchivo")
+        DatosArchivo.resize(450, 300)
+        self.verticalLayout = QtWidgets.QVBoxLayout(DatosArchivo)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.labelTitle = QtWidgets.QLabel(Dialog)
+        self.labelTitle = QtWidgets.QLabel(DatosArchivo)
         font = QtGui.QFont()
         font.setPointSize(13)
         font.setBold(True)
@@ -23,15 +23,15 @@ class Ui_DatosArchivo(object):
         self.labelTitle.setFont(font)
         self.labelTitle.setObjectName("labelTitle")
         self.verticalLayout.addWidget(self.labelTitle)
-        self.labelDescription = QtWidgets.QLabel(Dialog)
+        self.labelDescription = QtWidgets.QLabel(DatosArchivo)
         self.labelDescription.setObjectName("labelDescription")
         self.verticalLayout.addWidget(self.labelDescription)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.txtPath = QtWidgets.QLineEdit(Dialog)
+        self.txtPath = QtWidgets.QLineEdit(DatosArchivo)
         self.txtPath.setObjectName("txtPath")
         self.horizontalLayout.addWidget(self.txtPath)
-        self.searchButton = QtWidgets.QPushButton(Dialog)
+        self.searchButton = QtWidgets.QPushButton(DatosArchivo)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -43,14 +43,14 @@ class Ui_DatosArchivo(object):
         spacerItem = QtWidgets.QSpacerItem(20, 197, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(DatosArchivo)
+        QtCore.QMetaObject.connectSlotsByName(DatosArchivo)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self, DatosArchivo):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.labelTitle.setText(_translate("Dialog", "Datos de almacenamiento"))
-        self.labelDescription.setText(_translate("Dialog", "Elija la ubicacion del fichero de salida:"))
-        self.searchButton.setText(_translate("Dialog", "Buscar..."))
+        DatosArchivo.setWindowTitle(_translate("DatosArchivo", "Dialog"))
+        self.labelTitle.setText(_translate("DatosArchivo", "Datos de almacenamiento"))
+        self.labelDescription.setText(_translate("DatosArchivo", "Elija la ubicacion del fichero de salida:"))
+        self.searchButton.setText(_translate("DatosArchivo", "Buscar..."))
 
 

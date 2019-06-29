@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Ui_Page2</class>
- <widget class="QDialog" name="Ui_Page2">
+ <class>DatosPrueba</class>
+ <widget class="QDialog" name="DatosPrueba">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -38,7 +38,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSpinBox" name="spinBox"/>
+      <widget class="QSpinBox" name="txt_angulo"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
@@ -48,7 +48,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+      <widget class="QDoubleSpinBox" name="txt_mean_duration"/>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
@@ -58,7 +58,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+      <widget class="QDoubleSpinBox" name="txt_variaton"/>
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_5">
@@ -68,7 +68,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+      <widget class="QDoubleSpinBox" name="txt_testduration"/>
      </item>
     </layout>
    </item>

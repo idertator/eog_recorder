@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
         self.test = Test()
         self.settings = Settings(self)
 
-        self._newTest = MagicWizard(self)
+        self._newTest = MagicWizard(parent=self)
         self._configWindow = ConfigWindow(parent=self)
         self._signalsWindow = SignalsWindow(self)
 

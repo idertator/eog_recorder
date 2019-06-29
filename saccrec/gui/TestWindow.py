@@ -13,9 +13,9 @@ class MagicWizard(QtWidgets.QWizard):
     def __init__(self, parent=None):
         super(MagicWizard, self).__init__(parent)
 
-        self.paginas = [Page1(self),Page2(self),Page3(self)]
-
         self.padre = parent
+
+        self.paginas = [Page1(self),Page2(self),Page3(self)]
 
         for pagina in self.paginas:
             self.addPage(pagina)
@@ -38,6 +38,7 @@ class Page1(Ui_DatosPaciente, QtWidgets.QWizardPage):
         
         self.setupUi(self)
 
+        self.txtName.setText(parent.padre.settings.initialName)
 
 class Page2(Ui_DatosPrueba, QtWidgets.QWizardPage):
     def __init__(self, parent=None):
