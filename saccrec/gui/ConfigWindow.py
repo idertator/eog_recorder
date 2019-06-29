@@ -48,11 +48,9 @@ class _Page1(Ui_Configuracion, QtWidgets.QWizardPage):
 
         self.setupUi(self)
 
-        print(parent.padre.settings.capturePort)
-
-        self.txt_captureport.setValue = parent.padre.settings.capturePort
-        self.txt_horizontalsize.setValue = parent.padre.settings.screensize[0]
-        self.txt_verticalsize.setValue = parent.padre.settings.screensize[1]
-        self.txt_maxdistance.setValue = parent.padre.settings.distanceBetweenPoints
+        self.txt_captureport.setValue(int(parent.padre.settings.capturePort))
+        self.txt_horizontalsize.setValue(parent.padre.settings.screensize[0])
+        self.txt_verticalsize.setValue(parent.padre.settings.screensize[1])
+        self.txt_maxdistance.setValue(float(parent.padre.settings.distanceBetweenPoints))
 
         
