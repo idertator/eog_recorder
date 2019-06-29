@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>574</width>
     <height>300</height>
    </rect>
   </property>
@@ -38,7 +38,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSpinBox" name="spinBox">
+      <widget class="QSpinBox" name="txt_captureport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -61,7 +61,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox">
+      <widget class="QDoubleSpinBox" name="txt_horizontalsize">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -84,7 +84,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+      <widget class="QDoubleSpinBox" name="txt_verticalsize">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -102,12 +102,12 @@
      <item row="4" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Distancia del estimulo del centro (centimetros):</string>
+        <string>Distancia entre los 2 estímulos para el ángulo máximo (centimetros):</string>
        </property>
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+      <widget class="QDoubleSpinBox" name="txt_maxdistance">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
