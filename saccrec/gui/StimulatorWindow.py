@@ -10,8 +10,12 @@ from saccrec.core.Stimulator import BallPosition
 
 class StimulatorWindow(QMainWindow):
     
-    def __init__(self):
-        super(StimulatorWindow, self).__init__()
+    def __init__(self, tipo = None, parent=None):
+        super(StimulatorWindow, self).__init__(parent)
+
+        self.padre = parent
+
+        self.tipo = tipo
 
         self.initUI()
 
@@ -25,7 +29,7 @@ class StimulatorWindow(QMainWindow):
     
 
     def initUI(self):
-        self.resize(self.screensize[0],self.screensize[1])
+        self.resize(self.screenpixels[0],self.screenpixels[1])
 
     def runStimulator(self):
         self.show()
@@ -36,11 +40,33 @@ class StimulatorWindow(QMainWindow):
     
     @property
     def stimulator(self):
-        return self._stimulator        
+        return self._stimulator
+
+    @property
+    def screensize(self):
+        return self.padre.settings.screensize
+
+    @property
+    def distancePoints(self):
+        return self.padre.settings.distanceBetweenPoints
 
 
     @property
     def distanceFromCenter(self):
+        if(self.tipo == '1' or self.tipo == '3'):
+            angulo_vision = 30
+        else:
+            angulo_vision = self.padre.test.stimulation_angle 
+
+        distance_from_mid = self.distancePoints / 2
+        pantalla_horizontal = self.screensize[0]
+
+        densidad_pixeles = self.screenpixels[0] / self.screensize[0]
+
+        return math.floor(distancia_entre_puntos * densidad_pixeles)
+
+    @property
+    def distanceFromPatient(self):
         pantalla_diagonal = 22 # 22 pulgadas
         angulo_vision = 10 # grados
         distancia_paciente = 50 # centimetros
@@ -48,7 +74,7 @@ class StimulatorWindow(QMainWindow):
         pantalla_horizontal = (pantalla_diagonal / 16) * 9 # Se toma la proporcion en ancho, se da por hecho q se usa una pantalla de relacion de aspecto 16:9
         pantalla_horizontal_cm = pantalla_horizontal * 2.54 # Pulgadas a centimetros
 
-        densidad_pixeles = self.screensize[0] / pantalla_horizontal_cm
+        densidad_pixeles = self.screenpixels[0] / pantalla_horizontal_cm
 
         distancia_del_centro = distancia_paciente * (math.sin(math.radians(angulo_vision)) / math.sin(math.radians(90 - angulo_vision)))
 
@@ -65,6 +91,8 @@ class StimulatorWindow(QMainWindow):
         left = self.rect().center().x() - self.distanceFromCenter
         right = self.rect().center().x() + self.distanceFromCenter
 
+        print(self.distanceFromCenter)
+
         if self._ballposition.isRight(self.deltatime):
             self._stimulator.position = right, self.rect().center().y()
         else:
@@ -72,7 +100,7 @@ class StimulatorWindow(QMainWindow):
 
 
     @property
-    def screensize(self):
+    def screenpixels(self):
         size = (None, None)
         args = ["xrandr", "-q", "-d", ":0"]
         proc = subprocess.Popen(args,stdout=subprocess.PIPE)

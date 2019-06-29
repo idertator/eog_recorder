@@ -22,6 +22,10 @@ class Settings(object):
     def distanceBetweenPoints(self) -> float:
         return self._settings.value('DistanceBetweenPoints',5.0)
 
+    @property
+    def capturePort(self) -> int:
+        return self._settings.value('capturePort',0)
+
     @testDuration.setter
     def testDuration(self, duration:int):
         self._settings.setValue('testDuration', duration)
@@ -37,4 +41,8 @@ class Settings(object):
     @distanceBetweenPoints.setter
     def distanceBetweenPoints(self, distance: float):
         self._settings.setValue('DistanceBetweenPoints', distance)
+
+    @capturePort.setter
+    def capturePort(self, port: int):
+        self._settings.setValue('capturePort', port)
 
