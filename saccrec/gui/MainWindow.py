@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def openNewTest(self):
-        self._newTest.open()
+        self._newTest.show()
 
     def openConfigWindow(self):
         self._configWindow.open()

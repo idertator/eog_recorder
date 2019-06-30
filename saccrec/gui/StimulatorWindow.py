@@ -65,20 +65,6 @@ class StimulatorWindow(QMainWindow):
 
         return math.floor(distance_from_mid * densidad_pixeles)
 
-    @property
-    def distanceFromPatient(self):
-        pantalla_diagonal = 22 # 22 pulgadas
-        angulo_vision = 10 # grados
-        distancia_paciente = 50 # centimetros
-
-        pantalla_horizontal = (pantalla_diagonal / 16) * 9 # Se toma la proporcion en ancho, se da por hecho q se usa una pantalla de relacion de aspecto 16:9
-        pantalla_horizontal_cm = pantalla_horizontal * 2.54 # Pulgadas a centimetros
-
-        densidad_pixeles = self.screenpixels[0] / pantalla_horizontal_cm
-
-        distancia_del_centro = distancia_paciente * (math.sin(math.radians(angulo_vision)) / math.sin(math.radians(90 - angulo_vision)))
-
-        return math.floor(distancia_del_centro * densidad_pixeles)
 
     @property
     def deltatime(self):
@@ -91,7 +77,7 @@ class StimulatorWindow(QMainWindow):
         left = self.rect().center().x() - self.distanceFromCenter
         right = self.rect().center().x() + self.distanceFromCenter
 
-        print(self.distanceFromCenter)
+        # print(self.distanceFromCenter)
 
         if self._ballposition.isRight(self.deltatime):
             self._stimulator.position = right, self.rect().center().y()
