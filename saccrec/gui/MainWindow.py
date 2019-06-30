@@ -5,7 +5,7 @@ from PyQt5.QtCore import QSettings
 
 from qwt import tests
 
-from saccrec.gui.new_test import MagicWizard
+from saccrec.gui.TestWindow import MagicWizard
 from saccrec.gui.ConfigWindow import ConfigWindow
 from saccrec.core.Settings import Settings
 from saccrec.core.Test import Test
@@ -22,10 +22,13 @@ class MainWindow(QMainWindow):
         self.test = Test()
         self.settings = Settings(self)
 
-        self._newTest = MagicWizard(self)
-        self._configWindow = ConfigWindow(self.settings)
+        self._newTest = MagicWizard(parent=self)
+        self._configWindow = ConfigWindow(parent=self)
         self._signalsWindow = SignalsWindow(self)
-        self._stimulatorWindow = StimulatorWindow()
+
+        self._calibrationWindow1 = StimulatorWindow(parent=self, tipo='1')
+        self._testStimulator = StimulatorWindow(parent=self, tipo='2')
+        self._calibrationWindow2 = StimulatorWindow(parent=self, tipo='3')
 
     def newMenu(self, nombre):
         menubar = self.menuBar()
@@ -66,7 +69,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def openNewTest(self):
-        self._newTest.open()
+        self._newTest.show()
 
     def openConfigWindow(self):
         self._configWindow.open()
