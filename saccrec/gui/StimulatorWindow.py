@@ -2,6 +2,7 @@ import subprocess
 import math
 from datetime import datetime
 
+from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5.QtCore import QTimer
 
@@ -10,8 +11,8 @@ from saccrec.core.Stimulator import BallPosition
 
 class StimulatorWindow(QMainWindow):
     
-    def __init__(self, tipo = None, parent=None):
-        super(StimulatorWindow, self).__init__(parent)
+    def __init__(self, tipo=None, parent=None):
+        super(StimulatorWindow, self).__init__()
 
         self.padre = parent
 
@@ -30,9 +31,14 @@ class StimulatorWindow(QMainWindow):
 
         self.setCentralWidget(self._stimulator)
     
+    @property
+    def screenpixels(self):
+        app = QGuiApplication.instance()
+        size = app.primaryScreen().size()
+        return size.width(), size.height()
 
     def initUI(self):
-        self.resize(self.screenpixels[0],self.screenpixels[1])
+        self.resize(self.screenpixels[0], self.screenpixels[1])
 
     def runStimulator(self):
         self.show()
@@ -40,7 +46,6 @@ class StimulatorWindow(QMainWindow):
         print('Initial timestamp: '+str(self.initialTimeStamp))
         self._stimulatorTimer.start()
 
-    
     @property
     def stimulator(self):
         return self._stimulator
@@ -121,20 +126,5 @@ class StimulatorWindow(QMainWindow):
             self.hide()
             QMessageBox.question(self,'Aviso','A continuación será la calibración. Presione Ok para continuar.',QMessageBox.Ok)
             self.padre._calibrationWindow2.runStimulator()
-
-
-
-    @property
-    def screenpixels(self):
-        size = (None, None)
-        args = ["xrandr", "-q", "-d", ":0"]
-        proc = subprocess.Popen(args,stdout=subprocess.PIPE)
-
-        for line in proc.stdout:
-            if isinstance(line, bytes):
-                line = line.decode("utf-8")
-                if "Screen" in line:
-                    size = (int(line.split()[7]),  int(line.split()[9][:-1]))
-        return size
 
     

@@ -26,9 +26,9 @@ class MainWindow(QMainWindow):
         self._configWindow = ConfigWindow(parent=self)
         self._signalsWindow = SignalsWindow(self)
 
-        self._calibrationWindow1 = StimulatorWindow(parent=self, tipo='1')
-        self._testStimulator = StimulatorWindow(parent=self, tipo='2')
-        self._calibrationWindow2 = StimulatorWindow(parent=self, tipo='3')
+        self._calibrationWindow1 = StimulatorWindow('1', self)
+        self._testStimulator = StimulatorWindow('2', self)
+        self._calibrationWindow2 = StimulatorWindow('3', self)
 
     def newMenu(self, nombre):
         menubar = self.menuBar()
