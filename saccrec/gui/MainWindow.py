@@ -1,17 +1,18 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QDialog
+
+from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QApplication, QDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSettings
-
-from qwt import tests
 
 from saccrec.gui.TestWindow import MagicWizard
 from saccrec.gui.ConfigWindow import ConfigWindow
 from saccrec.core.Settings import Settings
 from saccrec.core.Test import Test
-from .Signals import SignalsWindow
 
 from saccrec.gui.StimulatorWindow import StimulatorWindow
+
+import saccrec.gui.icons
+
 
 class MainWindow(QMainWindow):
 
@@ -24,55 +25,62 @@ class MainWindow(QMainWindow):
 
         self._newTest = MagicWizard(parent=self)
         self._configWindow = ConfigWindow(parent=self)
-        self._signalsWindow = SignalsWindow(self)
 
         self._calibrationWindow1 = StimulatorWindow('1', self)
         self._testStimulator = StimulatorWindow('2', self)
         self._calibrationWindow2 = StimulatorWindow('3', self)
 
-    def newMenu(self, nombre):
-        menubar = self.menuBar()
-        menu = menubar.addMenu(nombre)
-        return menu
-
     def initUI(self):
-        exitAct = QAction(QIcon('saccrec/gui/images/exit.svg'), '&Exit', self)
-        exitAct.setShortcut('Ctrl+Q')
-        exitAct.setStatusTip('Exit application')
-        exitAct.triggered.connect(qApp.quit)
+        # Setting up top level menus
+        menubar = self.menuBar()
 
-        signalsAct = QAction('Signals',self)
-        signalsAct.triggered.connect(self.openSignalsWindow)
+        file_menu = menubar.addMenu('&Estudio')
+        help_menu = menubar.addMenu('&Ayuda')
 
-        testAct = QAction('Nuevo Test', self)
-        testAct.triggered.connect(self.openNewTest)
+        # Setting up actions
+        new_action = QAction(QIcon(':document.svg'), '&Iniciar Prueba', self)
+        new_action.triggered.connect(self.open_new_test_wizard)
 
-        configAct = QAction('Configuracion', self)
-        configAct.triggered.connect(self.openConfigWindow)
+        exit_action = QAction(QIcon(':exit.svg'), '&Salir', self)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Salir de la aplicación')
+        exit_action.triggered.connect(qApp.quit)
 
-        aboutUs = QAction(QIcon('saccrec/gui/images/interrogacion.png'), '&About Us', self)
+        settings_action = QAction(QIcon(':settings.svg'), '&Configuración', self)
+        settings_action.setShortcut('Ctrl+P')
+        settings_action.setStatusTip('Configurar aplicación')
+        settings_action.triggered.connect(self.open_settings_dialog)
 
-        self.statusBar()
+        aboutUs = QAction(QIcon(':help.svg'), '&Acerca de ...', self)
 
-        fileMenu = self.newMenu('&File')
-        fileMenu.addAction(testAct)
-        fileMenu.addAction(configAct)
-        # fileMenu.addAction(signalsAct)
-        fileMenu.addSeparator()
-        fileMenu.addAction(exitAct)
+        help_menu.addAction(aboutUs)
 
-        helpMenu = self.newMenu('&Help')
-        helpMenu.addAction(aboutUs)
+        # Setting up top menu
+        file_menu.addAction(new_action)
+        file_menu.addAction(new_action)
+        file_menu.addAction(settings_action)
 
+        file_menu.addSeparator()
+
+        file_menu.addAction(exit_action)
+
+        # Setting up top toolbar
+        main_toolbar = self.addToolBar('Main Toolbar')
+        main_toolbar.addAction(new_action)
+        main_toolbar.addAction(settings_action)
+
+        main_toolbar.addSeparator()
+
+        main_toolbar.addAction(exit_action)
+
+        # Setting up window
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('EyeTracker OpenBCI')
+
         self.show()
 
-    def openNewTest(self):
+    def open_new_test_wizard(self):
         self._newTest.show()
 
-    def openConfigWindow(self):
+    def open_settings_dialog(self):
         self._configWindow.open()
-
-    def openSignalsWindow(self):
-        self._signalsWindow.show()
