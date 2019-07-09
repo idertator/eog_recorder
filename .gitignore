@@ -109,3 +109,6 @@ venv.bak/
 # GitIgnore de Wilmer
 
 PruebasWilmer/
+
+# MacOs
+.DS_Store
