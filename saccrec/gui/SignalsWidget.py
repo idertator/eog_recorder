@@ -132,7 +132,6 @@ class SignalsWidget(QWidget):
 
             painter.setPen(QPen(self._signals_color, 0.8))
             lines = self._manager.lines(channel_title)
-            print(len(lines))
             painter.drawLines(lines)
 
             painter.restore()
