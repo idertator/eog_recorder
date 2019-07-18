@@ -10,6 +10,7 @@ from saccrec.core.Settings import Settings
 from saccrec.core.Test import Test
 
 from saccrec.gui.StimulatorWindow import StimulatorWindow
+from saccrec.gui.SignalsWidget import SignalsWidget
 
 import saccrec.gui.icons
 
@@ -18,10 +19,11 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.initUI()
 
         self.test = Test()
         self.settings = Settings(self)
+
+        self.signals_widget = SignalsWidget(self)
 
         self._newTest = MagicWizard(parent=self)
         self._configWindow = ConfigWindow(parent=self)
@@ -29,6 +31,8 @@ class MainWindow(QMainWindow):
         self._calibrationWindow1 = StimulatorWindow('1', self)
         self._testStimulator = StimulatorWindow('2', self)
         self._calibrationWindow2 = StimulatorWindow('3', self)
+
+        self.initUI()
 
     def initUI(self):
         # Setting up top level menus
@@ -51,9 +55,9 @@ class MainWindow(QMainWindow):
         settings_action.setStatusTip('Configurar aplicación')
         settings_action.triggered.connect(self.open_settings_dialog)
 
-        aboutUs = QAction(QIcon(':help.svg'), '&Acerca de ...', self)
+        about_action = QAction(QIcon(':help.svg'), '&Acerca de ...', self)
 
-        help_menu.addAction(aboutUs)
+        help_menu.addAction(about_action)
 
         # Setting up top menu
         file_menu.addAction(new_action)
@@ -76,6 +80,8 @@ class MainWindow(QMainWindow):
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('EyeTracker OpenBCI')
+
+        self.setCentralWidget(self.signals_widget)
 
         self.show()
 
