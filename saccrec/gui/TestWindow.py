@@ -8,15 +8,15 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QVBoxLayout
 
-from saccrec.gui.NewTest.DatosPruebaUI import Ui_DatosPrueba
 from saccrec.gui.NewTest.DatosArchivoUI import Ui_DatosArchivo
-from saccrec.gui.widgets import SubjectWidget
+from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 from saccrec.core.Patient import Patient
 
 
 class MagicWizard(QtWidgets.QWizard):
     def __init__(self, parent=None):
         super(MagicWizard, self).__init__(parent)
+        self.setWizardStyle(QtWidgets.QWizard.ClassicStyle)
 
         self.padre = parent
 
@@ -72,6 +72,8 @@ class Page1(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(Page1, self).__init__(parent)
 
+        self.setTitle('Datos del sujeto')
+
         layout = QVBoxLayout()
         self._subject_widget = SubjectWidget(self)
         self._subject_widget.fullnameChanged.connect(self.on_fullname_changed)
@@ -86,16 +88,18 @@ class Page1(QtWidgets.QWizardPage):
         self.completeChanged.emit()
 
 
-class Page2(Ui_DatosPrueba, QtWidgets.QWizardPage):
+class Page2(QtWidgets.QWizardPage):
+
     def __init__(self, parent=None):
         super(Page2, self).__init__(parent)
-        
-        self.setupUi(self)
 
-        self.txt_angulo.setValue(30)
-        self.txt_mean_duration.setValue(3.0)
-        self.txt_variaton.setValue(1.0)
-        self.txt_testduration.setValue(60.0)
+        self.setTitle('Configuración del estímulo')
+        
+        layout = QVBoxLayout()
+        self._stimulus_widget = StimulusWidget(self)
+        layout.addWidget(self._stimulus_widget)
+
+        self.setLayout(layout)
 
 
 class Page3(Ui_DatosArchivo, QtWidgets.QWizardPage):
@@ -109,11 +113,3 @@ class Page3(Ui_DatosArchivo, QtWidgets.QWizardPage):
     def file_open(self):
         name = QFileDialog.getSaveFileName(self, 'Open File')
         self.txtPath.setText(name[0])
-
-
-if __name__ == '__main__':
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    wizard = MagicWizard()
-    wizard.show()
-    sys.exit(app.exec_())

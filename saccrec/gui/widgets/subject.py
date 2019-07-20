@@ -79,6 +79,15 @@ class SubjectWidget(QWidget):
     def status(self, value: int):
         self._status_combo.setCurrentIndex(SUBJECT_STATUSES_DICT[value])
 
+    @property
+    def json(self) -> dict:
+        return {
+            'full_name': self.full_name,
+            'genre': self.genre,
+            'borndate': self.borndate,
+            'status': self.status,
+        }
+
     def on_full_name_changed(self):
         value = self._full_name_edit.text()
         self.fullnameChanged.emit(value)
