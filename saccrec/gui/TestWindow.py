@@ -6,10 +6,11 @@ from PyQt5.QtCore import pyqtProperty, QDate
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QVBoxLayout
 
-from saccrec.gui.NewTest.DatosPacienteUI import Ui_DatosPaciente
 from saccrec.gui.NewTest.DatosPruebaUI import Ui_DatosPrueba
 from saccrec.gui.NewTest.DatosArchivoUI import Ui_DatosArchivo
+from saccrec.gui.widgets import SubjectWidget
 from saccrec.core.Patient import Patient
 
 
@@ -66,15 +67,24 @@ class MagicWizard(QtWidgets.QWizard):
         
 
 
-class Page1(Ui_DatosPaciente, QtWidgets.QWizardPage):
+class Page1(QtWidgets.QWizardPage):
+
     def __init__(self, parent=None):
         super(Page1, self).__init__(parent)
-        
-        self.setupUi(self)
 
-        self.txtName.setText(parent.padre.settings.initialName)
-        self.borndateDate.setDate(QDate(1990,1,1))
-        
+        layout = QVBoxLayout()
+        self._subject_widget = SubjectWidget(self)
+        self._subject_widget.fullnameChanged.connect(self.on_fullname_changed)
+        layout.addWidget(self._subject_widget)
+
+        self.setLayout(layout)
+
+    def isComplete(self) -> bool:
+        return self._subject_widget.full_name.strip() != ''
+
+    def on_fullname_changed(self, value: str):
+        self.completeChanged.emit()
+
 
 class Page2(Ui_DatosPrueba, QtWidgets.QWizardPage):
     def __init__(self, parent=None):
