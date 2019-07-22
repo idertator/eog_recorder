@@ -4,13 +4,14 @@ from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QApplication, QDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSettings
 
-from saccrec.gui.create import RecordSetupWizard
-from saccrec.gui.ConfigWindow import ConfigWindow
-from saccrec.core.Settings import Settings
+from saccrec.core.settings import Settings
 from saccrec.core.Test import Test
 
+from saccrec.gui.dialogs import SettingsDialog
+from saccrec.gui.widgets import SignalsWidget
+from saccrec.gui.wizards import RecordSetupWizard
+
 from saccrec.gui.StimulatorWindow import StimulatorWindow
-from saccrec.gui.SignalsWidget import SignalsWidget
 
 import saccrec.gui.icons
 
@@ -25,8 +26,8 @@ class MainWindow(QMainWindow):
 
         self.signals_widget = SignalsWidget(self)
 
-        self._newTest = RecordSetupWizard(parent=self)
-        self._configWindow = ConfigWindow(parent=self)
+        self._newTest = RecordSetupWizard(self)
+        self._settings_dialog = SettingsDialog(self.settings, self)
 
         self._calibrationWindow1 = StimulatorWindow('1', self)
         self._testStimulator = StimulatorWindow('2', self)
@@ -89,4 +90,4 @@ class MainWindow(QMainWindow):
         self._newTest.show()
 
     def open_settings_dialog(self):
-        self._configWindow.open()
+        self._settings_dialog.open()

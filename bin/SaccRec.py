@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication
 
-from saccrec.gui.MainWindow import MainWindow
+from saccrec.gui import MainWindow
 
 app = QApplication([])
 

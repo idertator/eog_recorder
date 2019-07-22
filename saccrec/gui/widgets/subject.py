@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFormLayout
 from PyQt5.QtWidgets import QLineEdit, QComboBox, QDateEdit
 
-from saccrec.settings import GENRES, GENRES_DICT, SUBJECT_STATUSES, SUBJECT_STATUSES_DICT, SUBJECT_STATUSES_LABELS
+from saccrec.consts import GENRES, GENRES_DICT, SUBJECT_STATUSES, SUBJECT_STATUSES_DICT, SUBJECT_STATUSES_LABELS
 
 INITIAL_DATE = QDate(2000, 1, 1)
 

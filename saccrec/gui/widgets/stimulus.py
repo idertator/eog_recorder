@@ -3,10 +3,10 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFormLayout
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 
-from saccrec.settings import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE
-from saccrec.settings import STIMULUS_DEFAULT_DURATION
-from saccrec.settings import STIMULUS_DEFAULT_VARIABILITY
-from saccrec.settings import STIMULUS_DEFAULT_SACCADES, STIMULUS_MINUMUM_SACCADES, STIMULUS_MAXIMUM_SACCADES
+from saccrec.consts import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE
+from saccrec.consts import STIMULUS_DEFAULT_DURATION
+from saccrec.consts import STIMULUS_DEFAULT_VARIABILITY
+from saccrec.consts import STIMULUS_DEFAULT_SACCADES, STIMULUS_MINUMUM_SACCADES, STIMULUS_MAXIMUM_SACCADES
 
 
 class StimulusWidget(QWidget):

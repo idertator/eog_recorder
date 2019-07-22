@@ -1,48 +1,45 @@
 from PyQt5.QtCore import QSettings
 
+from saccrec.consts import SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM
+from saccrec.consts import SETTINGS_STIMULUS_SCREEN_HEIGHT_MINIMUM
+from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM
+
+from saccrec.engine.recording import list_ports
+
 
 class Settings(object):
 
     def __init__(self, parent=None):
-        self._settings = QSettings('umautm', 'saccrec', parent)
+        self._settings = QSettings('SaccRec', 'SaccRec', parent)
 
     @property
-    def initialName(self) -> str:
-        return self._settings.value('InitialName', 'John')
+    def openbci_port(self) -> str:
+        return self._settings.value('OpenBCI_Port', '')
+
+    @openbci_port.setter
+    def openbci_port(self, value: str):
+        self._settings.setValue('OpenBCI_Port', value)
 
     @property
-    def testDuration(self) -> int:
-        return self._settings.value('testDuration', 30)
+    def stimulus_screen_width(self) -> float:
+        return self._settings.value('StimulusScreenWidth', SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM)
+
+    @stimulus_screen_width.setter
+    def stimulus_screen_width(self, value: float):
+        self._settings.setValue('StimulusScreenWidth', value)
 
     @property
-    def screensize(self) -> tuple:
-        return self._settings.value('ScreenSize',(32,18))
+    def stimulus_screen_height(self) -> float:
+        return self._settings.value('StimulusScreenHeight', SETTINGS_STIMULUS_SCREEN_HEIGHT_MINIMUM)
+
+    @stimulus_screen_height.setter
+    def stimulus_screen_height(self, value: float):
+        self._settings.setValue('StimulusScreenHeight', value)
 
     @property
-    def distanceBetweenPoints(self) -> float:
-        return self._settings.value('DistanceBetweenPoints',5.0)
+    def stimulus_saccadic_distance(self) -> float:
+        return self._settings.value('StimulusSaccadicDistance', SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM)
 
-    @property
-    def capturePort(self) -> int:
-        return self._settings.value('capturePort',0)
-
-    @testDuration.setter
-    def testDuration(self, duration:int):
-        self._settings.setValue('testDuration', duration)
-
-    @initialName.setter
-    def initialName(self, name: str):
-        self._settings.setValue('InitialName', name)
-
-    @screensize.setter
-    def screensize(self, size: tuple):
-        self._settings.setValue('ScreenSize', size)
-
-    @distanceBetweenPoints.setter
-    def distanceBetweenPoints(self, distance: float):
-        self._settings.setValue('DistanceBetweenPoints', distance)
-
-    @capturePort.setter
-    def capturePort(self, port: int):
-        self._settings.setValue('capturePort', port)
-
+    @stimulus_saccadic_distance.setter
+    def stimulus_saccadic_distance(self, value: float):
+        self._settings.setValue('StimulusSaccadicDistance', value)
