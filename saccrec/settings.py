@@ -14,6 +14,7 @@ SUBJECT_STATUSES = (
 
 GENRES_DICT = {value: index for index, (value, _) in enumerate(GENRES)}
 SUBJECT_STATUSES_DICT = {value: index for index, (value, _) in enumerate(SUBJECT_STATUSES)}
+SUBJECT_STATUSES_LABELS = {value: label for value, label in SUBJECT_STATUSES}
 
 # Stimulus Parameters
 

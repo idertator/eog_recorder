@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFormLayout
 from PyQt5.QtWidgets import QLineEdit, QComboBox, QDateEdit
 
-from saccrec.settings import GENRES, GENRES_DICT, SUBJECT_STATUSES, SUBJECT_STATUSES_DICT
+from saccrec.settings import GENRES, GENRES_DICT, SUBJECT_STATUSES, SUBJECT_STATUSES_DICT, SUBJECT_STATUSES_LABELS
 
 INITIAL_DATE = QDate(2000, 1, 1)
 
@@ -78,6 +78,10 @@ class SubjectWidget(QWidget):
     @status.setter
     def status(self, value: int):
         self._status_combo.setCurrentIndex(SUBJECT_STATUSES_DICT[value])
+
+    @property
+    def status_label(self) -> str:
+        return SUBJECT_STATUSES_LABELS[self.status]
 
     @property
     def json(self) -> dict:
