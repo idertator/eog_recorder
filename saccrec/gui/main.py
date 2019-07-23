@@ -8,10 +8,8 @@ from saccrec.core.settings import Settings
 from saccrec.core.Test import Test
 
 from saccrec.gui.dialogs import SettingsDialog
-from saccrec.gui.widgets import SignalsWidget
+from saccrec.gui.widgets import SignalsWidget, StimulusPlayerWidget
 from saccrec.gui.wizards import RecordSetupWizard
-
-from saccrec.gui.StimulatorWindow import StimulatorWindow
 
 import saccrec.gui.icons
 
@@ -29,9 +27,9 @@ class MainWindow(QMainWindow):
         self._newTest = RecordSetupWizard(self)
         self._settings_dialog = SettingsDialog(self.settings, self)
 
-        self._calibrationWindow1 = StimulatorWindow('1', self)
-        self._testStimulator = StimulatorWindow('2', self)
-        self._calibrationWindow2 = StimulatorWindow('3', self)
+        self._calibrationWindow1 = StimulusPlayerWidget('1', self)
+        self._testStimulator = StimulusPlayerWidget('2', self)
+        self._calibrationWindow2 = StimulusPlayerWidget('3', self)
 
         self.initUI()
 

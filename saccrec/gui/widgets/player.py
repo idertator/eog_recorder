@@ -3,16 +3,17 @@ import math
 from datetime import datetime
 
 from PyQt5.QtGui import QGuiApplication
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMessageBox
 from PyQt5.QtCore import QTimer
 
 from saccrec.core.Stimulator import Stimulator
 from saccrec.core.Stimulator import BallPosition
 
-class StimulatorWindow(QMainWindow):
+
+class StimulusPlayerWidget(QWidget):
     
     def __init__(self, tipo=None, parent=None):
-        super(StimulatorWindow, self).__init__()
+        super(StimulusPlayerWidget, self).__init__()
 
         self.padre = parent
 
@@ -29,7 +30,10 @@ class StimulatorWindow(QMainWindow):
         self._stimulatorTimer.setInterval(16)
         self._stimulatorTimer.timeout.connect(self.onTimerTimeout)
 
-        self.setCentralWidget(self._stimulator)
+        layout = QVBoxLayout()
+        layout.addWidget(self._stimulator)
+        
+        self.setLayout(layout)
     
     @property
     def screenpixels(self):
