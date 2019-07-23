@@ -1,4 +1,4 @@
-from .enums import Channel
+from .enums import Channel, StimulusPosition
 from .errors import NotEnoughDataError
 from .models import ChannelsBuffer
 

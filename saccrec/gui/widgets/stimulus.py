@@ -20,12 +20,12 @@ class StimulusWidget(QWidget):
         self._angle_edit.setMinimum(STIMULUS_MINIMUM_ANGLE)
         self._angle_edit.setMaximum(STIMULUS_MAXIMUM_ANGLE)
         self._angle_edit.setSingleStep(1)
-        self._angle_edit.setSuffix(' grados')
+        self._angle_edit.setSuffix(' \u00B0')
         layout.addRow('Ángulo', self._angle_edit)
 
         self._fixation_mean_duration_edit = QDoubleSpinBox(self)
         self._fixation_mean_duration_edit.setSingleStep(0.01)
-        self._fixation_mean_duration_edit.setSuffix(' segundos')
+        self._fixation_mean_duration_edit.setSuffix(' seg')
         layout.addRow('Duración de fijaciones', self._fixation_mean_duration_edit)
 
         self._fixation_variability_edit = QDoubleSpinBox(self)

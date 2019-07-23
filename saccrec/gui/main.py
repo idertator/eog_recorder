@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QApplication, QDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSettings
 
+from saccrec import Manager
 from saccrec.core.settings import Settings
 from saccrec.core.Test import Test
 
@@ -19,13 +20,19 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
+        self._settings = Settings(self)
+
+        self._manager = Manager(self._settings, self)
+        self._manager.recordingStarted.connect(self.on_recording_started)
+        self._manager.recordingStopped.connect(self.on_recording_stopped)
+        self._manager.recordingFinished.connect(self.on_recording_finished)
+
         self.test = Test()
-        self.settings = Settings(self)
 
         self.signals_widget = SignalsWidget(self)
 
         self._newTest = RecordSetupWizard(self)
-        self._settings_dialog = SettingsDialog(self.settings, self)
+        self._settings_dialog = SettingsDialog(self._settings, self)
 
         self._calibrationWindow1 = StimulusPlayerWidget('1', self)
         self._testStimulator = StimulusPlayerWidget('2', self)
@@ -41,27 +48,27 @@ class MainWindow(QMainWindow):
         help_menu = menubar.addMenu('&Ayuda')
 
         # Setting up actions
-        new_action = QAction(QIcon(':document.svg'), '&Iniciar Prueba', self)
-        new_action.triggered.connect(self.open_new_test_wizard)
+        self._new_action = QAction(QIcon(':document.svg'), '&Iniciar Prueba', self)
+        self._new_action.triggered.connect(self.open_new_test_wizard)
 
         exit_action = QAction(QIcon(':exit.svg'), '&Salir', self)
         exit_action.setShortcut('Ctrl+Q')
         exit_action.setStatusTip('Salir de la aplicación')
         exit_action.triggered.connect(qApp.quit)
 
-        settings_action = QAction(QIcon(':settings.svg'), '&Configuración', self)
-        settings_action.setShortcut('Ctrl+P')
-        settings_action.setStatusTip('Configurar aplicación')
-        settings_action.triggered.connect(self.open_settings_dialog)
+        self._settings_action = QAction(QIcon(':settings.svg'), '&Configuración', self)
+        self._settings_action.setShortcut('Ctrl+P')
+        self._settings_action.setStatusTip('Configurar aplicación')
+        self._settings_action.triggered.connect(self.open_settings_dialog)
 
         about_action = QAction(QIcon(':help.svg'), '&Acerca de ...', self)
 
         help_menu.addAction(about_action)
 
         # Setting up top menu
-        file_menu.addAction(new_action)
-        file_menu.addAction(new_action)
-        file_menu.addAction(settings_action)
+        file_menu.addAction(self._new_action)
+        file_menu.addAction(self._new_action)
+        file_menu.addAction(self._settings_action)
 
         file_menu.addSeparator()
 
@@ -69,8 +76,8 @@ class MainWindow(QMainWindow):
 
         # Setting up top toolbar
         main_toolbar = self.addToolBar('Main Toolbar')
-        main_toolbar.addAction(new_action)
-        main_toolbar.addAction(settings_action)
+        main_toolbar.addAction(self._new_action)
+        main_toolbar.addAction(self._settings_action)
 
         main_toolbar.addSeparator()
 
@@ -89,3 +96,15 @@ class MainWindow(QMainWindow):
 
     def open_settings_dialog(self):
         self._settings_dialog.open()
+
+    def on_recording_started(self):
+        self._new_action.setEnabled(False)
+        self._settings_action.setEnabled(False)
+
+    def on_recording_stopped(self):
+        self._new_action.setEnabled(True)
+        self._settings_action.setEnabled(True)
+
+    def on_recording_finished(self):
+        self._new_action.setEnabled(True)
+        self._settings_action.setEnabled(True)

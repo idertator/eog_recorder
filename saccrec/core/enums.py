@@ -7,3 +7,9 @@ class Channel(IntEnum):
     Horizontal = 2
     Vertical = 4
     Annotations = 8
+
+
+class StimulusPosition(IntEnum):
+    Left = -1
+    Center = 0
+    Right = 1
