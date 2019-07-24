@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QFormLayout, QVBoxLayout
-from PyQt5.QtWidgets import QDoubleSpinBox, QComboBox, QDialogButtonBox
+from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QComboBox, QDialogButtonBox
 
+from saccrec.consts import SETTINGS_SAMPLING_FREQUENCY_MINIMUM
+from saccrec.consts import SETTINGS_SAMPLING_FREQUENCY_MAXIMUM
 from saccrec.consts import SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM
 from saccrec.consts import SETTINGS_STIMULUS_SCREEN_WIDTH_MAXIMUM
 from saccrec.consts import SETTINGS_STIMULUS_SCREEN_HEIGHT_MINIMUM
@@ -27,6 +29,12 @@ class SettingsDialog(QDialog):
         for port in list_ports():
             self._openbci_ports_combo.addItem(port, port)
         settings_layout.addRow('Puerto OpenBCI', self._openbci_ports_combo)
+
+        self._sampling_frequency_edit = QSpinBox()
+        self._sampling_frequency_edit.setMinimum(SETTINGS_SAMPLING_FREQUENCY_MINIMUM)
+        self._sampling_frequency_edit.setMaximum(SETTINGS_SAMPLING_FREQUENCY_MAXIMUM)
+        self._sampling_frequency_edit.setSuffix(' Hz')
+        settings_layout.addRow('Frecuencia de Muestreo', self._sampling_frequency_edit)
 
         stimulus_screen_size_layout = QFormLayout()
 
@@ -69,6 +77,8 @@ class SettingsDialog(QDialog):
         else:
             self._openbci_ports_combo.setCurrentIndex(0)
 
+        self._sampling_frequency_edit.setValue(self._settings.sampling_frequency)
+
         self._stimulus_screen_width_edit.setValue(self._settings.stimulus_screen_width)
         self._stimulus_screen_height_edit.setValue(self._settings.stimulus_screen_height)
         self._stimulus_saccadic_distance_edit.setValue(self._settings.stimulus_saccadic_distance)
@@ -77,6 +87,7 @@ class SettingsDialog(QDialog):
 
     def on_accepted(self):
         self._settings.openbci_port = self._openbci_ports_combo.currentData()
+        self._settings.sampling_frequency = self._sampling_frequency_edit.value()
         self._settings.stimulus_screen_width = self._stimulus_screen_width_edit.value()
         self._settings.stimulus_screen_height = self._stimulus_screen_height_edit.value()
         self._settings.stimulus_saccadic_distance = self._stimulus_saccadic_distance_edit.value()

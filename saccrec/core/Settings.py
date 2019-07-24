@@ -21,6 +21,14 @@ class Settings(object):
         self._settings.setValue('OpenBCI_Port', value)
 
     @property
+    def sampling_frequency(self) -> int:
+        return self._settings.value('SamplingFrequency', 250)
+
+    @sampling_frequency.setter
+    def sampling_frequency(self, value: int):
+        self._settings.setValue('SamplingFrequency', value)
+
+    @property
     def stimulus_screen_width(self) -> float:
         return self._settings.value('StimulusScreenWidth', SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM)
 
