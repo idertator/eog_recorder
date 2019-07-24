@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QDialog, QHBoxLayout, QListWidget, QAction, QListWidgetItem, QToolBar
 from PyQt5.QtWidgets import QFormLayout, QVBoxLayout
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox, QComboBox, QDialogButtonBox
 
@@ -14,16 +16,23 @@ from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MAXIMUM
 from saccrec.core.settings import Settings
 from saccrec.engine.recording import list_ports
 
+import saccrec.gui.icons
+
+
 class SettingsDialog(QDialog):
-    
+
     def __init__(self, settings: Settings, parent=None):
         super(SettingsDialog, self).__init__(parent=parent)
-        
+
         self._settings = settings
 
-        layout = QVBoxLayout()
-
+        layout = QHBoxLayout()
         settings_layout = QFormLayout()
+
+
+        # Menu List
+        menu_list = QListWidget()
+        menu_list.setMaximumWidth(100)
 
         self._openbci_ports_combo = QComboBox()
         for port in list_ports():
@@ -59,7 +68,6 @@ class SettingsDialog(QDialog):
 
         settings_layout.addRow('Distancia de estímulo sacádico', self._stimulus_saccadic_distance_edit)
 
-        layout.addLayout(settings_layout)
 
         dialog_buttons = QDialogButtonBox()
         dialog_buttons.addButton('Aplicar', QDialogButtonBox.AcceptRole)
@@ -67,7 +75,9 @@ class SettingsDialog(QDialog):
         dialog_buttons.accepted.connect(self.on_accepted)
         dialog_buttons.rejected.connect(self.on_rejected)
 
-        layout.addWidget(dialog_buttons)
+        settings_layout.addRow(dialog_buttons)
+        layout.addWidget(menu_list)
+        layout.addLayout(settings_layout)
 
         self.setLayout(layout)
 
@@ -78,7 +88,6 @@ class SettingsDialog(QDialog):
             self._openbci_ports_combo.setCurrentIndex(0)
 
         self._sampling_frequency_edit.setValue(self._settings.sampling_frequency)
-
         self._stimulus_screen_width_edit.setValue(self._settings.stimulus_screen_width)
         self._stimulus_screen_height_edit.setValue(self._settings.stimulus_screen_height)
         self._stimulus_saccadic_distance_edit.setValue(self._settings.stimulus_saccadic_distance)
@@ -95,4 +104,9 @@ class SettingsDialog(QDialog):
 
     def on_rejected(self):
         self.reject()
-        
+
+    def open_openbci_settings(self):
+        pass
+
+    def open_screen_settings(self):
+        pass

@@ -22,7 +22,7 @@ class Settings(object):
 
     @property
     def sampling_frequency(self) -> int:
-        return self._settings.value('SamplingFrequency', 250)
+        return int(self._settings.value('SamplingFrequency', 250))
 
     @sampling_frequency.setter
     def sampling_frequency(self, value: int):
@@ -30,7 +30,7 @@ class Settings(object):
 
     @property
     def stimulus_screen_width(self) -> float:
-        return self._settings.value('StimulusScreenWidth', SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM)
+        return float(self._settings.value('StimulusScreenWidth', SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM))
 
     @stimulus_screen_width.setter
     def stimulus_screen_width(self, value: float):
@@ -38,7 +38,7 @@ class Settings(object):
 
     @property
     def stimulus_screen_height(self) -> float:
-        return self._settings.value('StimulusScreenHeight', SETTINGS_STIMULUS_SCREEN_HEIGHT_MINIMUM)
+        return float(self._settings.value('StimulusScreenHeight', SETTINGS_STIMULUS_SCREEN_HEIGHT_MINIMUM))
 
     @stimulus_screen_height.setter
     def stimulus_screen_height(self, value: float):
@@ -46,7 +46,7 @@ class Settings(object):
 
     @property
     def stimulus_saccadic_distance(self) -> float:
-        return self._settings.value('StimulusSaccadicDistance', SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM)
+        return float(self._settings.value('StimulusSaccadicDistance', SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM))
 
     @stimulus_saccadic_distance.setter
     def stimulus_saccadic_distance(self, value: float):
