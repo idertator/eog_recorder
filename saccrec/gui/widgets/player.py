@@ -1,19 +1,53 @@
 import subprocess
 import math
 from datetime import datetime
+from time import time
 
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMessageBox
 from PyQt5.QtCore import QTimer
 
-from saccrec.core.Stimulator import Stimulator
-from saccrec.core.Stimulator import BallPosition
+from saccrec.core import Settings, StimulusPosition
+from saccrec.engine.stimulus import SaccadicStimuli
+
+
+STIMULUS_TIMEOUT = 7    # TODO: Calculate this from the refresh rate of the monitor
 
 
 class StimulusPlayerWidget(QWidget):
     
+    def __init__(self, settings: Settings, parent=None):
+        super(StimulusPlayerWidget, self).__init__(parent=parent)
+        self._settings = settings
+        self._stimuli = None
+        self._ball_position = StimulusPosition.Center
+
+        self._timer = QTimer()
+        self._timer.setInterval(STIMULUS_TIMEOUT)
+        self._timer.timeout.connect(self.on_timeout)
+
+        self._start_time = 0
+
+    def run_stimulus(self, stimuli: SaccadicStimuli):
+        self._stimuli = stimuli
+        self._start_time = time()
+        self._ball_position = stimuli.position(0)
+        # TODO: Setup ball positions
+        # TODO: Start timer
+
+    def on_timeout(self):
+        elapsed = time() - self._start_time
+        # TODO: Check if elapsed (time position) needs for a stimuli change
+
+
+from saccrec.core.Stimulator import Stimulator
+from saccrec.core.Stimulator import BallPosition
+
+
+class StimulusPlayerWidget1(QWidget):
+    
     def __init__(self, tipo=None, parent=None):
-        super(StimulusPlayerWidget, self).__init__()
+        super(StimulusPlayerWidget1, self).__init__()
 
         self.padre = parent
 

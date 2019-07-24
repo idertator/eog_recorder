@@ -5,11 +5,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSettings
 
 from saccrec import Manager
-from saccrec.core.settings import Settings
+from saccrec.core import Settings, Screen
 from saccrec.core.Test import Test
 
 from saccrec.gui.dialogs import SettingsDialog
-from saccrec.gui.widgets import SignalsWidget, StimulusPlayerWidget
+from saccrec.gui.widgets import SignalsWidget, StimulusPlayerWidget, StimulusPlayerWidget1
 from saccrec.gui.wizards import RecordSetupWizard
 
 import saccrec.gui.icons
@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         self._settings = Settings(self)
+        self._screen = Screen()
 
         self._manager = Manager(self._settings, self)
         self._manager.recordingStarted.connect(self.on_recording_started)
@@ -31,12 +32,15 @@ class MainWindow(QMainWindow):
 
         self.signals_widget = SignalsWidget(self)
 
-        self._newTest = RecordSetupWizard(self)
-        self._settings_dialog = SettingsDialog(self._settings, self)
+        self._new_record_wizard = RecordSetupWizard(self)
+        self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
 
-        self._calibrationWindow1 = StimulusPlayerWidget('1', self)
-        self._testStimulator = StimulusPlayerWidget('2', self)
-        self._calibrationWindow2 = StimulusPlayerWidget('3', self)
+        self._settings_dialog = SettingsDialog(self._settings, self)
+        self._stimulus_player = StimulusPlayerWidget(self._settings, None)
+
+        self._calibrationWindow1 = StimulusPlayerWidget1('1', self)
+        self._testStimulator = StimulusPlayerWidget1('2', self)
+        self._calibrationWindow2 = StimulusPlayerWidget1('3', self)
 
         self.initUI()
 
@@ -49,7 +53,7 @@ class MainWindow(QMainWindow):
 
         # Setting up actions
         self._new_action = QAction(QIcon(':document.svg'), '&Iniciar Prueba', self)
-        self._new_action.triggered.connect(self.open_new_test_wizard)
+        self._new_action.triggered.connect(self.on_new_test_wizard_clicked)
 
         exit_action = QAction(QIcon(':exit.svg'), '&Salir', self)
         exit_action.setShortcut('Ctrl+Q')
@@ -91,8 +95,11 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    def open_new_test_wizard(self):
-        self._newTest.show()
+    def on_new_test_wizard_clicked(self):
+        self._new_record_wizard.show()
+
+    def on_new_test_wizard_finished(self):
+        self._manager.start_recording()
 
     def open_settings_dialog(self):
         self._settings_dialog.open()
@@ -100,6 +107,12 @@ class MainWindow(QMainWindow):
     def on_recording_started(self):
         self._new_action.setEnabled(False)
         self._settings_action.setEnabled(False)
+
+        self._stimulus_player.move(
+            self._screen.secondary_screen_rect.left(), 
+            self._screen.secondary_screen_rect.top()
+        )
+        self._stimulus_player.showFullScreen()
 
     def on_recording_stopped(self):
         self._new_action.setEnabled(True)

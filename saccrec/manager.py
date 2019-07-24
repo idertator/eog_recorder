@@ -15,7 +15,7 @@ class Manager(QObject):
 
     def start_recording(self, **parameters):
         self.recordingStarted.emit()
-
+        
     def stop_recording(self):
         self.recordingStopped.emit()
     

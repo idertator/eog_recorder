@@ -3,7 +3,7 @@ from os.path import exists, dirname
 
 from PyQt5 import QtCore
 from PyQt5 import QtGui
-from PyQt5.QtCore import pyqtProperty, Qt, QDate
+from PyQt5.QtCore import pyqtProperty, pyqtSignal, Qt, QDate
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QWizard, QWizardPage
 from PyQt5.QtWidgets import QMessageBox
@@ -15,6 +15,8 @@ from saccrec.core.Patient import Patient
 
 
 class RecordSetupWizard(QWizard):
+    finished = pyqtSignal()
+
     def __init__(self, parent=None):
         super(RecordSetupWizard, self).__init__(parent)
         self.setWizardStyle(QWizard.ClassicStyle)
@@ -30,7 +32,7 @@ class RecordSetupWizard(QWizard):
         self.padre = parent
         
         self.setWindowTitle('Configuración de nuevo registro')
-        self.resize(640,480)
+        self.resize(640, 480)
 
         self.button(QWizard.FinishButton).clicked.connect(self.finish_wizard)
 
@@ -51,42 +53,48 @@ class RecordSetupWizard(QWizard):
 
     @property
     def json(self) -> dict:
-        pass
+        return {
+            'subject': self._subject_page.json,
+            'stimulus': self._stimulus_page.json,
+            'output': self._output_page.json,
+        }
 
     def finish_wizard(self):
+        self.finished.emit()
+
         # TODO: Deprecated. Move this
-        self.padre.test.patient = Patient(self.paginas[0].txtName.text,self.paginas[0].borndateDate.date, self.paginas[0].comboGenre.currentText, self.paginas[0].comboGenre.currentText)
+        # self.padre.test.patient = Patient(self.paginas[0].txtName.text,self.paginas[0].borndateDate.date, self.paginas[0].comboGenre.currentText, self.paginas[0].comboGenre.currentText)
         
-        self.padre.test.stimulation_angle = self.paginas[1].txt_angulo.value()
-        self.padre.test.mean_duration = self.paginas[1].txt_mean_duration.value()
-        self.padre.test.variation = self.paginas[1].txt_variaton.value()
-        self.padre.test.test_duration = self.paginas[1].txt_testduration.value()
+        # self.padre.test.stimulation_angle = self.paginas[1].txt_angulo.value()
+        # self.padre.test.mean_duration = self.paginas[1].txt_mean_duration.value()
+        # self.padre.test.variation = self.paginas[1].txt_variaton.value()
+        # self.padre.test.test_duration = self.paginas[1].txt_testduration.value()
 
-        self.padre.test.output_file_path = self.paginas[2].txtPath.text()
+        # self.padre.test.output_file_path = self.paginas[2].txtPath.text()
 
-        QMessageBox.question(self,'Aviso','La prueba consta de 3 partes: calibración inicial, prueba y calibración final. Presione OK para continuar.', QMessageBox.Ok)
-        QMessageBox.question(self,'Aviso','Se debe ubicar el paciente a '+str(self.distanceFromPatient)+' cm de la pantalla. Presione Ok para continuar.', QMessageBox.Ok)
+        # QMessageBox.question(self,'Aviso','La prueba consta de 3 partes: calibración inicial, prueba y calibración final. Presione OK para continuar.', QMessageBox.Ok)
+        # QMessageBox.question(self,'Aviso','Se debe ubicar el paciente a '+str(self.distanceFromPatient)+' cm de la pantalla. Presione Ok para continuar.', QMessageBox.Ok)
 
-        self.padre._calibrationWindow1.runStimulator()
+        # self.padre._calibrationWindow1.runStimulator()
 
 
-    @property
-    def distancePoints(self):
-        # TODO: Deprecated. Move this
-        return float(self.padre.settings.distanceBetweenPoints)
+    # @property
+    # def distancePoints(self):
+    #     # TODO: Deprecated. Move this
+    #     return float(self.padre.settings.distanceBetweenPoints)
 
-    @property
-    def distanceFromPatient(self):
-        # TODO: Deprecated. Move this
-        if self.padre.test.stimulation_angle > 30:
-            angulo_maximo = self.padre.test.stimulation_angle
-        else:
-            angulo_maximo = 30
-        distance_from_mid = self.distancePoints / 2
+    # @property
+    # def distanceFromPatient(self):
+    #     # TODO: Deprecated. Move this
+    #     if self.padre.test.stimulation_angle > 30:
+    #         angulo_maximo = self.padre.test.stimulation_angle
+    #     else:
+    #         angulo_maximo = 30
+    #     distance_from_mid = self.distancePoints / 2
 
-        distance_from_patient = distance_from_mid * (math.sin(math.radians(90 - angulo_maximo)) / math.sin(math.radians(angulo_maximo)))
+    #     distance_from_patient = distance_from_mid * (math.sin(math.radians(90 - angulo_maximo)) / math.sin(math.radians(angulo_maximo)))
 
-        return distance_from_patient
+    #     return distance_from_patient
         
 
 class SubjectWizardPage(QWizardPage):
