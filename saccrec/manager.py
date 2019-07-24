@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from saccrec.core import Settings
+from saccrec.core import settings
 
 
 class Manager(QObject):
@@ -8,7 +8,7 @@ class Manager(QObject):
     recordingStopped = pyqtSignal()
     recordingFinished = pyqtSignal()
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, settings: settings, parent=None):
         super(Manager, self).__init__(parent=parent)
 
         self._settings = settings
