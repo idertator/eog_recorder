@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
 
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
-from saccrec.core.Patient import Patient
 
 
 class RecordSetupWizard(QWizard):

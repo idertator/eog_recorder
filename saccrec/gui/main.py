@@ -6,10 +6,9 @@ from PyQt5.QtCore import QSettings
 
 from saccrec import Manager
 from saccrec.core import Settings, Screen
-from saccrec.core.Test import Test
 
 from saccrec.gui.dialogs import SettingsDialog
-from saccrec.gui.widgets import SignalsWidget, StimulusPlayerWidget, StimulusPlayerWidget1
+from saccrec.gui.widgets import SignalsWidget, StimulusPlayerWidget
 from saccrec.gui.wizards import RecordSetupWizard
 
 import saccrec.gui.icons
@@ -32,8 +31,6 @@ class MainWindow(QMainWindow):
         self._manager.recordingStopped.connect(self.on_recording_stopped)
         self._manager.recordingFinished.connect(self.on_recording_finished)
 
-        self.test = Test()
-
         self.signals_widget = SignalsWidget(self)
 
         self._new_record_wizard = RecordSetupWizard(self)
@@ -41,10 +38,6 @@ class MainWindow(QMainWindow):
 
         self._settings_dialog = SettingsDialog(self._settings, self)
         self._stimulus_player = StimulusPlayerWidget(self._settings, None)
-
-        self._calibrationWindow1 = StimulusPlayerWidget1('1', self)
-        self._testStimulator = StimulusPlayerWidget1('2', self)
-        self._calibrationWindow2 = StimulusPlayerWidget1('3', self)
 
         self.initUI()
 
