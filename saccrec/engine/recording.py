@@ -16,8 +16,6 @@ def list_ports():
         ]
     return [port for port in list_devices()]
 
-print(list_ports())
-
 def init_board():
     sample_rate = 250
     puerto = '/dev/ttyUSB0'
