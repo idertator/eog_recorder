@@ -21,9 +21,13 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         self._settings = Settings(self)
-        self._screen = Screen()
+        self._screen = Screen(self)
 
-        self._manager = Manager(self._settings, self)
+        self._manager = Manager(
+            settings=self._settings,
+            screen=self._screen,
+            parent=self
+        )
         self._manager.recordingStarted.connect(self.on_recording_started)
         self._manager.recordingStopped.connect(self.on_recording_stopped)
         self._manager.recordingFinished.connect(self.on_recording_finished)
@@ -99,7 +103,7 @@ class MainWindow(QMainWindow):
         self._new_record_wizard.show()
 
     def on_new_test_wizard_finished(self):
-        self._manager.start_recording()
+        self._manager.start_recording(**self._new_record_wizard.json)
 
     def open_settings_dialog(self):
         self._settings_dialog.open()
@@ -113,6 +117,7 @@ class MainWindow(QMainWindow):
             self._screen.secondary_screen_rect.top()
         )
         self._stimulus_player.showFullScreen()
+        self._stimulus_player.run_stimulus(self._manager.current_stimuli)
 
     def on_recording_stopped(self):
         self._new_action.setEnabled(True)

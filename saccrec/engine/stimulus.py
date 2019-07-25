@@ -3,13 +3,16 @@ from random import randint
 
 from numpy import array, int8, zeros, ones, hstack
 
-from saccrec.core import Settings, StimulusPosition
+from PyQt5.QtCore import QPoint
+
+from saccrec.core import Settings, Screen, StimulusPosition
 
 
 class SaccadicStimuli(object):
     
     def __init__(self,
         settings: Settings,
+        screen: Screen,
         angle: int,
         fixation_duration: float,   
         fixation_variability: float,
@@ -20,15 +23,22 @@ class SaccadicStimuli(object):
     
         Args:
             settings (saccrec.core.Settings): Settings object
+            screen: (saccrec.core.Screen): Screen object
             angle (int): Stimuli angle
             fixation_duration (float): Mean fixation duration in seconds
             fixation_variability (float): Variability of the fixation duration in percentage
             saccades_count (int): Amounts of saccades to generate
             test_name (str): Name of the stimulation pattern
         """
-        self._angle = angle
         self._settings = settings
+        self._screen = screen
+
+        self._angle = angle
         self._test_name = test_name
+
+        self._left_ball = None
+        self._center_ball = None
+        self._right_ball = None
 
         sampling_rate = settings.sampling_frequency
 
@@ -51,9 +61,24 @@ class SaccadicStimuli(object):
     def __str__(self):
         return f'{self._test_name} {self._angle}\u00B0'
 
-    @property
-    def channel(self) -> array:
-        return self._channel
+    def _update_positions(self):
+        cm_width = self._settings.stimulus_screen_width
+        cm_center = cm_width / 2
+        cm_delta = self._settings.stimulus_saccadic_distance / 2
+        cm_to_pixels = self._screen.secondary_screen_rect.width() / cm_width
+
+        left_x = (cm_center - cm_delta) * cm_to_pixels
+        right_x = (cm_center + cm_delta) * cm_to_pixels
+        center_x = self._screen.secondary_screen_rect.center().x()
+
+        y = self._screen.secondary_screen_rect.center().y()
+
+        self._left_ball = QPoint(left_x, y)
+        self._center_ball = QPoint(center_x, y)
+        self._right_ball = QPoint(right_x, y)
+
+    def reset_settings(self):
+        self._update_positions()
 
     def position(self, sample: int) -> StimulusPosition:
         if self._channel[sample] < 0:
@@ -62,9 +87,24 @@ class SaccadicStimuli(object):
             return StimulusPosition.Right
         return StimulusPosition.Center
 
-    def screen_position(self, sample: int) -> int:
-        pass
+    def screen_position(self, sample: int) -> QPoint:
+        if self._left_ball is None or self._right_ball is None or self._center_ball is None:
+            self._update_positions()
+
+        if sample < len(self._channel):
+            value = self._channel[sample]
+            if value < 0:
+                return self._left_ball
+            if value > 0:
+                return self._right_ball
+            return self._center_ball
+
+        return None
 
     @property
     def angle(self) -> int:
         return self._angle
+
+    @property
+    def channel(self) -> array:
+        return self._channel

@@ -1,26 +1,34 @@
 import subprocess
 import math
 from datetime import datetime
-from time import time
+from math import ceil
+from time import time, sleep
 
-from PyQt5.QtGui import QGuiApplication
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMessageBox
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import pyqtSignal, QTimer
+from PyQt5.QtGui import QGuiApplication, QPainter, QColor
+from PyQt5.QtWidgets import qApp, QWidget, QVBoxLayout, QMessageBox
 
 from saccrec.core import Settings, StimulusPosition
 from saccrec.engine.stimulus import SaccadicStimuli
 
 
 STIMULUS_TIMEOUT = 7    # TODO: Calculate this from the refresh rate of the monitor
-
+BACKGROUND_COLOR = QColor(0, 0, 0)
+BALL_RADIUS = 10
+BALL_COLOR = QColor(255, 255, 255)
 
 class StimulusPlayerWidget(QWidget):
+    stimuliStarted = pyqtSignal(float)
+    stimuliFinished = pyqtSignal()
     
     def __init__(self, settings: Settings, parent=None):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
         self._settings = settings
+        
+        self._sampling_step = 1000 / self._settings.sampling_frequency
+
         self._stimuli = None
-        self._ball_position = StimulusPosition.Center
+        self._ball_position = None
 
         self._timer = QTimer()
         self._timer.setInterval(STIMULUS_TIMEOUT)
@@ -30,14 +38,41 @@ class StimulusPlayerWidget(QWidget):
 
     def run_stimulus(self, stimuli: SaccadicStimuli):
         self._stimuli = stimuli
+        self._ball_position = stimuli.screen_position(0)
+        self.update()
         self._start_time = time()
-        self._ball_position = stimuli.position(0)
-        # TODO: Setup ball positions
-        # TODO: Start timer
+        self._timer.start()
+        self.stimuliStarted.emit(self._start_time)
 
     def on_timeout(self):
-        elapsed = time() - self._start_time
-        # TODO: Check if elapsed (time position) needs for a stimuli change
+        elapsed = (time() - self._start_time) * 1000.0
+        current_sample = ceil(elapsed / self._sampling_step)
+        self._ball_position = self._stimuli.screen_position(current_sample)
+        self.update()
+
+        if self._ball_position is None:
+            self._timer.stop()
+            self.close_player()
+            self.stimuliFinished.emit()
+            
+    def paintEvent(self, event):
+        painter = QPainter()
+        painter.begin(self)
+
+        painter.setBackground(BACKGROUND_COLOR)
+        painter.fillRect(self.rect(), BACKGROUND_COLOR)
+
+        painter.setBrush(BALL_COLOR)
+
+        if self._ball_position is not None:
+            painter.drawEllipse(self._ball_position, BALL_RADIUS, BALL_RADIUS)
+
+        painter.end()
+
+    def close_player(self):
+        self.setParent(qApp.topLevelWidgets()[0])
+        self.close()
+        self.setParent(None)
 
 
 from saccrec.core.Stimulator import Stimulator
