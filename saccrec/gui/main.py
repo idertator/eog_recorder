@@ -110,7 +110,12 @@ class MainWindow(QMainWindow):
             self._screen.secondary_screen_rect.top()
         )
         self._stimulus_player.showFullScreen()
-        self._stimulus_player.run_stimulus(self._manager.current_stimuli)
+        
+        stimuli = self._manager.current_stimuli
+        self._stimulus_player.run_stimulus(
+            stimuli, 
+            '\n'.join([str(stimuli), 'Presione espacio para continuar'])
+        )
 
     def on_recording_stopped(self):
         self._new_action.setEnabled(True)

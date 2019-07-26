@@ -1,36 +1,36 @@
 from PyQt5.QtCore import QSettings
+from PyQt5.QtGui import QColor
 
-from saccrec.consts import SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM, SETTINGS_OPENBCI_DEFAULT_BOARD_TYPE, \
+from saccrec.consts import SETTINGS_OPENBCI_DEFAULT_BOARD_TYPE, \
     SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE, SETTINGS_OPENBCI_DEFAULT_BOARD_MODE, SETTINGS_OPENBCI_DEFAULT_BAUDRATE, \
     SETTINGS_OPENBCI_DEFAULT_TIMEOUT, SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS, SETTINGS_DEFAULT_STIMULUS_BALL_COLOR, \
-    SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR, SETTINGS_OPENBCI_DEFAULT_GAIN, SETTINGS_OPENBCI_DEFAULT_CHANNEL_NUMBER
-from saccrec.consts import SETTINGS_STIMULUS_SCREEN_HEIGHT_MINIMUM
+    SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR, SETTINGS_OPENBCI_DEFAULT_GAIN, SETTINGS_OPENBCI_DEFAULT_CHANNEL_NUMBER, \
+    SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH, SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT
 from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM
 
 
 class Channel(object):
     def __init__(self, settings: QSettings, parent=None):
         self._settings = settings
-        self._channels = [(self._settings.value(f'Channels/OpenBCIChannelActivated{i}', 1),
-                           self._settings.value(f'Channels/OpenBCIChannelGain{i}', SETTINGS_OPENBCI_DEFAULT_GAIN)) for i in
+        self._channels = [(bool(int(self._settings.value(f'OpenBCIChannels/Activated{index}', 1))),
+                           int(self._settings.value(f'OpenBCIChannels/Gain{index}',
+                                                    SETTINGS_OPENBCI_DEFAULT_GAIN))) for index in
                           range(SETTINGS_OPENBCI_DEFAULT_CHANNEL_NUMBER)]
 
-    def __getitem__(self, index: int, arg: int = None):
-        if arg is None:
-            return tuple(self._channels[index])
-        return type(self._channels[index][arg])(self._channels[index][arg])
+    def __getitem__(self, index: int):
+        return tuple(self._channels[index])
 
     def __setitem__(self, index, value):
         if isinstance(value, bool):
-            self._channels[index] = (bool(value), self._channels[index][1])
+            self._channels[index] = (bool(value), int(self._channels[index][1]))
             self._settings.setValue(f'OpenBCIChannels/Activated{index}', int(bool(value)))
         if isinstance(value, int):
-            self._channels[index] = (self._channels[index][0], int(value))
-            self._settings.setValue(f'OpenBCIChannels/OpenBCIChannelGain{index}', int(value))
+            self._channels[index] = (bool(self._channels[index][0]), int(value))
+            self._settings.setValue(f'OpenBCIChannels/Gain{index}', int(value))
         if isinstance(value, tuple):
             self._channels[index] = value
-            self._settings.setValue(f'OpenBCIChannels/OpenBCIChannelActivated{index}', int(bool(value[0])))
-            self._settings.setValue(f'OpenBCIChannels/OpenBCIChannelGain{index}', value[1])
+            self._settings.setValue(f'OpenBCIChannels/Activated{index}', int(bool(value[0])))
+            self._settings.setValue(f'OpenBCIChannels/Gain{index}', int(value[1]))
 
 
 class Settings(object):
@@ -58,7 +58,7 @@ class Settings(object):
 
     @property
     def openbci_sample_rate(self) -> int:
-        return self._settings.value('OpenBCI/SampleRate', SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE)
+        return int(self._settings.value('OpenBCI/SampleRate', SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE))
 
     @openbci_sample_rate.setter
     def openbci_sample_rate(self, value: int):
@@ -74,7 +74,7 @@ class Settings(object):
 
     @property
     def openbci_baudrate(self) -> int:
-        return self._settings.value('OpenBCI/Baudrate', SETTINGS_OPENBCI_DEFAULT_BAUDRATE)
+        return int(self._settings.value('OpenBCI/Baudrate', SETTINGS_OPENBCI_DEFAULT_BAUDRATE))
 
     @openbci_baudrate.setter
     def openbci_baudrate(self, value: int):
@@ -82,7 +82,7 @@ class Settings(object):
 
     @property
     def openbci_timeout(self) -> int:
-        return self._settings.value('OpenBCI/Timeout', SETTINGS_OPENBCI_DEFAULT_TIMEOUT)
+        return int(self._settings.value('OpenBCI/Timeout', SETTINGS_OPENBCI_DEFAULT_TIMEOUT))
 
     @openbci_timeout.setter
     def openbci_timeout(self, value: int):
@@ -91,7 +91,7 @@ class Settings(object):
     # SCREEN SETTINGS
     @property
     def stimulus_screen_width(self) -> float:
-        return float(self._settings.value('Stimulus/ScreenWidth', SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM))
+        return float(self._settings.value('Stimulus/ScreenWidth', SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH))
 
     @stimulus_screen_width.setter
     def stimulus_screen_width(self, value: float):
@@ -99,7 +99,7 @@ class Settings(object):
 
     @property
     def stimulus_screen_height(self) -> float:
-        return float(self._settings.value('Stimulus/ScreenHeight', SETTINGS_STIMULUS_SCREEN_HEIGHT_MINIMUM))
+        return float(self._settings.value('Stimulus/ScreenHeight', SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT))
 
     @stimulus_screen_height.setter
     def stimulus_screen_height(self, value: float):
@@ -116,26 +116,27 @@ class Settings(object):
 
     @property
     def stimulus_saccadic_ball_radius(self) -> float:
-        return self._settings.value('Stimulus/SaccadicBallRadius', SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS)
+        return float(self._settings.value('Stimulus/SaccadicBallRadius', SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS))
 
     @stimulus_saccadic_ball_radius.setter
     def stimulus_saccadic_ball_radius(self, value: float):
         self._settings.setValue('Stimulus/SaccadicBallRadius', value)
 
     @property
-    def stimulus_saccadic_ball_color(self) -> str:
-        return self._settings.value('Stimulus/SaccadicBallColor', SETTINGS_DEFAULT_STIMULUS_BALL_COLOR)
+    def stimulus_saccadic_ball_color(self) -> QColor:
+        return QColor(self._settings.value('Stimulus/SaccadicBallColor', SETTINGS_DEFAULT_STIMULUS_BALL_COLOR))
 
     @stimulus_saccadic_ball_color.setter
-    def stimulus_saccadic_ball_color(self, value: str):
+    def stimulus_saccadic_ball_color(self, value: QColor):
         self._settings.setValue('Stimulus/SaccadicBallColor', value)
 
     @property
-    def stimulus_saccadic_background_color(self) -> str:
-        return self._settings.value('Stimulus/SaccadicBackgroundColor', SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR)
+    def stimulus_saccadic_background_color(self) -> QColor:
+        return QColor(
+            self._settings.value('Stimulus/SaccadicBackgroundColor', SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR))
 
     @stimulus_saccadic_background_color.setter
-    def stimulus_saccadic_background_color(self, value: str):
+    def stimulus_saccadic_background_color(self, value: QColor):
         self._settings.setValue('Stimulus/SaccadicBackgroundColor', value)
 
     @property

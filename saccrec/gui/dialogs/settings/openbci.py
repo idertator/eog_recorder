@@ -82,10 +82,10 @@ class OpenBCISettingsPage(QWidget):
             self._openbci_board_mode_combo.setCurrentIndex(0)
 
         # openbci_baudrate_edit
-        self._openbci_baudrate_edit.setValue(int(self._settings.openbci_baudrate))
+        self._openbci_baudrate_edit.setValue(self._settings.openbci_baudrate)
 
         # openbci_timeout_edit
-        self._openbci_timeout_edit.setValue(int(self._settings.openbci_timeout))
+        self._openbci_timeout_edit.setValue(self._settings.openbci_timeout)
 
     def save(self):
         self._settings.openbci_port = self._openbci_ports_combo.currentData()

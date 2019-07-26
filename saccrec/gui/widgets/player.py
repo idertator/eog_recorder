@@ -1,8 +1,8 @@
 from math import ceil
 from time import time
 
-from PyQt5.QtCore import pyqtSignal, QTimer
-from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtCore import pyqtSignal, Qt, QTimer
+from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import qApp, QWidget
 
 from saccrec.core import Settings
@@ -10,23 +10,22 @@ from saccrec.engine.stimulus import SaccadicStimuli
 
 
 STIMULUS_TIMEOUT = 7    # TODO: Calculate this from the refresh rate of the monitor
-BACKGROUND_COLOR = QColor(0, 0, 0)
-BALL_RADIUS = 10
-BALL_COLOR = QColor(255, 255, 255)
 
 
 class StimulusPlayerWidget(QWidget):
     stimuliStarted = pyqtSignal(float)
+    stimuliStopped = pyqtSignal()
     stimuliFinished = pyqtSignal()
     
     def __init__(self, settings: Settings, parent=None):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
         self._settings = settings
         
-        self._sampling_step = 1000 / int(self._settings.openbci_sample_rate)
+        self._sampling_step = 1000 / self._settings.openbci_sample_rate
 
         self._stimuli = None
         self._ball_position = None
+        self._initial_message = None
 
         self._timer = QTimer()
         self._timer.setInterval(STIMULUS_TIMEOUT)
@@ -34,13 +33,41 @@ class StimulusPlayerWidget(QWidget):
 
         self._start_time = 0
 
-    def run_stimulus(self, stimuli: SaccadicStimuli):
-        self._stimuli = stimuli
-        self._ball_position = stimuli.screen_position(0)
+        self._load_settings()
+
+    def _load_settings(self):
+        if self._stimuli is None:
+            self._ball_radius = self._settings.stimulus_saccadic_ball_radius
+        else:
+            self._ball_radius = self._stimuli.cm_to_pixels_x(self._settings.stimulus_saccadic_ball_radius)
+        self._ball_color = self._settings.stimulus_saccadic_ball_color
+        self._background_color = self._settings.stimulus_saccadic_background_color
+
+    def _start_stimulus(self):
+        self._ball_position = self._stimuli.screen_position(0)
         self.update()
         self._start_time = time()
         self._timer.start()
         self.stimuliStarted.emit(self._start_time)
+
+    def run_stimulus(
+        self, 
+        stimuli: SaccadicStimuli, 
+        initial_message: str = None
+    ):
+        self._stimuli = stimuli
+        self._load_settings()
+        self._initial_message = initial_message
+    
+        if initial_message is None:
+            self._start_stimulus()
+        else:
+            self.update()
+
+    def close_player(self):
+        self.setParent(qApp.topLevelWidgets()[0])
+        self.close()
+        self.setParent(None)
 
     def on_timeout(self):
         elapsed = (time() - self._start_time) * 1000.0
@@ -57,20 +84,39 @@ class StimulusPlayerWidget(QWidget):
         painter = QPainter()
         painter.begin(self)
 
-        painter.setBackground(BACKGROUND_COLOR)
-        painter.fillRect(self.rect(), BACKGROUND_COLOR)
+        painter.setBackground(self._background_color)
+        painter.fillRect(self.rect(), self._background_color)
 
-        painter.setBrush(BALL_COLOR)
+        if self._start_stimulus is not None:
+            painter.save()
+            painter.setPen(self._ball_color)
+            
+            font = painter.font()
+            font.setPixelSize(48)
+            painter.setFont(font)
+
+            painter.drawText(
+                self.rect(),
+                Qt.AlignHCenter | Qt.AlignVCenter,
+                self._initial_message
+            )
+            painter.restore()
 
         if self._ball_position is not None:
-            painter.drawEllipse(self._ball_position, BALL_RADIUS, BALL_RADIUS)
+            painter.setPen(self._ball_color)
+            painter.setBrush(self._ball_color)
+            painter.drawEllipse(self._ball_position, self._ball_radius, self._ball_radius)
 
         painter.end()
 
-    def close_player(self):
-        self.setParent(qApp.topLevelWidgets()[0])
-        self.close()
-        self.setParent(None)
+    def keyPressEvent(self, event):
+        if not self._timer.isActive() and event.key() == Qt.Key_Space:
+            self._initial_message = None
+            self._start_stimulus()
+        elif self._timer.isActive() and (event.modifiers() & Qt.ControlModifier) and event.key() == Qt.Key_C:
+            self._timer.stop()
+            self.close_player()
+            self.stimuliStopped.emit()
 
 
 # class StimulusPlayerWidget1(QWidget):

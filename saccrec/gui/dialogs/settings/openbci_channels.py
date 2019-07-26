@@ -34,10 +34,10 @@ class OpenBCIChannelWidget(QWidget):
         self._gain_label.setVisible(self._openbci_channel_activated_check.checkState())
 
     def load_settings(self):
-        self._openbci_channel_activated_check.setChecked(bool(int(self._settings.openbci_channels[self._channel_number][0])))
+        self._openbci_channel_activated_check.setChecked(self._settings.openbci_channels[self._channel_number][0])
         self._gain_label.setVisible(self._openbci_channel_activated_check.isChecked())
         self._openbci_channel_gain_edit.setVisible(self._openbci_channel_activated_check.isChecked())
-        self._openbci_channel_gain_edit.setValue(int(self._settings.openbci_channels[self._channel_number][1]))
+        self._openbci_channel_gain_edit.setValue(self._settings.openbci_channels[self._channel_number][1])
 
     def save(self):
         self._settings.openbci_channels[self._channel_number] = self._openbci_channel_activated_check.isChecked()

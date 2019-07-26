@@ -1,4 +1,4 @@
-from math import floor
+from math import floor, ceil
 from random import randint
 
 from numpy import array, int8, zeros, ones, hstack
@@ -17,7 +17,7 @@ class SaccadicStimuli(object):
         fixation_duration: float,   
         fixation_variability: float,
         saccades_count: int,
-        test_name: str = 'Saccadic'
+        test_name: str = 'Prueba Sacádica'
     ):
         """Constructor
     
@@ -39,6 +39,7 @@ class SaccadicStimuli(object):
         self._left_ball = None
         self._center_ball = None
         self._right_ball = None
+        self._cm_to_pixels_x = 1.0
 
         sampling_rate = settings.openbci_sample_rate
 
@@ -58,6 +59,8 @@ class SaccadicStimuli(object):
 
         self._channel = hstack(chunks)
 
+        self.reset_settings()
+
     def __str__(self):
         return f'{self._test_name} {self._angle}\u00B0'
 
@@ -65,10 +68,10 @@ class SaccadicStimuli(object):
         cm_width = self._settings.stimulus_screen_width
         cm_center = cm_width / 2
         cm_delta = self._settings.stimulus_saccadic_distance / 2
-        cm_to_pixels = self._screen.secondary_screen_rect.width() / cm_width
+        self._cm_to_pixels_x = self._screen.secondary_screen_rect.width() / cm_width
 
-        left_x = (cm_center - cm_delta) * cm_to_pixels
-        right_x = (cm_center + cm_delta) * cm_to_pixels
+        left_x = (cm_center - cm_delta) * self._cm_to_pixels_x
+        right_x = (cm_center + cm_delta) * self._cm_to_pixels_x
         center_x = self._screen.secondary_screen_rect.center().x()
 
         y = self._screen.secondary_screen_rect.center().y()
@@ -100,6 +103,9 @@ class SaccadicStimuli(object):
             return self._center_ball
 
         return None
+
+    def cm_to_pixels_x(self, value: float) -> int:
+        return ceil(value * self._cm_to_pixels_x)
 
     @property
     def angle(self) -> int:

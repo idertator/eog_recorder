@@ -1,17 +1,16 @@
-from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QDoubleSpinBox, QWidget, QColorDialog, QPushButton
 from PyQt5.QtWidgets import QFormLayout
 from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM, \
     SETTINGS_STIMULUS_SACCADIC_DISTANCE_MAXIMUM, SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MINIMUM, \
-    SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MAXIMUM, SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR
+    SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MAXIMUM
 
 from saccrec.core.settings import Settings
 
 
 class ColorButton(QPushButton):
 
-    def __init__(self, color: str = None, *args, **kwargs):
+    def __init__(self, color: QColor = None, *args, **kwargs):
         super(ColorButton, self).__init__(*args, **kwargs)
 
         self._color = color
@@ -19,25 +18,23 @@ class ColorButton(QPushButton):
         self.setFixedHeight(32)
         self.pressed.connect(self.onColorPicker)
 
-    def value(self):
+    def value(self) -> QColor:
         return self._color
 
-    def setColor(self, color):
-        if color != self._color:
-            self._color = color
-
+    def setColor(self, color: QColor):
+        self._color = color
         if self._color:
-            self.setStyleSheet(f'background-color: {self._color};')
+            self.setStyleSheet(f'background-color: {self._color.name()};')
         else:
             self.setStyleSheet("")
 
     def onColorPicker(self):
         dlg = QColorDialog(self)
         if self._color:
-            dlg.setCurrentColor(QColor(self._color))
+            dlg.setCurrentColor(self._color)
 
         if dlg.exec_():
-            self.setColor(dlg.currentColor().name())
+            self.setColor(dlg.currentColor())
 
 
 class StimulusSettingsPage(QWidget):
