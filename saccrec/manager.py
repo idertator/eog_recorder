@@ -2,6 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from saccrec.core import Settings, Screen
 
+
 class Manager(QObject):
     recordingStarted = pyqtSignal()
     recordingStopped = pyqtSignal()

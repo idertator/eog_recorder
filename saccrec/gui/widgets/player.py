@@ -24,7 +24,7 @@ class StimulusPlayerWidget(QWidget):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
         self._settings = settings
         
-        self._sampling_step = 1000 / self._settings.sampling_frequency
+        self._sampling_step = 1000 / self._settings.openbci_sample_rate
 
         self._stimuli = None
         self._ball_position = None

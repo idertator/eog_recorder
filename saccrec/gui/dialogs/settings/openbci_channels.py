@@ -61,7 +61,6 @@ class OpenBCIChannelsSettingsPage(QWidget):
         layout.addLayout(layout2)
         self.setLayout(layout)
 
-
     def save(self):
         for channel in self.channel_list:
             channel.save()
