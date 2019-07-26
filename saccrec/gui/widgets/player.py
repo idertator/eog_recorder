@@ -1,12 +1,11 @@
-from datetime import datetime
 from math import ceil
-from time import time, sleep
+from time import time
 
 from PyQt5.QtCore import pyqtSignal, QTimer
 from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import qApp, QWidget
 
-from saccrec.core import Settings, StimulusPosition
+from saccrec.core import Settings
 from saccrec.engine.stimulus import SaccadicStimuli
 
 
@@ -24,7 +23,7 @@ class StimulusPlayerWidget(QWidget):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
         self._settings = settings
         
-        self._sampling_step = 1000 / self._settings.openbci_sample_rate
+        self._sampling_step = 1000 / int(self._settings.openbci_sample_rate)
 
         self._stimuli = None
         self._ball_position = None
