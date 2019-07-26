@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QSettings
+from PyQt5.QtGui import QColor
 
 from saccrec.consts import SETTINGS_STIMULUS_SCREEN_WIDTH_MINIMUM, SETTINGS_OPENBCI_DEFAULT_BOARD_TYPE, \
     SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE, SETTINGS_OPENBCI_DEFAULT_BOARD_MODE, SETTINGS_OPENBCI_DEFAULT_BAUDRATE, \
@@ -97,16 +98,16 @@ class Settings(object):
         self._settings.setValue('StimulusSaccadicBallRadius', value)
 
     @property
-    def stimulus_saccadic_ball_color(self) -> str:
-        return self._settings.value('StimulusSaccadicBallColor', SETTINGS_DEFAULT_STIMULUS_BALL_COLOR)
+    def stimulus_saccadic_ball_color(self) -> QColor:
+        return QColor(self._settings.value('StimulusSaccadicBallColor', SETTINGS_DEFAULT_STIMULUS_BALL_COLOR))
 
     @stimulus_saccadic_ball_color.setter
     def stimulus_saccadic_ball_color(self, value: str):
         self._settings.setValue('StimulusSaccadicBallColor', value)
 
     @property
-    def stimulus_saccadic_background_color(self) -> str:
-        return self._settings.value('StimulusSaccadicBackgroundColor', SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR)
+    def stimulus_saccadic_background_color(self) -> QColor:
+        return QColor(self._settings.value('StimulusSaccadicBackgroundColor', SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR))
 
     @stimulus_saccadic_background_color.setter
     def stimulus_saccadic_background_color(self, value: str):
