@@ -19,9 +19,10 @@ class SettingsDialog(QDialog):
         self.contentsWidget.setFlow(QListView.TopToBottom)
         self.contentsWidget.setViewMode(QListView.IconMode)
         self.contentsWidget.setMovement(QListView.Static)
-        self.contentsWidget.setFixedWidth(140)
+        self.contentsWidget.setFixedWidth(150)
         self.contentsWidget.setFixedHeight(260)
         self.contentsWidget.setSpacing(5)
+        self.contentsWidget.setIconSize(QSize(25, 25))
 
         self.pagesWidget = QStackedWidget()
         self.pagesWidget.addWidget(OpenBCISettingsPage(self._settings))
@@ -31,29 +32,30 @@ class SettingsDialog(QDialog):
         self.contentsWidget.setCurrentRow(0)
 
         openbci_button = QListWidgetItem(QIcon(':openbci.png'), 'OpenBCI')
-        openbci_button.setSizeHint(QSize(125, 50))
         self.contentsWidget.addItem(openbci_button)
         openbci_button.setTextAlignment(Qt.AlignHCenter)
         openbci_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
         channel_button = QListWidgetItem(QIcon(':channels.svg'), 'Canales')
-        channel_button.setSizeHint(QSize(125, 50))
         self.contentsWidget.addItem(channel_button)
         channel_button.setTextAlignment(Qt.AlignHCenter)
         channel_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
         screen_button = QListWidgetItem(QIcon(':screen.svg'), 'Pantalla de estimulo')
-        screen_button.setSizeHint(QSize(125, 50))
         self.contentsWidget.addItem(screen_button)
         screen_button.setTextAlignment(Qt.AlignHCenter)
         screen_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
         stimulus_button = QListWidgetItem(QIcon(':stimuli.svg'), 'Estimulo')
-        stimulus_button.setSizeHint(QSize(125, 50))
         self.contentsWidget.addItem(stimulus_button)
         stimulus_button.setTextAlignment(Qt.AlignHCenter)
         stimulus_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
+        screen_button.setTextAlignment(Qt.AlignHCenter)
+        openbci_button.setTextAlignment(Qt.AlignHCenter)
+        channel_button.setTextAlignment(Qt.AlignHCenter)
+        screen_button.setTextAlignment(Qt.AlignHCenter)
+        stimulus_button.setTextAlignment(Qt.AlignHCenter)
         self.contentsWidget.currentItemChanged.connect(self.change_page)
 
         layout = QVBoxLayout()

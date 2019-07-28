@@ -29,10 +29,7 @@ class ColorButton(QPushButton):
             self.setStyleSheet("")
 
     def onColorPicker(self):
-        dlg = QColorDialog(self)
-        if self._color:
-            dlg.setCurrentColor(self._color)
-
+        dlg = QColorDialog(self._color)
         if dlg.exec_():
             self.setColor(dlg.currentColor())
 
@@ -65,7 +62,7 @@ class StimulusSettingsPage(QWidget):
 
     def load_settings(self):
         self._stimulus_saccadic_distance_edit.setValue(self._settings.stimulus_saccadic_distance)
-        self._stimulus_saccadic_ball_radius_edit.setValue(float(self._settings.stimulus_saccadic_ball_radius))
+        self._stimulus_saccadic_ball_radius_edit.setValue(self._settings.stimulus_saccadic_ball_radius)
         self._stimulus_saccadic_ball_color_select.setColor(self._settings.stimulus_saccadic_ball_color)
         self._stimulus_saccadic_background_color_select.setColor(self._settings.stimulus_saccadic_background_color)
 
