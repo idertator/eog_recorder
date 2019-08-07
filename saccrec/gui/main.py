@@ -13,6 +13,8 @@ from saccrec.gui.wizards import RecordSetupWizard
 
 import saccrec.gui.icons
 
+from .runner import Runner
+
 
 class MainWindow(QMainWindow):
 
@@ -38,6 +40,13 @@ class MainWindow(QMainWindow):
 
         self._settings_dialog = SettingsDialog(self._settings, self)
         self._stimulus_player = StimulusPlayerWidget(self._settings, None)
+
+        self._runner = Runner(
+            settings=self._settings,
+            screen=self._screen,
+            player=self._stimulus_player, 
+            parent=self
+        )
 
         self.initUI()
 
@@ -105,18 +114,8 @@ class MainWindow(QMainWindow):
         self._new_action.setEnabled(False)
         self._settings_action.setEnabled(False)
 
-        self._stimulus_player.move(
-            self._screen.secondary_screen_rect.left(), 
-            self._screen.secondary_screen_rect.top()
-        )
-        self._stimulus_player.showFullScreen()
+        self._runner.run(self._manager.tests)
         
-        stimuli = self._manager.current_stimuli
-        self._stimulus_player.run_stimulus(
-            stimuli, 
-            '\n'.join([str(stimuli), 'Presione espacio para continuar'])
-        )
-
     def on_recording_stopped(self):
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)

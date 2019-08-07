@@ -13,9 +13,9 @@ STIMULUS_TIMEOUT = 7    # TODO: Calculate this from the refresh rate of the moni
 
 
 class StimulusPlayerWidget(QWidget):
-    stimuliStarted = pyqtSignal(float)
-    stimuliStopped = pyqtSignal()
-    stimuliFinished = pyqtSignal()
+    started = pyqtSignal(float)
+    stopped = pyqtSignal()
+    finished = pyqtSignal()
     
     def __init__(self, settings: Settings, parent=None):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
@@ -48,7 +48,7 @@ class StimulusPlayerWidget(QWidget):
         self.update()
         self._start_time = time()
         self._timer.start()
-        self.stimuliStarted.emit(self._start_time)
+        self.started.emit(self._start_time)
 
     def run_stimulus(
         self, 
@@ -77,8 +77,7 @@ class StimulusPlayerWidget(QWidget):
 
         if self._ball_position is None:
             self._timer.stop()
-            self.close_player()
-            self.stimuliFinished.emit()
+            self.finished.emit()
             
     def paintEvent(self, event):
         painter = QPainter()
@@ -115,8 +114,7 @@ class StimulusPlayerWidget(QWidget):
             self._start_stimulus()
         elif self._timer.isActive() and (event.modifiers() & Qt.ControlModifier) and event.key() == Qt.Key_C:
             self._timer.stop()
-            self.close_player()
-            self.stimuliStopped.emit()
+            self.stopped.emit()
 
 
 # class StimulusPlayerWidget1(QWidget):
