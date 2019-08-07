@@ -59,6 +59,8 @@ class Runner(QObject):
     def on_player_started(self):
         if not self._signals.isVisible():
             self._signals.show()
+
+        if not self._signals.is_rendering:
             self._signals.start()
 
     def on_player_stopped(self):
@@ -67,6 +69,7 @@ class Runner(QObject):
         self.stopped.emit()
     
     def on_player_finished(self):
+        self._signals.stop()
         if self._next_test < len(self._tests):
             stimuli = self._tests[self._next_test]
             self._next_test += 1
@@ -76,6 +79,5 @@ class Runner(QObject):
                 '\n'.join([str(stimuli), 'Presione espacio para continuar'])
             )
         else:
-            self._signals.stop()
             self._player.close_player()
             self.finished.emit()
