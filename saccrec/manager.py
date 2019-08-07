@@ -6,9 +6,9 @@ from saccrec.core import Settings, Screen
 
 
 class Manager(QObject):
-    recordingStarted = pyqtSignal()
-    recordingStopped = pyqtSignal()
-    recordingFinished = pyqtSignal()
+    started = pyqtSignal()
+    stopped = pyqtSignal()
+    finished = pyqtSignal()
 
     def __init__(self, settings: Settings, screen: Screen, parent=None):
         super(Manager, self).__init__(parent=parent)
@@ -27,26 +27,10 @@ class Manager(QObject):
         self._stimulus = stimulus
         self._output = output
 
-        self.recordingStarted.emit()
+        self.started.emit()
         
     def stop_recording(self):
-        self.recordingStopped.emit()
-
-    @property
-    def current_stimuli(self):
-        # Deprecated: Remove this method
-        if self._stimulus is not None:
-            from saccrec.engine.stimulus import SaccadicStimuli
-
-            return SaccadicStimuli(
-                settings=self._settings,
-                screen=self._screen,
-                angle=self._stimulus['angle'],
-                fixation_duration=self._stimulus['fixation_duration'],
-                fixation_variability=self._stimulus['fixation_variability'],
-                saccades_count=self._stimulus['saccades_count']
-            )
-        return None
+        self.stopped.emit()
 
     @property
     def tests(self) -> List['SaccadicStimuli']:

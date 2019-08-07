@@ -47,8 +47,8 @@ class StimulusPlayerWidget(QWidget):
         self._ball_position = self._stimuli.screen_position(0)
         self.update()
         self._start_time = time()
-        self._timer.start()
         self.started.emit(self._start_time)
+        self._timer.start()
 
     def run_stimulus(
         self, 

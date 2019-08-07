@@ -95,8 +95,16 @@ class SignalsWidget(QWidget):
         self._refresh_timer = QTimer()
         self._refresh_timer.setInterval(200)
         self._refresh_timer.timeout.connect(self.fetch_signals)
+
+    def start(self):
         self._refresh_timer.start()
 
+    def stop(self):
+        self._refresh_timer.stop()
+
+    def fetch_signals(self):
+        self._manager.add_random_samples()
+        self.update()
 
     @property
     def channel_height(self) -> int:
@@ -141,7 +149,3 @@ class SignalsWidget(QWidget):
             painter.restore()
 
         painter.end()
-
-    def fetch_signals(self):
-        self._manager.add_random_samples()
-        self.update()

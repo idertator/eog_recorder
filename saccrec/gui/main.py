@@ -29,11 +29,10 @@ class MainWindow(QMainWindow):
             screen=self._screen,
             parent=self
         )
-        self._manager.recordingStarted.connect(self.on_recording_started)
-        self._manager.recordingStopped.connect(self.on_recording_stopped)
-        self._manager.recordingFinished.connect(self.on_recording_finished)
+        self._manager.started.connect(self.on_recording_started)
 
-        self.signals_widget = SignalsWidget(self)
+        self._signals_widget = SignalsWidget(self)
+        self._signals_widget.setVisible(False)
 
         self._new_record_wizard = RecordSetupWizard(self)
         self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
@@ -44,9 +43,13 @@ class MainWindow(QMainWindow):
         self._runner = Runner(
             settings=self._settings,
             screen=self._screen,
-            player=self._stimulus_player, 
+            player=self._stimulus_player,
+            signals=self._signals_widget,
             parent=self
         )
+
+        self._runner.stopped.connect(self.on_runner_stopped)
+        self._runner.finished.connect(self.on_runner_finished)
 
         self.initUI()
 
@@ -97,7 +100,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('EyeTracker OpenBCI')
 
-        self.setCentralWidget(self.signals_widget)
+        self.setCentralWidget(self._signals_widget)
 
         self.show()
 
@@ -116,10 +119,12 @@ class MainWindow(QMainWindow):
 
         self._runner.run(self._manager.tests)
         
-    def on_recording_stopped(self):
+    def on_runner_stopped(self):
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)
 
-    def on_recording_finished(self):
+    def on_runner_finished(self):
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)
+        
+

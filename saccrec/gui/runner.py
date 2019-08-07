@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 
 from saccrec.core import Settings, Screen
 from saccrec.engine.stimulus import SaccadicStimuli
-from saccrec.gui.widgets import StimulusPlayerWidget
+from saccrec.gui.widgets import StimulusPlayerWidget, SignalsWidget
 
 
 class Runner(QObject):
@@ -17,16 +17,19 @@ class Runner(QObject):
         settings: Settings,
         screen: Screen,
         player: StimulusPlayerWidget, 
+        signals: SignalsWidget,
         parent=None
     ):
         super(Runner, self).__init__(parent=parent)
         self._settings = settings
         self._screen = screen
         self._player = player
+        self._signals = signals
 
         self._tests = None
         self._next_test = None
 
+        self._player.started.connect(self.on_player_started)
         self._player.stopped.connect(self.on_player_stopped)
         self._player.finished.connect(self.on_player_finished)
 
@@ -39,6 +42,8 @@ class Runner(QObject):
         self._tests = tests
         self._next_test = 1
 
+        self._signals.hide()
+
         stimuli = tests[0]
         self._player.run_stimulus(
             stimuli, 
@@ -49,10 +54,15 @@ class Runner(QObject):
             self._screen.secondary_screen_rect.top()
         )
         self._player.showFullScreen()
-
         self.started.emit()
 
+    def on_player_started(self):
+        if not self._signals.isVisible():
+            self._signals.show()
+            self._signals.start()
+
     def on_player_stopped(self):
+        self._signals.stop()
         self._player.close_player()
         self.stopped.emit()
     
@@ -66,5 +76,6 @@ class Runner(QObject):
                 '\n'.join([str(stimuli), 'Presione espacio para continuar'])
             )
         else:
+            self._signals.stop()
             self._player.close_player()
             self.finished.emit()
