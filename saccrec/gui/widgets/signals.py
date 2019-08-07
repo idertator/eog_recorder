@@ -95,16 +95,23 @@ class SignalsWidget(QWidget):
         self._refresh_timer = QTimer()
         self._refresh_timer.setInterval(200)
         self._refresh_timer.timeout.connect(self.fetch_signals)
+        self._rendering = False
 
     def start(self):
+        self._rendering = True
         self._refresh_timer.start()
 
     def stop(self):
         self._refresh_timer.stop()
+        self._rendering = False
 
     def fetch_signals(self):
         self._manager.add_random_samples()
         self.update()
+
+    @property
+    def is_rendering(self) -> bool:
+        return self._rendering
 
     @property
     def channel_height(self) -> int:

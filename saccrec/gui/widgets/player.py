@@ -32,8 +32,10 @@ class StimulusPlayerWidget(QWidget):
         self._timer.timeout.connect(self.on_timeout)
 
         self._start_time = 0
+        self._first_paint = None
 
         self._load_settings()
+
 
     def _load_settings(self):
         if self._stimuli is None:
@@ -46,9 +48,10 @@ class StimulusPlayerWidget(QWidget):
     def _start_stimulus(self):
         self._ball_position = self._stimuli.screen_position(0)
         self.update()
+
         self._start_time = time()
-        self.started.emit(self._start_time)
         self._timer.start()
+        self.started.emit(self._start_time)
 
     def run_stimulus(
         self, 
@@ -86,7 +89,7 @@ class StimulusPlayerWidget(QWidget):
         painter.setBackground(self._background_color)
         painter.fillRect(self.rect(), self._background_color)
 
-        if self._start_stimulus is not None:
+        if self._initial_message is not None:
             painter.save()
             painter.setPen(self._ball_color)
             
@@ -107,6 +110,10 @@ class StimulusPlayerWidget(QWidget):
             painter.drawEllipse(self._ball_position, self._ball_radius, self._ball_radius)
 
         painter.end()
+
+        if self._first_paint is None and self._ball_position is not None:
+            self._first_paint = time()
+            print(f'Latency from player initialization: {self._first_paint - self._start_time}')
 
     def keyPressEvent(self, event):
         if not self._timer.isActive() and event.key() == Qt.Key_Space:

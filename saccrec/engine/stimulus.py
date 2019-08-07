@@ -72,7 +72,7 @@ class SaccadicStimuli(object):
 
         left_x = (cm_center - cm_delta) * self._cm_to_pixels_x
         right_x = (cm_center + cm_delta) * self._cm_to_pixels_x
-        center_x = self._screen.secondary_screen_rect.center().x()
+        center_x = (left_x + right_x ) / 2
 
         y = self._screen.secondary_screen_rect.center().y()
 
