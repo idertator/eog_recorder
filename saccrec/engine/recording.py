@@ -1,23 +1,29 @@
 import time
 import pandas as pd
 from openbci_interface import Cyton
-from openbci_interface import util
+from openbci_interface.util import list_devices
 from serial import Serial
 import pickle
 
+from saccrec.consts import DEBUG
+
 
 def list_ports():
-    ports = []
-    for port in util.list_devices():
-        ports.append(port)
-    return ports
-
-print(list_ports())
+    if DEBUG:
+        return [
+            '/dev/ttyUSB0',
+            '/dev/ttyUSB1',
+        ]
+    return [port for port in list_devices()]
 
 def init_board():
     sample_rate = 250
     puerto = '/dev/ttyUSB0'
-    port = Serial(port=puerto,baudrate=115200,timeout=2)
+    port = Serial(
+        port=puerto,
+        baudrate=115200,
+        timeout=2
+    )
 
     print("configurando placa...\n")
 

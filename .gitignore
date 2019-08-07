@@ -104,8 +104,12 @@ venv.bak/
 .mypy_cache/
 
 # IDE
+.idea
 .vscode
 
 # GitIgnore de Wilmer
 
 PruebasWilmer/
+
+# MacOs
+.DS_Store
