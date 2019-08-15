@@ -19,10 +19,11 @@ class SettingsDialog(QDialog):
         self.contentsWidget.setFlow(QListView.TopToBottom)
         self.contentsWidget.setViewMode(QListView.IconMode)
         self.contentsWidget.setMovement(QListView.Static)
-        self.contentsWidget.setFixedWidth(150)
-        self.contentsWidget.setFixedHeight(260)
+        self.contentsWidget.setFixedWidth(80)
+        self.contentsWidget.setFixedHeight(362)
         self.contentsWidget.setSpacing(5)
-        self.contentsWidget.setIconSize(QSize(25, 25))
+        self.contentsWidget.setIconSize(QSize(60, 60))
+        self.adjustSize()
 
         self.pagesWidget = QStackedWidget()
         self.pagesWidget.addWidget(OpenBCISettingsPage(self._settings))
@@ -31,6 +32,8 @@ class SettingsDialog(QDialog):
         self.pagesWidget.addWidget(StimulusSettingsPage(self._settings))
         self.contentsWidget.setCurrentRow(0)
 
+
+        # MENUS
         openbci_button = QListWidgetItem(QIcon(':openbci.png'), 'OpenBCI')
         self.contentsWidget.addItem(openbci_button)
         openbci_button.setTextAlignment(Qt.AlignHCenter)
@@ -41,7 +44,7 @@ class SettingsDialog(QDialog):
         channel_button.setTextAlignment(Qt.AlignHCenter)
         channel_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-        screen_button = QListWidgetItem(QIcon(':screen.svg'), 'Pantalla de estimulo')
+        screen_button = QListWidgetItem(QIcon(':screen.svg'), 'Pantalla')
         self.contentsWidget.addItem(screen_button)
         screen_button.setTextAlignment(Qt.AlignHCenter)
         screen_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)

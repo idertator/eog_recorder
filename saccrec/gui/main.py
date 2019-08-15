@@ -126,5 +126,5 @@ class MainWindow(QMainWindow):
     def on_runner_finished(self):
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)
-        
+        self._manager.finish_recording()
 

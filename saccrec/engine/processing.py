@@ -6,9 +6,7 @@ from numpy import array
 from scipy.signal import medfilt
 from sklearn.cluster import KMeans
 
-from saccrec.core import Channel, ChannelsBuffer
-
-_buffer = ChannelsBuffer()
+from saccrec.core import Channel
 
 
 @njit(fastmath=True, parallel=True)
@@ -76,24 +74,3 @@ def identify_kmeans(
 
     if window is not None and last_range is not None and max(window) - min(window) >= amplitude_threshold:
         yield last_range
-
-
-class SaccadeDetector(Process):
-
-    def __init__(self, **settings):
-        super(Process, self).__init__()
-
-        self._settings = settings
-        self.sent_samples = 0
-
-    def start_session(self):
-        pass
-
-    def finish_session(self):
-        pass
-
-    def next_samples(count: int) -> Dict[Channel, array]:
-        pass
-
-    def _detect_saccades(self) -> Tuple[int, int]:
-        pass

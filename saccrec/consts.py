@@ -3,16 +3,20 @@ from PyQt5.QtGui import QColor
 
 DEBUG = True
 
+DATE_FORMAT = '%d/%m/%Y'
+DATETIME_FORMAT = '%d/%m/%Y %H:%M'
+
 GENRES = (
-    (0, 'Masculino'),
-    (1, 'Femenino'),
+    ('Unknown', 'Desconocido'),
+    ('Male', 'Masculino'),
+    ('Female', 'Femenino'),
 )
 
 SUBJECT_STATUSES = (
-    (0, 'Desconocido'),
-    (1, 'Control'),
-    (2, 'Presintomático'),
-    (3, 'SCA2'),
+    ('Unknown', 'Desconocido'),
+    ('Control', 'Control'),
+    ('Presymptomatic', 'Presintomático'),
+    ('SCA2', 'SCA2'),
 )
 
 OPENBCI_BOARD_TYPES = (

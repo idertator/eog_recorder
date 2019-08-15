@@ -41,12 +41,18 @@ class StimulusSettingsPage(QWidget):
         layout = QFormLayout()
 
         self._stimulus_saccadic_distance_edit = QDoubleSpinBox()
+        self._stimulus_saccadic_distance_edit.setFixedWidth(85)
         self._stimulus_saccadic_distance_edit.setMinimum(SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM)
         self._stimulus_saccadic_distance_edit.setMaximum(SETTINGS_STIMULUS_SACCADIC_DISTANCE_MAXIMUM)
         self._stimulus_saccadic_distance_edit.setSuffix(' cm')
-        layout.addRow('Distancia de estímulo sacádico', self._stimulus_saccadic_distance_edit)
+
+        # TODO: Hay que redactar mejor esto
+        aclaracion = 'Para pruebas con ángulos de estimulación menor a 30 grados, deberá tomarse esta distancia para el ángulo de cal'
+        layout.addRow('Distancia máxima de estímulo sacádico', self._stimulus_saccadic_distance_edit)
+
 
         self._stimulus_saccadic_ball_radius_edit = QDoubleSpinBox()
+        self._stimulus_saccadic_ball_radius_edit.setFixedWidth(85)
         self._stimulus_saccadic_ball_radius_edit.setMinimum(SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MINIMUM)
         self._stimulus_saccadic_ball_radius_edit.setMaximum(SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MAXIMUM)
         self._stimulus_saccadic_ball_radius_edit.setSuffix(' cm')
