@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
 
+from saccrec.core.models import Subject
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 
 
@@ -57,6 +58,10 @@ class RecordSetupWizard(QWizard):
             'stimulus': self._stimulus_page.json,
             'output': self._output_page.json,
         }
+
+    @property
+    def subject(self) -> Subject:
+        return self._subject_page.subject
 
     def finish_wizard(self):
         self.finished.emit()
@@ -130,6 +135,10 @@ class SubjectWizardPage(QWizardPage):
     def json(self) -> dict:
         return self._subject_widget.json
 
+    @property
+    def subject(self) -> Subject:
+        return self._subject_widget.model
+
 class StimulusWizardPage(QWizardPage):
 
     def __init__(self, parent=None):
@@ -186,6 +195,7 @@ class OutputWizardPage(QWizardPage):
 
         self.setLayout(layout)
 
+    @property
     def json(self) -> str:
         return self._output_path_edit.text()
 

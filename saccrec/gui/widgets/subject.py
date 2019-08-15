@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFormLayout
 from PyQt5.QtWidgets import QLineEdit, QComboBox, QDateEdit
 
+from saccrec.core.models import Subject
 from saccrec.consts import GENRES, GENRES_DICT, SUBJECT_STATUSES, SUBJECT_STATUSES_DICT, SUBJECT_STATUSES_LABELS
 
 INITIAL_DATE = QDate(2000, 1, 1)
@@ -55,11 +56,11 @@ class SubjectWidget(QWidget):
             self.fullnameChanged.emit(value)
 
     @property
-    def genre(self) -> int:
+    def genre(self) -> str:
         return self._genre_combo.currentData()
 
     @genre.setter
-    def genre(self, value: int):
+    def genre(self, value: str):
         self._genre_combo.setCurrentIndex(GENRES_DICT[value])
 
     @property
@@ -72,11 +73,11 @@ class SubjectWidget(QWidget):
         self._borndate_edit.setDate(qdate)
 
     @property
-    def status(self) -> int:
+    def status(self) -> str:
         return self._status_combo.currentData()
 
     @status.setter
-    def status(self, value: int):
+    def status(self, value: str):
         self._status_combo.setCurrentIndex(SUBJECT_STATUSES_DICT[value])
 
     @property
@@ -91,6 +92,15 @@ class SubjectWidget(QWidget):
             'borndate': self.borndate,
             'status': self.status,
         }
+
+    @property
+    def model(self) -> Subject:
+        return Subject(
+            full_name=self.full_name,
+            genre=self.genre,
+            borndate=self.borndate,
+            status=self.status
+        )
 
     def on_full_name_changed(self):
         value = self._full_name_edit.text()

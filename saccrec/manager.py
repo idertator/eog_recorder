@@ -2,7 +2,8 @@ from typing import List
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from saccrec.core import Settings, Screen
+from saccrec.core import Settings, Screen, Record
+from saccrec.core.models import Subject, Hardware
 
 
 class Manager(QObject):
@@ -22,15 +23,34 @@ class Manager(QObject):
 
         self._tests = None
 
+        self._record = None
+
     def start_recording(self, subject, stimulus, output, **kwargs):
         self._subject = subject
         self._stimulus = stimulus
         self._output = output
 
+        subject = Subject.from_json(subject)
+        hardware = Hardware(
+            board=self._settings.openbci_board_type,
+            mode=self._settings.openbci_board_mode,
+            sample_rate=self._settings.openbci_sample_rate,
+            channels=self._settings.openbci_channels.json
+        )
+
+        self._record = Record(
+            subject=subject,
+            hardware=hardware
+        )
+
         self.started.emit()
         
     def stop_recording(self):
         self.stopped.emit()
+
+    def finish_recording(self):
+        self._record.save(self._output)
+        print('Record Saved')
 
     @property
     def tests(self) -> List['SaccadicStimuli']:
