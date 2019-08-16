@@ -1,5 +1,5 @@
 from math import floor
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from numpy import sin, cos, linspace, pi, array
 from numpy.random import randint, random
@@ -7,6 +7,9 @@ from numpy.random import randint, random
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QColor, QPen
 from PyQt5.QtCore import QRect, QPoint, QLineF, QPointF, QTimer
+
+from saccrec.engine.recording import OpenBCIRecorder
+
 
 HORIZONTAL_CHANNEL = 'Horizontal Channel'
 VERTICAL_CHANNEL = 'Vertical Channel'
@@ -46,8 +49,17 @@ class SignalsManager:
             return first + last
         return last
 
-    def add_samples(self, samples: Dict[str, array]):
-        for channel, samples in samples.items():
+    def add_samples(self, samples: List[Tuple[int, float, float]]):
+        horizontal = []
+        vertical = []
+        for timestamp, h, v in samples:
+            horizontal.append(h)
+            vertical.append(v)
+        
+        for channel, samples in {
+            HORIZONTAL_CHANNEL: horizontal,
+            VERTICAL_CHANNEL: vertical
+        }.items():
             first = self._lines[channel]
             x = first[-1].p2().x() + 1 if first else 0
             last = SignalsManager.samples_to_lines(samples, x)
@@ -97,8 +109,11 @@ class SignalsWidget(QWidget):
         self._refresh_timer.timeout.connect(self.fetch_signals)
         self._rendering = False
 
-    def start(self):
+        self._recorder = None
+
+    def start(self, recorder: OpenBCIRecorder):
         self._rendering = True
+        self._recorder = recorder
         self._refresh_timer.start()
 
     def stop(self):
@@ -106,7 +121,7 @@ class SignalsWidget(QWidget):
         self._rendering = False
 
     def fetch_signals(self):
-        self._manager.add_random_samples()
+        self._manager.add_samples(self._recorder.read_samples())
         self.update()
 
     @property

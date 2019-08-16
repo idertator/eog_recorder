@@ -100,7 +100,7 @@ class OpenBCIRecorder(Process):
 
     def stop_streaming(self):
         self._command_queue.put('stop')
-        recorder.join()
+        self.join()
 
 
 if __name__ == '__main__':
