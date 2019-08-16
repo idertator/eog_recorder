@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
 
         self._new_record_wizard = RecordSetupWizard(
             settings=self._settings,
+            screen=self._screen,
             parent=self
         )
         self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)

@@ -1,5 +1,3 @@
-from typing import List
-
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from saccrec.core import Settings, Screen, Record
@@ -42,48 +40,12 @@ class Runner(QObject):
         self._player.stopped.connect(self.on_player_stopped)
         self._player.finished.connect(self.on_player_finished)
 
-    @property
-    def tests(self) -> List[SaccadicStimuli]:
-        if self._tests is None:
-            self._tests = [
-                SaccadicStimuli(
-                    settings=self._settings,
-                    screen=self._screen,
-                    distance_to_subject=self._distance_to_subject,
-                    angle=30,
-                    fixation_duration=self._stimulus['fixation_duration'],
-                    fixation_variability=self._stimulus['fixation_variability'],
-                    saccades_count=5,
-                    test_name='Prueba de Calibración Horizontal Inicial'
-                ),
-                SaccadicStimuli(
-                    settings=self._settings,
-                    screen=self._screen,
-                    distance_to_subject=self._distance_to_subject,
-                    angle=self._stimulus['angle'],
-                    fixation_duration=self._stimulus['fixation_duration'],
-                    fixation_variability=self._stimulus['fixation_variability'],
-                    saccades_count=self._stimulus['saccades_count']
-                ),
-                SaccadicStimuli(
-                    settings=self._settings,
-                    screen=self._screen,
-                    distance_to_subject=self._distance_to_subject,
-                    angle=30,
-                    fixation_duration=self._stimulus['fixation_duration'],
-                    fixation_variability=self._stimulus['fixation_variability'],
-                    saccades_count=5,
-                    test_name='Prueba de Calibración Horizontal Final'
-                ),
-            ]
-
-        return self._tests
-
-    def run(self, subject, stimulus, output, distance_to_subject, **kwargs):
+    def run(self, subject, stimulus, output, distance_to_subject, tests, **kwargs):
         self._subject = subject
         self._stimulus = stimulus
         self._output = output
         self._distance_to_subject = distance_to_subject
+        self._tests = tests
 
         subject = Subject.from_json(subject)
         hardware = Hardware(
@@ -98,7 +60,7 @@ class Runner(QObject):
             hardware=hardware
         )
 
-        tests = self.tests
+        tests = self._tests
         self._next_test = 1
 
         self._signals.hide()

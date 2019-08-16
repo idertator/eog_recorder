@@ -1,5 +1,5 @@
-import math
 from os.path import exists, dirname
+from typing import List
 
 from PyQt5 import QtCore
 from PyQt5 import QtGui
@@ -10,24 +10,28 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
 
-from saccrec.core import Settings
+from saccrec.core import Settings, Screen
 from saccrec.core.math import distance_to_subject
 from saccrec.core.models import Subject
+from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 
 
 class RecordSetupWizard(QWizard):
     finished = pyqtSignal()
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, settings: Settings, screen: Screen, parent=None):
         super(RecordSetupWizard, self).__init__(parent)
         self.setWizardStyle(QWizard.ClassicStyle)
 
         self._settings = settings
+        self._screen = screen
 
         self._subject_page = SubjectWizardPage(self)
         self._stimulus_page = StimulusWizardPage(self)
         self._output_page = OutputWizardPage(self)
+
+        self._tests = None
 
         self.addPage(self._subject_page)
         self.addPage(self._stimulus_page)
@@ -65,6 +69,7 @@ class RecordSetupWizard(QWizard):
             'stimulus': self._stimulus_page.json,
             'output': self._output_page.json,
             'distance_to_subject': self.fixed_distance_to_subject,
+            'tests': self.tests,
         }
 
     @property
@@ -77,6 +82,44 @@ class RecordSetupWizard(QWizard):
             self._settings.stimulus_saccadic_distance, 
             self._stimulus_page.max_angle
         )
+
+    @property
+    def tests(self) -> List[SaccadicStimuli]:
+        distance_to_subject = self.fixed_distance_to_subject
+        if self._tests is None:
+            self._tests = [
+                SaccadicStimuli(
+                    settings=self._settings,
+                    screen=self._screen,
+                    distance_to_subject=distance_to_subject,
+                    angle=30,
+                    fixation_duration=self._stimulus_page.json['fixation_duration'],
+                    fixation_variability=self._stimulus_page.json['fixation_variability'],
+                    saccades_count=5,
+                    test_name='Prueba de Calibración Horizontal Inicial'
+                ),
+                SaccadicStimuli(
+                    settings=self._settings,
+                    screen=self._screen,
+                    distance_to_subject=distance_to_subject,
+                    angle=self._stimulus_page.json['angle'],
+                    fixation_duration=self._stimulus_page.json['fixation_duration'],
+                    fixation_variability=self._stimulus_page.json['fixation_variability'],
+                    saccades_count=self._stimulus_page.json['saccades_count']
+                ),
+                SaccadicStimuli(
+                    settings=self._settings,
+                    screen=self._screen,
+                    distance_to_subject=distance_to_subject,
+                    angle=30,
+                    fixation_duration=self._stimulus_page.json['fixation_duration'],
+                    fixation_variability=self._stimulus_page.json['fixation_variability'],
+                    saccades_count=5,
+                    test_name='Prueba de Calibración Horizontal Final'
+                ),
+            ]
+
+        return self._tests
 
     def finish_wizard(self):
         self.finished.emit()
