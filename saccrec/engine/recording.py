@@ -55,19 +55,22 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
 
 
 def close_board(board: Cyton):
-    board.terminate()
+    if not DEBUG:
+        board.terminate()
 
 
 class OpenBCIRecorder(Process):
 
     def __init__(self, input_queue: Queue, output_queue: Queue, board: Cyton):
-        self._input_queue = Queue()
-        self._output_queue = Queue()
+        super(OpenBCIRecorder, self).__init__()
+        self._input_queue = input_queue
+        self._output_queue = output_queue
 
         self._board = board
 
     def run(self):
-        self._board.start_streaming()
+        if not DEBUG:
+            self._board.start_streaming()
 
         while self._input_queue.empty() or self._input_queue.get() != 'stop':
             if not DEBUG:
@@ -76,6 +79,40 @@ class OpenBCIRecorder(Process):
             else:
                 sample = [1, 2]
                 self._output_queue.put(sample)
-                sleep(1.0 / self._board.get_sample_rate())
-            
-        self._board.stop_streaming()            
+                sleep(1.0 / 250)
+
+        if not DEBUG:
+            self._board.stop_streaming()            
+
+
+if __name__ == '__main__':
+    command_queue = Queue()
+    data_queue = Queue()
+
+    settings = Settings()
+    
+    if not DEBUG:
+        board = initialize_board(settings)
+    else:
+        board = None
+
+    recorder = OpenBCIRecorder(
+        input_queue=command_queue,
+        output_queue=data_queue,
+        board=board
+    )
+    recorder.start()
+
+    count = 0
+    stop = 100000
+
+    while count < stop:        
+        while not data_queue.empty():
+            print(data_queue.get())
+            count += 1
+        sleep(0.001)
+    
+    command_queue.put('stop')
+    recorder.join()
+    close_board(board)
+
