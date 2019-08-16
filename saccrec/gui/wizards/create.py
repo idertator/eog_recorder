@@ -10,6 +10,8 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
 
+from saccrec.core import Settings
+from saccrec.core.math import distance_to_subject
 from saccrec.core.models import Subject
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 
@@ -17,9 +19,11 @@ from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 class RecordSetupWizard(QWizard):
     finished = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, settings: Settings, parent=None):
         super(RecordSetupWizard, self).__init__(parent)
         self.setWizardStyle(QWizard.ClassicStyle)
+
+        self._settings = settings
 
         self._subject_page = SubjectWizardPage(self)
         self._stimulus_page = StimulusWizardPage(self)
@@ -44,9 +48,12 @@ class RecordSetupWizard(QWizard):
                 <meta charset="utf-8">
             </head>
             <body>
-                <h3>Resúmen</h3>
+                <h3>Resumen</h3>
                 {self._subject_page.html}
                 {self._stimulus_page.html}
+
+                <h3>Important Notes</h3>
+                <p>Distance to subject: <strong>{self.fixed_distance_to_subject:.2f} cm</strong></p>
             </body>
         </html>
         '''
@@ -63,42 +70,15 @@ class RecordSetupWizard(QWizard):
     def subject(self) -> Subject:
         return self._subject_page.subject
 
+    @property
+    def fixed_distance_to_subject(self) -> float:
+        return distance_to_subject(
+            self._settings.stimulus_saccadic_distance, 
+            self._stimulus_page.max_angle
+        )
+
     def finish_wizard(self):
         self.finished.emit()
-
-        # TODO: Deprecated. Move this
-        # self.padre.test.patient = Patient(self.paginas[0].txtName.text,self.paginas[0].borndateDate.date, self.paginas[0].comboGenre.currentText, self.paginas[0].comboGenre.currentText)
-        
-        # self.padre.test.stimulation_angle = self.paginas[1].txt_angulo.value()
-        # self.padre.test.mean_duration = self.paginas[1].txt_mean_duration.value()
-        # self.padre.test.variation = self.paginas[1].txt_variaton.value()
-        # self.padre.test.test_duration = self.paginas[1].txt_testduration.value()
-
-        # self.padre.test.output_file_path = self.paginas[2].txtPath.text()
-
-        # QMessageBox.question(self,'Aviso','La prueba consta de 3 partes: calibración inicial, prueba y calibración final. Presione OK para continuar.', QMessageBox.Ok)
-        # QMessageBox.question(self,'Aviso','Se debe ubicar el paciente a '+str(self.distanceFromPatient)+' cm de la pantalla. Presione Ok para continuar.', QMessageBox.Ok)
-
-        # self.padre._calibrationWindow1.runStimulator()
-
-
-    # @property
-    # def distancePoints(self):
-    #     # TODO: Deprecated. Move this
-    #     return float(self.padre.settings.distanceBetweenPoints)
-
-    # @property
-    # def distanceFromPatient(self):
-    #     # TODO: Deprecated. Move this
-    #     if self.padre.test.stimulation_angle > 30:
-    #         angulo_maximo = self.padre.test.stimulation_angle
-    #     else:
-    #         angulo_maximo = 30
-    #     distance_from_mid = self.distancePoints / 2
-
-    #     distance_from_patient = distance_from_mid * (math.sin(math.radians(90 - angulo_maximo)) / math.sin(math.radians(angulo_maximo)))
-
-    #     return distance_from_patient
         
 
 class SubjectWizardPage(QWizardPage):
@@ -166,6 +146,11 @@ class StimulusWizardPage(QWizardPage):
     @property
     def json(self) -> dict:
         return self._stimulus_widget.json
+
+    @property
+    def max_angle(self) -> float:
+        return self._stimulus_widget.angle
+
 
 class OutputWizardPage(QWizardPage):
 

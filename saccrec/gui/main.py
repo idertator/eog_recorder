@@ -26,7 +26,10 @@ class MainWindow(QMainWindow):
         self._signals_widget = SignalsWidget(self)
         self._signals_widget.setVisible(False)
 
-        self._new_record_wizard = RecordSetupWizard(self)
+        self._new_record_wizard = RecordSetupWizard(
+            settings=self._settings,
+            parent=self
+        )
         self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
 
         self._settings_dialog = SettingsDialog(self._settings, self)
