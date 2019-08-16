@@ -1,11 +1,22 @@
-import time
-import pandas as pd
+from multiprocessing import Process, Queue
+from serial import Serial
+from time import sleep
+from typing import Optional
+
 from openbci_interface import Cyton
 from openbci_interface.util import list_devices
-from serial import Serial
-import pickle
 
 from saccrec.consts import DEBUG
+from saccrec.core import Settings
+
+
+_DEFAULT_CHANNEL_SETTINGS = {
+    'power_down': 'ON',
+    'input_type': 'NORMAL',
+    'bias': 0,
+    'srb2': 0,
+    'srb1': 1,
+}
 
 
 def list_ports():
@@ -16,39 +27,55 @@ def list_ports():
         ]
     return [port for port in list_devices()]
 
-def init_board():
-    sample_rate = 250
-    puerto = '/dev/ttyUSB0'
-    port = Serial(
-        port=puerto,
-        baudrate=115200,
-        timeout=2
-    )
 
-    print("configurando placa...\n")
+def initialize_board(settings: Settings) -> Optional[Cyton]:
+    if not DEBUG:
+        port = Serial(
+            port=settings.openbci_port,
+            baudrate=settings.openbci_baudrate,
+            timeout=settings.openbci_timeout
+        )
 
-    with Cyton(port) as board:
-        board.set_board_mode('default')
-        board.set_sample_rate(sample_rate)
-        board.disable_channel(5)
-        board.disable_channel(6)
-        board.disable_channel(7)
-        board.disable_channel(8)
-        board.configure_channel(1, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(2, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(3, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(4, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        print(board.get_config())
-        """
-        board.start_streaming()
-        for x in range(500):
-            sample = board.read_sample()
-            lista.append(sample)
-            time.sleep(0.85 / sample_rate)
-        board.stop_streaming()
-        fichero = open('datos.pickle', 'wb') 
-        pickle.dump(lista,fichero)
-        fichero.close()
+        board = Cyton(port)
 
-        """
-#class Board:
+        board.set_board_mode(settings.openbci_board_mode)
+        board.set_sample_rate(settings.openbci_sample_rate)
+
+        for index in range(8):
+            channel = index + 1
+            active, gain = settings.openbci_channels[index]
+            if active:
+                board.configure_channel(channel, gain=gain, **_DEFAULT_CHANNEL_SETTINGS)
+            else:
+                board.disable_channel(channel)
+
+        return board
+
+    return None
+
+
+def close_board(board: Cyton):
+    board.terminate()
+
+
+class OpenBCIRecorder(Process):
+
+    def __init__(self, input_queue: Queue, output_queue: Queue, board: Cyton):
+        self._input_queue = Queue()
+        self._output_queue = Queue()
+
+        self._board = board
+
+    def run(self):
+        self._board.start_streaming()
+
+        while self._input_queue.empty() or self._input_queue.get() != 'stop':
+            if not DEBUG:
+                sample = self._board.read_sample()
+                self._output_queue.put(sample)
+            else:
+                sample = [1, 2]
+                self._output_queue.put(sample)
+                sleep(1.0 / self._board.get_sample_rate())
+            
+        self._board.stop_streaming()            
