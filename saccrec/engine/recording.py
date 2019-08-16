@@ -1,7 +1,8 @@
+from random import randrange
 from multiprocessing import Process, Queue
 from serial import Serial
 from time import sleep
-from typing import Optional
+from typing import Optional, List, Tuple
 
 from openbci_interface import Cyton
 from openbci_interface.util import list_devices
@@ -61,10 +62,10 @@ def close_board(board: Cyton):
 
 class OpenBCIRecorder(Process):
 
-    def __init__(self, input_queue: Queue, output_queue: Queue, board: Cyton):
+    def __init__(self, board: Cyton):
         super(OpenBCIRecorder, self).__init__()
-        self._input_queue = input_queue
-        self._output_queue = output_queue
+        self._command_queue = Queue()
+        self._data_queue = Queue()
 
         self._board = board
 
@@ -72,22 +73,39 @@ class OpenBCIRecorder(Process):
         if not DEBUG:
             self._board.start_streaming()
 
-        while self._input_queue.empty() or self._input_queue.get() != 'stop':
+        timestamp = 0
+        while self._command_queue.empty() or self._command_queue.get() != 'stop':
             if not DEBUG:
                 sample = self._board.read_sample()
-                self._output_queue.put(sample)
+                self._data_queue.put(sample)
             else:
-                sample = [1, 2]
-                self._output_queue.put(sample)
+                sample = [timestamp, randrange(-300, 300), randrange(-300, 300)]
+                timestamp += 1
+                self._data_queue.put(sample)
                 sleep(1.0 / 250)
 
         if not DEBUG:
             self._board.stop_streaming()            
 
+    def start_streaming(self):
+        self.start()
+
+    def read_samples(self) -> List[Tuple[int, float, float]]:
+        result = []
+
+        while not self._data_queue.empty():
+            result.append(self._data_queue.get())
+
+        return result
+
+    def stop_streaming(self):
+        self._command_queue.put('stop')
+        recorder.join()
+
 
 if __name__ == '__main__':
     command_queue = Queue()
-    data_queue = Queue()
+    queue = Queue()
 
     settings = Settings()
     
@@ -96,23 +114,18 @@ if __name__ == '__main__':
     else:
         board = None
 
-    recorder = OpenBCIRecorder(
-        input_queue=command_queue,
-        output_queue=data_queue,
-        board=board
-    )
-    recorder.start()
+    recorder = OpenBCIRecorder(board=board)
+    recorder.start_streaming()
 
     count = 0
-    stop = 100000
+    stop = 1000
 
-    while count < stop:        
-        while not data_queue.empty():
-            print(data_queue.get())
-            count += 1
+    while count < stop:
+        samples = recorder.read_samples()
+        if samples:
+            print(samples)
+            count += len(samples)
         sleep(0.001)
-    
-    command_queue.put('stop')
-    recorder.join()
-    close_board(board)
 
+    recorder.stop_streaming()
+    close_board(board)
