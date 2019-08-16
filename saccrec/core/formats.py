@@ -1,7 +1,7 @@
 from datetime import datetime
 from json import dump, dumps
 from os import makedirs
-from os.path import join
+from os.path import join, exists, dirname
 from shutil import rmtree
 from tempfile import mkdtemp
 from typing import List, Tuple, Optional
@@ -48,24 +48,32 @@ class Record:
         if stimulus is not None:
             path = f'{current_index:02}/stimulus.npz'
             full_path = join(self._folder, path)
-            savez_compressed(full_path, stimulus)
+            if not exists(dirname(full_path)):
+                makedirs(dirname(full_path))
+            savez_compressed(full_path, stimulus=stimulus)
             data['stimulus'] = path
 
         if horizontal is not None:
             path = f'{current_index:02}/horizontal.npz'
             full_path = join(self._folder, path)
-            savez_compressed(full_path, horizontal)
+            if not exists(dirname(full_path)):
+                makedirs(dirname(full_path))
+            savez_compressed(full_path, horizontal=horizontal)
             data['horizontal'] = path
 
         if vertical is not None:
             path = f'{current_index:02}/vertical.npz'
             full_path = join(self._folder, path)
-            savez_compressed(full_path, vertical)
+            if not exists(dirname(full_path)):
+                makedirs(dirname(full_path))
+            savez_compressed(full_path, vertical=vertical)
             data['vertical'] = path
 
         if annotations is not None:
             path = f'{current_index:02}/annotations.json'
             full_path = join(self._folder, path)
+            if not exists(dirname(full_path)):
+                makedirs(dirname(full_path))
             with open(full_path, 'wt') as f:
                 dump(annotations, f, indent=4)
             data['annotations'] = path

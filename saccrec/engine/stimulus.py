@@ -34,6 +34,9 @@ class SaccadicStimuli(object):
         self._screen = screen
 
         self._angle = angle
+        self._fixation_duration = fixation_duration
+        self._fixation_variability = fixation_variability
+        self._saccades_count = saccades_count
         self._test_name = test_name
 
         self._left_ball = None
@@ -110,6 +113,22 @@ class SaccadicStimuli(object):
     @property
     def angle(self) -> int:
         return self._angle
+
+    @property
+    def fixation_duration(self) -> float:
+        return self._fixation_duration
+
+    @property
+    def fixation_variability(self) -> float:
+        return self._fixation_variability
+
+    @property
+    def saccades_count(self) -> int:
+        return self._saccades_count
+
+    @property
+    def test_name(self) -> str:
+        return self._test_name
 
     @property
     def channel(self) -> array:
