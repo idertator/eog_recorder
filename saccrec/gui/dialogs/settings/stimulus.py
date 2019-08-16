@@ -46,7 +46,6 @@ class StimulusSettingsPage(QWidget):
         self._stimulus_saccadic_distance_edit.setMaximum(SETTINGS_STIMULUS_SACCADIC_DISTANCE_MAXIMUM)
         self._stimulus_saccadic_distance_edit.setSuffix(' cm')
 
-        # TODO: Hay que redactar mejor esto
         layout.addRow('Distancia máxima de estímulo sacádico *', self._stimulus_saccadic_distance_edit)
 
         self._stimulus_saccadic_ball_radius_edit = QDoubleSpinBox()
