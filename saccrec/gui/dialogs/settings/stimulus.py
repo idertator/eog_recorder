@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QDoubleSpinBox, QWidget, QColorDialog, QPushButton
+from PyQt5.QtWidgets import QLabel, QDoubleSpinBox, QWidget, QColorDialog, QPushButton
 from PyQt5.QtWidgets import QFormLayout
 from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM, \
     SETTINGS_STIMULUS_SACCADIC_DISTANCE_MAXIMUM, SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MINIMUM, \
@@ -46,10 +46,7 @@ class StimulusSettingsPage(QWidget):
         self._stimulus_saccadic_distance_edit.setMaximum(SETTINGS_STIMULUS_SACCADIC_DISTANCE_MAXIMUM)
         self._stimulus_saccadic_distance_edit.setSuffix(' cm')
 
-        # TODO: Hay que redactar mejor esto
-        aclaracion = 'Para pruebas con ángulos de estimulación menor a 30 grados, deberá tomarse esta distancia para el ángulo de cal'
-        layout.addRow('Distancia máxima de estímulo sacádico', self._stimulus_saccadic_distance_edit)
-
+        layout.addRow('Distancia máxima de estímulo sacádico *', self._stimulus_saccadic_distance_edit)
 
         self._stimulus_saccadic_ball_radius_edit = QDoubleSpinBox()
         self._stimulus_saccadic_ball_radius_edit.setFixedWidth(85)
@@ -63,6 +60,10 @@ class StimulusSettingsPage(QWidget):
 
         self._stimulus_saccadic_background_color_select = ColorButton()
         layout.addRow('Color de fondo', self._stimulus_saccadic_background_color_select)
+
+        layout.addRow('', QLabel())
+        layout.addRow('', QLabel())
+        layout.addRow(QLabel('* Define la distancia entre los puntos de estímulo para la prueba con mayor ángulo de estimulación'))
 
         self.setLayout(layout)
 
