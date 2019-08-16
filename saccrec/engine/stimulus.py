@@ -6,6 +6,7 @@ from numpy import array, int8, zeros, ones, hstack
 from PyQt5.QtCore import QPoint
 
 from saccrec.core import Settings, Screen, StimulusPosition
+from saccrec.core.math import points_distance
 
 
 class SaccadicStimuli(object):
@@ -13,6 +14,7 @@ class SaccadicStimuli(object):
     def __init__(self,
         settings: Settings,
         screen: Screen,
+        distance_to_subject: float,
         angle: int,
         fixation_duration: float,   
         fixation_variability: float,
@@ -24,6 +26,7 @@ class SaccadicStimuli(object):
         Args:
             settings (saccrec.core.Settings): Settings object
             screen: (saccrec.core.Screen): Screen object
+            distance_to_subject (float): Distance to the subject in cm
             angle (int): Stimuli angle
             fixation_duration (float): Mean fixation duration in seconds
             fixation_variability (float): Variability of the fixation duration in percentage
@@ -32,8 +35,12 @@ class SaccadicStimuli(object):
         """
         self._settings = settings
         self._screen = screen
+        self._distance_to_subject = distance_to_subject
 
         self._angle = angle
+        self._fixation_duration = fixation_duration
+        self._fixation_variability = fixation_variability
+        self._saccades_count = saccades_count
         self._test_name = test_name
 
         self._left_ball = None
@@ -65,9 +72,11 @@ class SaccadicStimuli(object):
         return f'{self._test_name} {self._angle}\u00B0'
 
     def _update_positions(self):
+        distance = points_distance(self._distance_to_subject, self._angle)
+
         cm_width = self._settings.stimulus_screen_width
         cm_center = cm_width / 2
-        cm_delta = self._settings.stimulus_saccadic_distance / 2
+        cm_delta = distance / 2
         self._cm_to_pixels_x = self._screen.secondary_screen_rect.width() / cm_width
 
         left_x = (cm_center - cm_delta) * self._cm_to_pixels_x
@@ -110,6 +119,22 @@ class SaccadicStimuli(object):
     @property
     def angle(self) -> int:
         return self._angle
+
+    @property
+    def fixation_duration(self) -> float:
+        return self._fixation_duration
+
+    @property
+    def fixation_variability(self) -> float:
+        return self._fixation_variability
+
+    @property
+    def saccades_count(self) -> int:
+        return self._saccades_count
+
+    @property
+    def test_name(self) -> str:
+        return self._test_name
 
     @property
     def channel(self) -> array:

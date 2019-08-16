@@ -75,4 +75,4 @@ class OpenBCIChannelsSettingsPage(QWidget):
 
     @property
     def title(self) -> str:
-        return 'Configuracion de los canales del OpenBCI'
+        return 'Configuración de los canales del OpenBCI'

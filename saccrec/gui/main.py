@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QApplication, QDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSettings
 
-from saccrec import Manager
 from saccrec.core import Settings, Screen
 
 from saccrec.gui.dialogs import SettingsDialog
@@ -24,17 +23,14 @@ class MainWindow(QMainWindow):
         self._settings = Settings(self)
         self._screen = Screen(self)
 
-        self._manager = Manager(
+        self._signals_widget = SignalsWidget(self)
+        self._signals_widget.setVisible(False)
+
+        self._new_record_wizard = RecordSetupWizard(
             settings=self._settings,
             screen=self._screen,
             parent=self
         )
-        self._manager.started.connect(self.on_recording_started)
-
-        self._signals_widget = SignalsWidget(self)
-        self._signals_widget.setVisible(False)
-
-        self._new_record_wizard = RecordSetupWizard(self)
         self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
 
         self._settings_dialog = SettingsDialog(self._settings, self)
@@ -108,16 +104,13 @@ class MainWindow(QMainWindow):
         self._new_record_wizard.show()
 
     def on_new_test_wizard_finished(self):
-        self._manager.start_recording(**self._new_record_wizard.json)
-
-    def open_settings_dialog(self):
-        self._settings_dialog.open()
-
-    def on_recording_started(self):
         self._new_action.setEnabled(False)
         self._settings_action.setEnabled(False)
 
-        self._runner.run(self._manager.tests)
+        self._runner.run(**self._new_record_wizard.json)
+
+    def open_settings_dialog(self):
+        self._settings_dialog.open()
         
     def on_runner_stopped(self):
         self._new_action.setEnabled(True)
@@ -126,5 +119,4 @@ class MainWindow(QMainWindow):
     def on_runner_finished(self):
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)
-        self._manager.finish_recording()
 

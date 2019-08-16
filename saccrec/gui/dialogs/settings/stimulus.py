@@ -56,10 +56,10 @@ class StimulusSettingsPage(QWidget):
         self._stimulus_saccadic_ball_radius_edit.setMinimum(SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MINIMUM)
         self._stimulus_saccadic_ball_radius_edit.setMaximum(SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MAXIMUM)
         self._stimulus_saccadic_ball_radius_edit.setSuffix(' cm')
-        layout.addRow('Radio de la estimulo sacadica', self._stimulus_saccadic_ball_radius_edit)
+        layout.addRow('Radio del estímulo sacádico', self._stimulus_saccadic_ball_radius_edit)
 
         self._stimulus_saccadic_ball_color_select = ColorButton()
-        layout.addRow('Color del estimulo', self._stimulus_saccadic_ball_color_select)
+        layout.addRow('Color del estímulo', self._stimulus_saccadic_ball_color_select)
 
         self._stimulus_saccadic_background_color_select = ColorButton()
         layout.addRow('Color de fondo', self._stimulus_saccadic_background_color_select)
@@ -80,4 +80,4 @@ class StimulusSettingsPage(QWidget):
 
     @property
     def title(self):
-        return 'Configuracion de estimulo'
+        return 'Configuración de estímulo'

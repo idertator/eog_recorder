@@ -98,4 +98,4 @@ class OpenBCISettingsPage(QWidget):
 
     @property
     def title(self) -> str:
-        return 'Configuracion del OpenBCI'
+        return 'Configuración del OpenBCI'
