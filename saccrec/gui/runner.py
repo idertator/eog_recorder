@@ -33,6 +33,7 @@ class Runner(QObject):
         self._subject = None
         self._stimulus = None
         self._output = None
+        self._distance_to_subject = None
 
         self._tests = None
         self._record = None
@@ -48,6 +49,7 @@ class Runner(QObject):
                 SaccadicStimuli(
                     settings=self._settings,
                     screen=self._screen,
+                    distance_to_subject=self._distance_to_subject,
                     angle=30,
                     fixation_duration=self._stimulus['fixation_duration'],
                     fixation_variability=self._stimulus['fixation_variability'],
@@ -57,6 +59,7 @@ class Runner(QObject):
                 SaccadicStimuli(
                     settings=self._settings,
                     screen=self._screen,
+                    distance_to_subject=self._distance_to_subject,
                     angle=self._stimulus['angle'],
                     fixation_duration=self._stimulus['fixation_duration'],
                     fixation_variability=self._stimulus['fixation_variability'],
@@ -65,6 +68,7 @@ class Runner(QObject):
                 SaccadicStimuli(
                     settings=self._settings,
                     screen=self._screen,
+                    distance_to_subject=self._distance_to_subject,
                     angle=30,
                     fixation_duration=self._stimulus['fixation_duration'],
                     fixation_variability=self._stimulus['fixation_variability'],
@@ -75,10 +79,11 @@ class Runner(QObject):
 
         return self._tests
 
-    def run(self, subject, stimulus, output, **kwargs):
+    def run(self, subject, stimulus, output, distance_to_subject, **kwargs):
         self._subject = subject
         self._stimulus = stimulus
         self._output = output
+        self._distance_to_subject = distance_to_subject
 
         subject = Subject.from_json(subject)
         hardware = Hardware(

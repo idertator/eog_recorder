@@ -64,6 +64,7 @@ class RecordSetupWizard(QWizard):
             'subject': self._subject_page.json,
             'stimulus': self._stimulus_page.json,
             'output': self._output_page.json,
+            'distance_to_subject': self.fixed_distance_to_subject,
         }
 
     @property
@@ -200,5 +201,8 @@ class OutputWizardPage(QWizardPage):
             'Seleccione fichero de salida',
             filter='Archivo de SaccRec (*.rec)'
         )
+        if not filepath.lower().endswith('.rec'):
+            filepath += '.rec'
+
         self._output_path_edit.setText(filepath)
         self.completeChanged.emit()
