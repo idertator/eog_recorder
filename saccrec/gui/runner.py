@@ -90,7 +90,7 @@ class Runner(QObject):
             self._signals.show()            
 
         if not self._signals.is_rendering:
-            self._recorder = OpenBCIRecorder(self._board)
+            self._recorder = OpenBCIRecorder(self._board, self._record.folder_for_test(self._next_test - 1))
             self._signals.start(self._recorder)
             self._recorder.start_streaming()
 
@@ -112,7 +112,6 @@ class Runner(QObject):
         current_test = self._tests[self._next_test - 1]
         self._record.add_test(
             stimulus=current_test.channel,
-            horizontal=None,
             angle=current_test.angle,
             fixation_duration=current_test.fixation_duration,
             fixation_variability=current_test.fixation_variability,
