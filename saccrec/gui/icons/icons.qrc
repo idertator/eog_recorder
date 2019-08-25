@@ -1,0 +1,13 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file>document.svg</file>
+        <file>exit.svg</file>
+        <file>help.svg</file>
+        <file>settings.svg</file>
+        <file>openbci.png</file>
+        <file>screen.svg</file>
+        <file>stimuli.svg</file>
+        <file>channels.svg</file>
+    </qresource>
+</RCC>
