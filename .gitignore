@@ -106,6 +106,7 @@ venv.bak/
 # IDE
 .idea
 .vscode
+.pickle
 
 # GitIgnore de Wilmer
 
