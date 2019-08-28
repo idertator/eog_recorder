@@ -69,6 +69,19 @@ Para ejecutar la aplicación ya solo tendríamos que llamar el script principal:
 $ SaccRec.py
 ```
 
+Si se abre otra consola, al intentar ejecutar el script principal nos dirá que no lo encuentra.
+Esto se debe a que el script no se encuentra en una de las rutas del PATH del sistema.
+Para poder siempre abrir el software desde cualquier lado sin tener que exportar el PATH cada
+una de las veces se añadirá la siguiente línea al final del archivo **~/.bashrc**
+
+```export PATH=~/.local/bin:$PATH```
+
+y para cargar la configuración en la misma sesión:
+
+```shell
+$ source ~/.bashrc
+```
+
 ## Instrucciones para desarrollar
 
 Lo primero que hay es que crear el entorno con los requerimientos utilizando el siguiente comando estando en la carpeta raíz del proyecto:
