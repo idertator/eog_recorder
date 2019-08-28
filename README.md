@@ -26,7 +26,7 @@ $ ./SaccRec.py
 Lo primero es instalar todos los paquetes requeridos por el proceso de instalación. Para ello ejecutamos el siguiente comando:
 
 ```shell
-$ sudo apt-get install git python3.7 python3-distutils
+$ sudo apt-get install git python3.7 python3-distutils qt5dxcb-plugin
 ```
 
 Una vez instalados los requrimientos, necesitamos instalar algunos paquetes base de python:
