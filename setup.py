@@ -26,6 +26,7 @@ setup(
         'saccrec.engine',        
         'saccrec.gui',
         'saccrec.gui.dialogs',
+        'saccrec.gui.dialogs.settings',
         'saccrec.gui.icons',
         'saccrec.gui.widgets',
         'saccrec.gui.wizards',

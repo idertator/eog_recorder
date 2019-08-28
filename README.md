@@ -66,7 +66,7 @@ $ python3.7 setup.py install --user
 Para ejecutar la aplicación ya solo tendríamos que llamar el script principal:
 
 ```shell
-$ SaccRec,py
+$ SaccRec.py
 ```
 
 ## Instrucciones para desarrollar
