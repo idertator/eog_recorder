@@ -69,7 +69,7 @@ class SaccadicStimuli(object):
         self.reset_settings()
 
     def __str__(self):
-        return f'{self._test_name} {self._angle}\u00B0'
+        return f'{self._test_name}'
 
     def _update_positions(self):
         distance = points_distance(self._distance_to_subject, self._angle)
