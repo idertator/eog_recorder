@@ -32,6 +32,8 @@ def list_ports():
 
 def initialize_board(settings: Settings) -> Optional[Cyton]:
     if not DEBUG:
+        print('Serial Initialization')
+        print(f'Port: {settings.openbci_port}, Baudrate: {settings.openbci_baudrate}, Timeout: {settings.openbci_timeout}')
         port = Serial(
             port=settings.openbci_port,
             baudrate=settings.openbci_baudrate,
@@ -39,6 +41,8 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         )
 
         board = Cyton(port)
+        print('Board Initialization')
+        print(f'Mode: {settings.openbci_board_mode}, Sample Rate: {settings.openbci_sample_rate}')
 
         board.set_board_mode(settings.openbci_board_mode)
         board.set_sample_rate(settings.openbci_sample_rate)
@@ -47,6 +51,7 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
             channel = index + 1
             active, gain = settings.openbci_channels[index]
             if active:
+                print(f'Configure Channel {index}: Gain = {gain}')
                 board.configure_channel(channel, gain=gain, **_DEFAULT_CHANNEL_SETTINGS)
             else:
                 board.disable_channel(channel)
