@@ -24,12 +24,10 @@ _DEFAULT_CHANNEL_SETTINGS = {
 
 
 def list_ports():
-    if DEBUG:
-        return [
-            '/dev/ttyUSB0',
-            '/dev/ttyUSB1',
-        ]
-    return [port for port in list_devices()]
+    return [
+        '/dev/ttyUSB0',
+        '/dev/ttyUSB1',
+    ]
 
 
 def initialize_board(settings: Settings) -> Optional[Cyton]:
