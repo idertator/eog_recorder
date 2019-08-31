@@ -48,6 +48,7 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         board.set_sample_rate(settings.openbci_sample_rate)
 
         for index in range(8):
+            print(index)
             channel = index + 1
             active, gain = settings.openbci_channels[index]
             print(f'Configure Channel {index}: Gain = {gain}')
@@ -75,18 +76,20 @@ def textfile_to_array(filepath: str, dtype) -> array:
 
 class OpenBCIRecorder(Process):
 
-    def __init__(self, board: Cyton, tmp_folder: str = None):
+    def __init__(self, settings: Settings, tmp_folder: str = None):
         super(OpenBCIRecorder, self).__init__()
+        self._settings = settings
         self._command_queue = Queue()
         self._data_queue = Queue()
 
-        self._board = board
         self._tmp_folder = tmp_folder
 
 
     def run(self):
+        board = None
         if not DEBUG:
-            self._board.start_streaming()
+            board = initialize_board(self._settings)
+            board.start_streaming()
 
         if self._tmp_folder is not None:
             ts_file = open(join(self._tmp_folder, 'time.tmp'), 'wt')
@@ -100,7 +103,7 @@ class OpenBCIRecorder(Process):
         timestamp = 0
         while self._command_queue.empty() or self._command_queue.get() != 'stop':
             if not DEBUG:
-                sample = self._board.read_sample()
+                sample = board.read_sample()
                 self._data_queue.put([
                     sample['timestamp'],
                     sample['eeg'][0],
@@ -124,7 +127,8 @@ class OpenBCIRecorder(Process):
                 vc_file.write(f'{vc}\n')
 
         if not DEBUG:
-            self._board.stop_streaming()            
+            board.stop_streaming()            
+            close_board(board)
 
         if ts_file is not None:
             ts_file.close()

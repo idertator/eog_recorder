@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from saccrec.core import Settings, Screen, Record
 from saccrec.core.models import Subject, Hardware
 from saccrec.engine.stimulus import SaccadicStimuli
-from saccrec.engine.recording import OpenBCIRecorder, initialize_board, close_board
+from saccrec.engine.recording import OpenBCIRecorder
 from saccrec.gui.widgets import StimulusPlayerWidget, SignalsWidget
 
 
@@ -26,7 +26,6 @@ class Runner(QObject):
         self._player = player
         self._signals = signals
 
-        self._board = None
         self._recorder = None
 
         self._tests = None
@@ -51,7 +50,6 @@ class Runner(QObject):
         self._distance_to_subject = distance_to_subject
         self._tests = tests
 
-        self._board = initialize_board(self._settings)
         self._recorder = None
 
         subject = Subject.from_json(subject)
@@ -90,7 +88,10 @@ class Runner(QObject):
             self._signals.show()            
 
         if not self._signals.is_rendering:
-            self._recorder = OpenBCIRecorder(self._board, self._record.folder_for_test(self._next_test - 1))
+            self._recorder = OpenBCIRecorder(
+                self._settings, 
+                self._record.folder_for_test(self._next_test - 1)
+            )
             self._signals.start(self._recorder)
             self._recorder.start_streaming()
 
@@ -98,8 +99,6 @@ class Runner(QObject):
         self._signals.stop()
         self._recorder.stop_streaming()
 
-        close_board(self._board)
-        self._board = None
         self._recorder = None
 
         self._player.close_player()
@@ -128,8 +127,6 @@ class Runner(QObject):
                 '\n'.join([str(stimuli), 'Presione espacio para continuar'])
             )
         else:
-            close_board(self._board)
-            self._board = None
             self._recorder = None
 
             self._player.close_player()
