@@ -22,6 +22,7 @@ class SignalsManager:
         self._channels = channels
         self._window_width = window_width
         self._lines = {channel: [] for channel in channels}
+        self._max_y = 500
 
     @staticmethod
     def samples_to_lines(samples: array, x_offset: int):
@@ -53,6 +54,8 @@ class SignalsManager:
         horizontal = []
         vertical = []
         for timestamp, h, v in samples:
+            self._max_y = max(self._max_y, abs(h), abs(v))
+
             horizontal.append(h)
             vertical.append(v)
         
@@ -85,7 +88,8 @@ class SignalsManager:
                 min_x = lines[0].p1().x()
                 max_x = max(self._window_width, lines[-1].p2().x())
 
-            return QRect(QPoint(min_x, 500), QPoint(max_x, -500))
+            window = QRect(QPoint(min_x, self._max_y * 1.1), QPoint(max_x, -self._max_y * 1.1))
+            return window
 
 
 class SignalsWidget(QWidget):
@@ -121,7 +125,9 @@ class SignalsWidget(QWidget):
         self._rendering = False
 
     def fetch_signals(self):
-        self._manager.add_samples(self._recorder.read_samples())
+        samples = self._recorder.read_samples()
+        print(samples)
+        self._manager.add_samples(samples)
         self.update()
 
     @property
@@ -140,6 +146,7 @@ class SignalsWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
         painter.fillRect(self.rect(), self._background)
 
         channels = len(self._channels)

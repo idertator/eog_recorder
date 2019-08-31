@@ -41,6 +41,7 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         )
 
         board = Cyton(port)
+        board.reset_board()
         print('Board Initialization')
         print(f'Mode: {settings.openbci_board_mode}, Sample Rate: {settings.openbci_sample_rate}')
 
@@ -125,16 +126,20 @@ class OpenBCIRecorder(Process):
         while self._command_queue.empty() or self._command_queue.get() != 'stop':
             if not DEBUG:
                 sample = board.read_sample()
-                self._data_queue.put([
+                sample = [
                     sample['timestamp'],
                     sample['eeg'][0],
                     sample['eeg'][1],
-                ])
+                ]
+                print('Here')
+                self._data_queue.put(sample)
             else:
                 sample = [timestamp, randrange(-300, 300), randrange(-300, 300)]
                 timestamp += 1
                 self._data_queue.put(sample)
                 sleep(1.0 / 250)
+            
+            print(sample)
 
             ts, hc, vc = sample
 
@@ -187,13 +192,8 @@ if __name__ == '__main__':
     queue = Queue()
 
     settings = Settings()
-    
-    if not DEBUG:
-        board = initialize_board(settings)
-    else:
-        board = None
 
-    recorder = OpenBCIRecorder(board=board)
+    recorder = OpenBCIRecorder(settings)
     recorder.start_streaming()
 
     count = 0
@@ -207,4 +207,5 @@ if __name__ == '__main__':
         sleep(0.001)
 
     recorder.stop_streaming()
-    close_board(board)
+
+# openbci_interface.exception.UnexpectedMessageFormat: Device returned a message not in OpenBCI format; 
