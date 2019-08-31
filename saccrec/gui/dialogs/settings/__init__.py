@@ -20,7 +20,7 @@ class SettingsDialog(QDialog):
         self.contentsWidget.setViewMode(QListView.IconMode)
         self.contentsWidget.setMovement(QListView.Static)
         self.contentsWidget.setFixedWidth(90)
-        self.contentsWidget.setFixedHeight(370)
+        self.contentsWidget.setFixedHeight(380)
         self.contentsWidget.setSpacing(5)
         self.contentsWidget.setIconSize(QSize(60, 60))
         self.adjustSize()

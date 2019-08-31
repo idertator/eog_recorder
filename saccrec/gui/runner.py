@@ -54,8 +54,6 @@ class Runner(QObject):
 
         subject = Subject.from_json(subject)
         hardware = Hardware(
-            board=self._settings.openbci_board_type,
-            mode=self._settings.openbci_board_mode,
             sample_rate=self._settings.openbci_sample_rate,
             channels=self._settings.openbci_channels.json
         )

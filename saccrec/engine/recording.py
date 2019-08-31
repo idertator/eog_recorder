@@ -24,6 +24,8 @@ _DEFAULT_CHANNEL_SETTINGS = {
 
 
 def list_ports():
+    if not DEBUG:
+        return list_devices()
     return [
         '/dev/ttyUSB0',
         '/dev/ttyUSB1',
@@ -32,19 +34,14 @@ def list_ports():
 
 def initialize_board(settings: Settings) -> Optional[Cyton]:
     if not DEBUG:
-        print('Serial Initialization')
-        print(f'Port: {settings.openbci_port}, Baudrate: {settings.openbci_baudrate}, Timeout: {settings.openbci_timeout}')
         port = Serial(
             port=settings.openbci_port,
-            baudrate=settings.openbci_baudrate,
-            timeout=settings.openbci_timeout
+            baudrate=115200,
+            timeout=2
         )
 
         board = Cyton(port)
         board.reset_board()
-        print('Board Initialization')
-        print(f'Mode: {settings.openbci_board_mode}, Sample Rate: {settings.openbci_sample_rate}')
-
         board.set_board_mode('default')
         board.set_sample_rate(settings.openbci_sample_rate)
 

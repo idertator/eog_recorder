@@ -3,9 +3,8 @@ from typing import List
 from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QColor
 
-from saccrec.consts import SETTINGS_OPENBCI_DEFAULT_BOARD_TYPE, \
-    SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE, SETTINGS_OPENBCI_DEFAULT_BOARD_MODE, SETTINGS_OPENBCI_DEFAULT_BAUDRATE, \
-    SETTINGS_OPENBCI_DEFAULT_TIMEOUT, SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS, SETTINGS_DEFAULT_STIMULUS_BALL_COLOR, \
+from saccrec.consts import SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE, \
+    SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS, SETTINGS_DEFAULT_STIMULUS_BALL_COLOR, \
     SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR, SETTINGS_OPENBCI_DEFAULT_GAIN, SETTINGS_OPENBCI_DEFAULT_CHANNEL_NUMBER, \
     SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH, SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT
 from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM
@@ -61,44 +60,12 @@ class Settings(object):
         self._settings.setValue('OpenBCI/Port', value)
 
     @property
-    def openbci_board_type(self) -> str:
-        return self._settings.value('OpenBCI/BoardType', SETTINGS_OPENBCI_DEFAULT_BOARD_TYPE)
-
-    @openbci_board_type.setter
-    def openbci_board_type(self, value: str):
-        self._settings.setValue('OpenBCI/BoardType', value)
-
-    @property
     def openbci_sample_rate(self) -> int:
         return int(self._settings.value('OpenBCI/SampleRate', SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE))
 
     @openbci_sample_rate.setter
     def openbci_sample_rate(self, value: int):
         self._settings.setValue('OpenBCI/SampleRate', value)
-
-    @property
-    def openbci_board_mode(self) -> str:
-        return self._settings.value('OpenBCI/BoardMode', SETTINGS_OPENBCI_DEFAULT_BOARD_MODE)
-
-    @openbci_board_mode.setter
-    def openbci_board_mode(self, value: str):
-        self._settings.setValue('OpenBCI/BoardMode', value)
-
-    @property
-    def openbci_baudrate(self) -> int:
-        return int(self._settings.value('OpenBCI/Baudrate', SETTINGS_OPENBCI_DEFAULT_BAUDRATE))
-
-    @openbci_baudrate.setter
-    def openbci_baudrate(self, value: int):
-        self._settings.setValue('OpenBCI/Baudrate', value)
-
-    @property
-    def openbci_timeout(self) -> int:
-        return int(self._settings.value('OpenBCI/Timeout', SETTINGS_OPENBCI_DEFAULT_TIMEOUT))
-
-    @openbci_timeout.setter
-    def openbci_timeout(self, value: int):
-        self._settings.setValue('OpenBCI/Timeout', value)
 
     # SCREEN SETTINGS
     @property
