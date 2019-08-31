@@ -50,11 +50,8 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         for index in range(8):
             channel = index + 1
             active, gain = settings.openbci_channels[index]
-            if active:
-                print(f'Configure Channel {index}: Gain = {gain}')
-                board.configure_channel(channel, gain=gain, **_DEFAULT_CHANNEL_SETTINGS)
-            else:
-                board.disable_channel(channel)
+            print(f'Configure Channel {index}: Gain = {gain}')
+            board.configure_channel(channel, gain=gain, **_DEFAULT_CHANNEL_SETTINGS)
 
         return board
 
