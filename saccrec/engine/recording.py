@@ -99,10 +99,11 @@ class OpenBCIRecorder(Process):
         while self._command_queue.empty() or self._command_queue.get() != 'stop':
             if not DEBUG:
                 sample = self._board.read_sample()
-                print(sample)
-                # Convertir formato de muestra aqui
-                # self._data_queue.put(sample)
-                self._data_queue.put([0, 0, 0])
+                self._data_queue.put([
+                    sample['timestamp'],
+                    sample['eeg'][0],
+                    sample['eeg'][1],
+                ])
             else:
                 sample = [timestamp, randrange(-300, 300), randrange(-300, 300)]
                 timestamp += 1
