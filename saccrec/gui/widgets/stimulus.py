@@ -55,7 +55,7 @@ class StimulusWidget(QGroupBox):
         self._fixation_mean_duration_edit.setFixedWidth(80)
         self._fixation_mean_duration_edit.setToolTip('Duración de fijaciones')
         element_layout = QVBoxLayout()
-        element_layout.addWidget(QLabel('Duración'))
+        element_layout.addWidget(QLabel('T. Fijación'))
         element_layout.addWidget(self._fixation_mean_duration_edit)
         layout.addLayout(element_layout)
 
