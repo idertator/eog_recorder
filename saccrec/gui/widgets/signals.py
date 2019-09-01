@@ -61,8 +61,8 @@ class SignalsManager:
         vc_max, vc_min = float(self._vc_window.max()), float(self._vc_window.min())
         vc_center = (vc_max + vc_min) / 2
 
-        self._hc_window -= hc_center
-        self._vc_window -= vc_center
+        # self._hc_window -= hc_center
+        # self._vc_window -= vc_center
 
         self._hc_max = max(abs(hc_max - hc_center), abs(hc_min - hc_center))
         self._vc_max = max(abs(vc_max - vc_center), abs(vc_min - vc_center))
