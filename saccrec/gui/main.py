@@ -95,6 +95,7 @@ class MainWindow(QMainWindow):
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('EyeTracker OpenBCI')
+        self.setWindowIcon(QIcon(':app.png'))
 
         self.setCentralWidget(self._signals_widget)
 

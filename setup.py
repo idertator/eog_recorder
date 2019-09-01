@@ -19,6 +19,10 @@ setup(
     scripts=[
         'bin/SaccRec.py',
     ],
+    data_files=[
+        ('share/icons', ['install/SaccRec.png']),
+        ('share/applications', ['install/SaccRec.desktop']),
+    ],
     packages=[
         'saccrec',
         'saccrec.core',
@@ -36,6 +40,6 @@ setup(
         'numpy',
         'scipy',
     ],
-    include_package_data=False,
+    include_package_data=True,
     zip_safe=False
 )

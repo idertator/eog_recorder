@@ -1,7 +1,7 @@
 # Subject Parameters
 from PyQt5.QtGui import QColor
 
-DEBUG = False
+DEBUG = True
 
 DATE_FORMAT = '%d/%m/%Y'
 DATETIME_FORMAT = '%d/%m/%Y %H:%M'
