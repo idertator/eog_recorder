@@ -37,50 +37,43 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         board.set_board_mode('default')
         board.set_sample_rate(settings.openbci_sample_rate)
 
-        board.configure_channel(1, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(2, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(3, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(4, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(5, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(6, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(7, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(8, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(9, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(10, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(11, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(12, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(13, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(14, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(15, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(16, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.disable_channel(5)
-        board.disable_channel(6)
-        board.disable_channel(7)
-        board.disable_channel(8)
-        board.disable_channel(9)
-        board.disable_channel(10)
-        board.disable_channel(11)
-        board.disable_channel(12)    
-        board.disable_channel(13)
-        board.disable_channel(14)
-        board.disable_channel(15)
-        board.disable_channel(16)
+        # board.configure_channel(1, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(2, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(3, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(4, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(5, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(6, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(7, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(8, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(9, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(10, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(11, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(12, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(13, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(14, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(15, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.configure_channel(16, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+        # board.disable_channel(5)
+        # board.disable_channel(6)
+        # board.disable_channel(7)
+        # board.disable_channel(8)
+        # board.disable_channel(9)
+        # board.disable_channel(10)
+        # board.disable_channel(11)
+        # board.disable_channel(12)    
+        # board.disable_channel(13)
+        # board.disable_channel(14)
+        # board.disable_channel(15)
+        # board.disable_channel(16)
         
-        # for index in range(8):
-        #     channel = index + 1
-        #     active, gain = settings.openbci_channels[index]
-        #     if active:
-        #         board.configure_channel(channel * 2 - 1, power_down='ON', gain=gain, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        #         board.configure_channel(channel * 2, power_down='ON', gain=gain, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        #     else:
-        #         board.disable_channel(channel * 2 - 1)
-        #         board.disable_channel(channel * 2)
+        for index in range(8):
+            channel = index + 1
+            active, gain = settings.openbci_channels[index]
+            if active:
+                board.configure_channel(channel, power_down='ON', gain=gain, input_type='NORMAL', bias=0, srb2=0, srb1=0)
+            else:
+                board.disable_channel(channel)
 
-        from pprint import pprint
-        print('Board Config')
-        pprint(board.get_config())
-        print()
-        print()
         return board
 
     return None
