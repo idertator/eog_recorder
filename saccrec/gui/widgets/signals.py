@@ -12,7 +12,7 @@ from saccrec.engine.recording import OpenBCIRecorder
 
 
 SIGNALS_PADDING = 1.5
-WINDOWS_WIDTH = 1000
+WINDOWS_WIDTH = 4000
 
 
 class SignalsManager:
