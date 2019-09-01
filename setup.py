@@ -20,8 +20,8 @@ setup(
         'bin/SaccRec.py',
     ],
     data_files=[
-        ('share/icons', ['./data/SaccRec.png']),
-        ('share/applications', ['./data/SaccRec.desktop']),
+        ('share/icons', ['data/SaccRec.png']),
+        ('share/applications', ['data/SaccRec.desktop']),
     ],
     packages=[
         'saccrec',
@@ -40,6 +40,6 @@ setup(
         'numpy',
         'scipy',
     ],
-    include_package_data=True,
+    # include_package_data=True,
     zip_safe=False
 )
