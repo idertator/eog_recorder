@@ -56,19 +56,17 @@ class SignalsManager:
             self._hc_window = self._hc_window[length - self._window_width:]
             self._vc_window = self._vc_window[length - self._window_width:]
 
-        self._hc_window -= self._hc_window.mean()
-        self._vc_window -= self._vc_window.mean()
-
-        self._hc_max = max(abs(self._hc_window.min()), abs(self._hc_window.max()))
-        self._vc_max = max(abs(self._vc_window.min()), abs(self._vc_window.max()))
-
     @property
     def horizontal_lines(self) -> List[QLineF]:
-        return self._samples_to_lines(self._hc_window)
+        channel = self._hc_window - self._hc_window.mean()
+        self._hc_max = max(abs(channel.min()), abs(channel.max()))
+        return self._samples_to_lines(channel)
 
     @property
     def vertical_lines(self) -> List[QLineF]:
-        return self._samples_to_lines(self._vc_window)
+        channel = self._vc_window - self._vc_window.mean()
+        self._vc_max = max(abs(channel.min()), abs(channel.max()))
+        return self._samples_to_lines(channel)
         
     @property
     def horizontal_window(self) -> QRect:
@@ -153,10 +151,11 @@ class SignalsWidget(QWidget):
         viewport = channel_rect.adjusted(1, 1, -1, -1)
         painter.setClipRect(viewport)
         painter.setViewport(viewport)
+        lines = self._manager.horizontal_lines
         painter.setWindow(self._manager.horizontal_window)
 
         painter.setPen(QPen(self._signals_color, 2.0))
-        painter.drawLines(self._manager.horizontal_lines)
+        painter.drawLines(lines)
 
         painter.restore()
 
@@ -177,10 +176,11 @@ class SignalsWidget(QWidget):
         viewport = channel_rect.adjusted(1, 1, -1, -1)
         painter.setClipRect(viewport)
         painter.setViewport(viewport)
+        lines = self._manager.vertical_lines
         painter.setWindow(self._manager.vertical_window)
 
         painter.setPen(QPen(self._signals_color, 2.0))
-        painter.drawLines(self._manager.vertical_lines)
+        painter.drawLines(lines)
 
         painter.restore()
 
