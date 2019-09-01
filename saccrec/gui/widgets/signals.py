@@ -12,11 +12,12 @@ from saccrec.engine.recording import OpenBCIRecorder
 
 
 SIGNALS_PADDING = 1.5
+WINDOWS_WIDTH = 1000
 
 
 class SignalsManager:
 
-    def __init__(self, window_width: int = 500):
+    def __init__(self, window_width: int = WINDOWS_WIDTH):
         self._window_width = window_width        
 
         self._hc_window = array([], dtype=float32)
@@ -72,14 +73,14 @@ class SignalsManager:
     def horizontal_window(self) -> QRect:
         return QRect(
             QPoint(self._x_offset, self._hc_max * SIGNALS_PADDING), 
-            QPoint(self._x_offset + 500, -self._hc_max * SIGNALS_PADDING)
+            QPoint(self._x_offset + WINDOWS_WIDTH, -self._hc_max * SIGNALS_PADDING)
         )
 
     @property
     def vertical_window(self) -> QRect:
         return QRect(
             QPoint(self._x_offset, self._vc_max * SIGNALS_PADDING), 
-            QPoint(self._x_offset + 500, -self._vc_max * SIGNALS_PADDING)
+            QPoint(self._x_offset + WINDOWS_WIDTH, -self._vc_max * SIGNALS_PADDING)
         )
 
 
@@ -96,7 +97,7 @@ class SignalsWidget(QWidget):
         self._channels_outline = QColor(150, 150, 150)
         self._signals_color = QColor(30, 30, 100)
 
-        self._manager = SignalsManager(window_width=500)
+        self._manager = SignalsManager(window_width=WINDOWS_WIDTH)
 
         self._refresh_timer = QTimer()
         self._refresh_timer.setInterval(200)

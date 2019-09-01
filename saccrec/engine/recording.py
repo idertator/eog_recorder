@@ -133,14 +133,16 @@ class OpenBCIRecorder(Process):
                     sample['eeg'][0],
                     sample['eeg'][1],
                 ]
-                self._data_queue.put(sample)
+                if timestamp > 0:
+                    self._data_queue.put(sample)
             else:
                 sample = [
                     timestamp, 
                     randrange(-300, 300), 
                     randrange(-300, 300)
                 ]
-                self._data_queue.put(sample)
+                if timestamp > 0:
+                    self._data_queue.put(sample)
                 sleep(1.0 / 250)
 
             timestamp += 1
