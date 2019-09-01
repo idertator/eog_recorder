@@ -123,9 +123,9 @@ class SignalsWidget(QWidget):
 
     def fetch_signals(self):
         samples = self._recorder.read_samples()
-        print(samples)
-        self._manager.add_samples(samples)
-        self.update()
+        if samples:
+            self._manager.add_samples(samples)
+            self.update()
 
     @property
     def is_rendering(self) -> bool:
