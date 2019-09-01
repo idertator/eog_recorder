@@ -1,7 +1,7 @@
 from math import floor
 from typing import List, Dict, Tuple
 
-from numpy import sin, cos, linspace, pi, array
+from numpy import sin, cos, linspace, pi, array, float32, hstack, mean
 from numpy.random import randint, random
 
 from PyQt5.QtWidgets import QWidget
@@ -11,85 +11,83 @@ from PyQt5.QtCore import QRect, QPoint, QLineF, QPointF, QTimer
 from saccrec.engine.recording import OpenBCIRecorder
 
 
-HORIZONTAL_CHANNEL = 'Horizontal Channel'
-VERTICAL_CHANNEL = 'Vertical Channel'
-CHANNELS = [HORIZONTAL_CHANNEL, VERTICAL_CHANNEL]
+SIGNALS_PADDING = 1.5
 
 
 class SignalsManager:
 
-    def __init__(self, channels: List[str] = CHANNELS, window_width: int = 500):
-        self._channels = channels
-        self._window_width = window_width
-        self._lines = {channel: [] for channel in channels}
-        self._max_y = 500
+    def __init__(self, window_width: int = 500):
+        self._window_width = window_width        
 
-    @staticmethod
-    def samples_to_lines(samples: array, x_offset: int):
+        self._hc_window = array([], dtype=float32)
+        self._hc_max = 500
+        self._vc_window = array([], dtype=float32)
+        self._vc_max = 500
+        self._x_offset = 0
+
+    def _samples_to_lines(self, samples: array) -> List[QLineF]:
         lines = []
 
         last = None
         for index, sample in enumerate(samples):
-            current = QPointF(index + x_offset, sample)
+            current = QPointF(index + self._x_offset, sample)
             if last is not None:
                 lines.append(QLineF(last, current))
             last = current
 
         return lines
 
-    @staticmethod
-    def merge_lines(first: List[QLineF], last: List[QLineF], max_samples: int) -> List[QLineF]:
-        total = len(first) + len(last) + 1
-
-        if total > max_samples:
-            result = first + last
-            return result[len(result) - max_samples:]
-
-        if first:
-            first.append(QLineF(first[-1].p2(), last[0].p1()))
-            return first + last
-        return last
-
     def add_samples(self, samples: List[Tuple[int, float, float]]):
         horizontal = []
         vertical = []
         for timestamp, h, v in samples:
-            self._max_y = max(self._max_y, abs(h), abs(v))
-
             horizontal.append(h)
             vertical.append(v)
-        
-        for channel, samples in {
-            HORIZONTAL_CHANNEL: horizontal,
-            VERTICAL_CHANNEL: vertical
-        }.items():
-            first = self._lines[channel]
-            x = first[-1].p2().x() + 1 if first else 0
-            last = SignalsManager.samples_to_lines(samples, x)
 
-            self._lines[channel] = SignalsManager.merge_lines(first, last, self._window_width)
+        horizontal = array(horizontal, dtype=float32)
+        vertical = array(vertical, dtype=float32)
 
-    def add_random_samples(self, samples_count: int = 50, abs_max: float = 300.0):
-        samples = {}
-        for channel in self._lines.keys():
-            samples[channel] = (random(samples_count) - 0.5) * abs_max * 2
+        self._hc_window = hstack((self._hc_window, horizontal))
+        self._vc_window = hstack((self._vc_window, vertical))
 
-        self.add_samples(samples)
+        length = len(self._hc_window)
+        if length > self._window_width:
+            self._x_offset += length - self._window_width
+            self._hc_window = self._hc_window[length - self._window_width:]
+            self._vc_window = self._vc_window[length - self._window_width:]
 
-    def lines(self, channel: str) -> List[QLineF]:
-        return self._lines.get(channel, [])
+        hc_max, hc_min = float(self._hc_window.max()), float(self._hc_window.min())
+        hc_center = (hc_max + hc_min) / 2
+        vc_max, vc_min = float(self._vc_window.max()), float(self._vc_window.min())
+        vc_center = (vc_max + vc_min) / 2
+
+        self._hc_window -= hc_center
+        self._vc_window -= vc_center
+
+        self._hc_max = max(abs(hc_max - hc_center), abs(hc_min - hc_center))
+        self._vc_max = max(abs(vc_max - vc_center), abs(vc_min - vc_center))
 
     @property
-    def window(self) -> QRect:
-        for channel, lines in self._lines.items():
-            min_x = 0
-            max_x = self._window_width
-            if lines:
-                min_x = lines[0].p1().x()
-                max_x = max(self._window_width, lines[-1].p2().x())
+    def horizontal_lines(self) -> List[QLineF]:
+        return self._samples_to_lines(self._hc_window)
 
-            window = QRect(QPoint(min_x, self._max_y * 1.1), QPoint(max_x, -self._max_y * 1.1))
-            return window
+    @property
+    def vertical_lines(self) -> List[QLineF]:
+        return self._samples_to_lines(self._vc_window)
+        
+    @property
+    def horizontal_window(self) -> QRect:
+        return QRect(
+            QPoint(self._x_offset, self._hc_max * SIGNALS_PADDING), 
+            QPoint(self._x_offset + 500, -self._hc_max * SIGNALS_PADDING)
+        )
+
+    @property
+    def vertical_window(self) -> QRect:
+        return QRect(
+            QPoint(self._x_offset, self._vc_max * SIGNALS_PADDING), 
+            QPoint(self._x_offset + 500, -self._vc_max * SIGNALS_PADDING)
+        )
 
 
 class SignalsWidget(QWidget):
@@ -97,7 +95,6 @@ class SignalsWidget(QWidget):
     def __init__(self, parent=None):
         super(SignalsWidget, self).__init__(parent=parent)
 
-        self._channels = CHANNELS
         self._channel_padding = 10
         self._left_padding = 100
 
@@ -136,9 +133,8 @@ class SignalsWidget(QWidget):
 
     @property
     def channel_height(self) -> int:
-        channels = len(self._channels)
-        padding_total = (channels + 1) * self._channel_padding
-        return floor((self.size().height() - padding_total) / channels)
+        padding_total = 3 * self._channel_padding
+        return floor((self.size().height() - padding_total) / 2)
 
     @property
     def channel_width(self) -> int:
@@ -149,32 +145,52 @@ class SignalsWidget(QWidget):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.fillRect(self.rect(), self._background)
 
-        channels = len(self._channels)
-        for channel, channel_title in enumerate(self._channels):
-            painter.save()
+        # Horizontal Channel
+        painter.save()
+        channel_rect = QRect(
+            self._left_padding, self._channel_padding,
+            self.channel_width, self.channel_height
+        )
+        painter.setPen(QPen(self._channels_outline, self._channels_outline_width))
+        painter.drawRect(channel_rect)
 
-            channel_rect = QRect(
-                self._left_padding, self._channel_padding + (channel * (self.channel_height + self._channel_padding)),
-                self.channel_width, self.channel_height
-            )
-            painter.setPen(QPen(self._channels_outline, self._channels_outline_width))
-            painter.drawRect(channel_rect)
+        painter.save()
+        viewport = channel_rect.adjusted(1, 1, -1, -1)
+        painter.setClipRect(viewport)
+        painter.setViewport(viewport)
+        painter.setWindow(self._manager.horizontal_window)
 
-            painter.save()
-            viewport = channel_rect.adjusted(1, 1, -1, -1)
-            painter.setClipRect(viewport)
-            painter.setViewport(viewport)
-            window = self._manager.window
-            painter.setWindow(window)
+        painter.setPen(QPen(self._signals_color, 0.8))
+        painter.drawLines(self._manager.horizontal_lines)
 
-            painter.setPen(QPen(self._signals_color, 0.8))
-            lines = self._manager.lines(channel_title)
-            painter.drawLines(lines)
+        painter.restore()
 
-            painter.restore()
+        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), 'Horizontal Channel')
 
-            painter.drawText(channel_rect.topLeft() + QPoint(10, 20), channel_title)
+        painter.restore()
 
-            painter.restore()
+        # Vertical Channel
+        painter.save()
+        channel_rect = QRect(
+            self._left_padding, self._channel_padding + self.channel_height + self._channel_padding,
+            self.channel_width, self.channel_height
+        )
+        painter.setPen(QPen(self._channels_outline, self._channels_outline_width))
+        painter.drawRect(channel_rect)
+
+        painter.save()
+        viewport = channel_rect.adjusted(1, 1, -1, -1)
+        painter.setClipRect(viewport)
+        painter.setViewport(viewport)
+        painter.setWindow(self._manager.vertical_window)
+
+        painter.setPen(QPen(self._signals_color, 0.8))
+        painter.drawLines(self._manager.vertical_lines)
+
+        painter.restore()
+
+        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), 'Vertical Channel')
+
+        painter.restore()
 
         painter.end()

@@ -1,9 +1,11 @@
 from random import randrange
 from multiprocessing import Process, Queue
 from serial import Serial
+from tempfile import gettempdir
 from time import sleep
 from typing import Optional, List, Tuple
-from os.path import join
+from os import remove
+from os.path import join, exists
 
 from numpy import array, savez_compressed, int32, float32
 
@@ -12,15 +14,6 @@ from openbci_interface.util import list_devices
 
 from saccrec.consts import DEBUG
 from saccrec.core import Settings
-
-
-_DEFAULT_CHANNEL_SETTINGS = {
-    'power_down': 'ON',
-    'input_type': 'NORMAL',
-    'bias': 0,
-    'srb2': 0,
-    'srb1': 1,
-}
 
 
 def list_ports():
@@ -45,34 +38,14 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         board.set_board_mode('default')
         board.set_sample_rate(settings.openbci_sample_rate)
 
-        board.configure_channel(1, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(2, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(3, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(4, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(5, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(6, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(7, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(8, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(9, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(10, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(11, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(12, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(13, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(14, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(15, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.configure_channel(16, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
-        board.disable_channel(5)
-        board.disable_channel(6)
-        board.disable_channel(7)
-        board.disable_channel(8)
-        board.disable_channel(9)
-        board.disable_channel(10)
-        board.disable_channel(11)
-        board.disable_channel(12)    
-        board.disable_channel(13)
-        board.disable_channel(14)
-        board.disable_channel(15)
-        board.disable_channel(16)
+        for index in range(8):
+            channel = index + 1
+            active, gain = settings.openbci_channels[index]
+            if active:
+                board.configure_channel(channel, power_down='ON', gain=gain, input_type='NORMAL', bias=0, srb2=0, srb1=1)
+            else:
+                board.disable_channel(channel)
+
         return board
 
     return None
@@ -96,7 +69,7 @@ def textfile_to_array(filepath: str, dtype) -> array:
 class OpenBCIRecorder(Process):
 
     def __init__(self, settings: Settings, tmp_folder: str = None):
-        super(OpenBCIRecorder, self).__init__()
+        super(OpenBCIRecorder, self).__init__(name='saccrec_recording')
         self._settings = settings
         self._command_queue = Queue()
         self._data_queue = Queue()
@@ -105,6 +78,10 @@ class OpenBCIRecorder(Process):
 
 
     def run(self):
+        pid_path = join(gettempdir(), 'saccrec.pid')
+        with open(pid_path, 'wt') as f:
+            f.write(f'{self.pid}')
+
         board = None
         if not DEBUG:
             board = initialize_board(self._settings)
@@ -128,7 +105,6 @@ class OpenBCIRecorder(Process):
                     sample['eeg'][0],
                     sample['eeg'][1],
                 ]
-                print('Here')
                 self._data_queue.put(sample)
             else:
                 sample = [timestamp, randrange(-300, 300), randrange(-300, 300)]
@@ -136,8 +112,6 @@ class OpenBCIRecorder(Process):
                 self._data_queue.put(sample)
                 sleep(1.0 / 250)
             
-            print(sample)
-
             ts, hc, vc = sample
 
             if ts_file is not None:
@@ -167,6 +141,9 @@ class OpenBCIRecorder(Process):
             vc_file.close()
             vc_array = textfile_to_array(join(self._tmp_folder, 'vertical.tmp'), int32)
             savez_compressed(join(self._tmp_folder, 'vertical.npz'), vertical=vc_array)
+
+        if exists(pid_path):
+            remove(pid_path)
 
     def start_streaming(self):
         self.start()
