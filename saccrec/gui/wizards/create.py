@@ -29,7 +29,7 @@ class RecordSetupWizard(QWizard):
 
         self._subject_page = SubjectWizardPage(self)
         self._stimulus_page = StimulusWizardPage(self)
-        self._output_page = OutputWizardPage(self)
+        self._output_page = OutputWizardPage(settings=settings, parent=self)
 
         self._tests = None
 
@@ -226,8 +226,9 @@ class StimulusWizardPage(QWizardPage):
 
 class OutputWizardPage(QWizardPage):
 
-    def __init__(self, parent=None):
-        super(OutputWizardPage, self).__init__(parent)
+    def __init__(self, settings: Settings, parent=None):
+        super(OutputWizardPage, self).__init__(parent=parent)
+        self._settings = settings
 
         self.setTitle('Configuración de la salida')
 
@@ -267,9 +268,11 @@ class OutputWizardPage(QWizardPage):
         self.completeChanged.emit()
 
     def on_output_select_clicked(self):
+        wizard = self.wizard()
         filepath, _ = QFileDialog.getSaveFileName(
             self,
             'Seleccione fichero de salida',
+            self._settings.output_dir,
             filter='Archivo de SaccRec (*.rec)'
         )
         if not filepath.lower().endswith('.rec'):

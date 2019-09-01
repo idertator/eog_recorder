@@ -1,3 +1,5 @@
+from os import makedirs
+from os.path import expanduser, join, exists
 from typing import List
 
 from PyQt5.QtCore import QSettings
@@ -49,6 +51,14 @@ class Settings(object):
     def __init__(self, parent=None):
         self._settings = QSettings('SaccRec', 'SaccRec', parent)
         self._channels = Channel(self._settings)
+
+    @property
+    def output_dir(self) -> str:
+        homedir = expanduser('~')
+        output_path = join(homedir, 'Recordings')
+        if not exists(output_path):
+            makedirs(output_path)
+        return output_path
 
     # OPENBCI SETTINGS
     @property
