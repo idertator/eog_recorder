@@ -160,7 +160,7 @@ class SignalsWidget(QWidget):
         painter.setViewport(viewport)
         painter.setWindow(self._manager.horizontal_window)
 
-        painter.setPen(QPen(self._signals_color, 0.8))
+        painter.setPen(QPen(self._signals_color, 2.0))
         painter.drawLines(self._manager.horizontal_lines)
 
         painter.restore()
@@ -184,7 +184,7 @@ class SignalsWidget(QWidget):
         painter.setViewport(viewport)
         painter.setWindow(self._manager.vertical_window)
 
-        painter.setPen(QPen(self._signals_color, 0.8))
+        painter.setPen(QPen(self._signals_color, 2.0))
         painter.drawLines(self._manager.vertical_lines)
 
         painter.restore()
