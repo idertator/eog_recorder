@@ -76,8 +76,9 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         #         board.disable_channel(channel * 2 - 1)
         #         board.disable_channel(channel * 2)
 
+        from pprint import pprint
         print('Board Config')
-        print(board.get_config())
+        pprint(board.get_config())
         print()
         print()
         return board
