@@ -20,8 +20,8 @@ setup(
         'bin/SaccRec.py',
     ],
     data_files=[
-        ('share/icons', ['install/SaccRec.png']),
-        ('share/applications', ['install/SaccRec.desktop']),
+        ('share/icons', ['./data/SaccRec.png']),
+        ('share/applications', ['./data/SaccRec.desktop']),
     ],
     packages=[
         'saccrec',
