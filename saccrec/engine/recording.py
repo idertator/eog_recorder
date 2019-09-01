@@ -34,7 +34,6 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         )
 
         board = Cyton(port)
-        board.reset_board()
         board.set_board_mode('default')
         board.set_sample_rate(settings.openbci_sample_rate)
 
