@@ -65,7 +65,7 @@ class SignalsManager:
         self._vc_window -= vc_center
 
         self._hc_max = max(abs(hc_max - hc_center), abs(hc_min - hc_center))
-        self._vc_max = max(abs(vc_max - hc_center), abs(vc_min - hc_center))
+        self._vc_max = max(abs(vc_max - vc_center), abs(vc_min - vc_center))
 
     @property
     def horizontal_lines(self) -> List[QLineF]:
