@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QTextEdit
-from PyQt5.QtWidgets import QVBoxLayout
-
+from PyQt5.QtWidgets import QDialog, QTextBrowser
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt5.QtSvg import QSvgWidget
 
 _HTML = '''
 <!DOCTYPE HTML>
@@ -10,15 +10,20 @@ _HTML = '''
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <style>
-            h1 {
+            ul {
+                list-style: none;
+            }
+            li {
                 text-align: center;
+            }
+            .project {
+                text-align: center;
+                margin-top: 2em;
             }
         </style>        
     </head>
     <body>
-        <h1>Proyecto DIATAX</h1>
-
-        <ol>
+        <ul>
             <li>Gonzalo Joya Caparrós (UMA), <strong>Coordinador General</strong></li>
             <li>Rodolfo García (UTM), <strong>Coordinador UTM</strong></li>
             <li>Roberto Becerra (UMA), <strong>Desarrollador Principal</strong></li>
@@ -27,11 +32,9 @@ _HTML = '''
             <li>Rodolfo Becerra (UHO), <strong>Desarrollador</strong></li>            
             <li>Luis Velázquez Rodríguez (CIRAH), <strong>Asesor Principal</strong></li>
             <li>Roberto Rodríguez Labrada (CIRAH), <strong>Asesor</strong></li>
-        </ol>
+        </ul>
 
-        <br>
-
-        <p>Proyecto resultado de la colaboración entre la Universidad de Málaga (España),
+        <p class="project">Proyecto resultado de la colaboración entre la Universidad de Málaga (España),
         el Instituto Tecnológico de Manabí (Ecuador) y el Centro de Investigación y 
         Rehabilitación de las Ataxias Hereditarias (Cuba)<p/>
     </body>
@@ -49,10 +52,21 @@ class AboutDialog(QDialog):
 
         main_layout = QVBoxLayout()
 
-        credits_text = QTextEdit()
+        logo_svg = QSvgWidget(':diatax.svg')
+        logo_svg.setFixedSize(183, 81)
+        
+        logo_layout = QHBoxLayout()    
+        logo_layout.addStretch()    
+        logo_layout.addWidget(logo_svg)
+        logo_layout.addStretch()
+
+        main_layout.addLayout(logo_layout)
+
+        credits_text = QTextBrowser()
         credits_text.setHtml(_HTML)
         credits_text.setReadOnly(True)
         credits_text.setTextInteractionFlags(Qt.NoTextInteraction)
+        credits_text.setStyleSheet("background: rgba(0, 0, 0, 0%)")
 
         main_layout.addWidget(credits_text)
 
