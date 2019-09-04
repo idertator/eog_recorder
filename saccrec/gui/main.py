@@ -6,7 +6,7 @@ from PyQt5.QtCore import QSettings
 
 from saccrec.core import Settings, Screen
 
-from saccrec.gui.dialogs import SettingsDialog
+from saccrec.gui.dialogs import SettingsDialog, AboutDialog
 from saccrec.gui.widgets import SignalsWidget, StimulusPlayerWidget
 from saccrec.gui.wizards import RecordSetupWizard
 
@@ -34,6 +34,7 @@ class MainWindow(QMainWindow):
         self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
 
         self._settings_dialog = SettingsDialog(self._settings, self)
+        self._about_dialog = None
         self._stimulus_player = StimulusPlayerWidget(self._settings, None)
 
         self._runner = Runner(
@@ -70,9 +71,10 @@ class MainWindow(QMainWindow):
         self._settings_action.setStatusTip('Configurar aplicación')
         self._settings_action.triggered.connect(self.open_settings_dialog)
 
-        about_action = QAction(QIcon(':help.svg'), '&Acerca de ...', self)
+        self._about_action = QAction(QIcon(':help.svg'), '&Acerca de ...', self)
+        self._about_action.triggered.connect(self.on_about_dialog_clicked)
 
-        help_menu.addAction(about_action)
+        help_menu.addAction(self._about_action)
 
         # Setting up top menu
         file_menu.addAction(self._new_action)
@@ -121,3 +123,8 @@ class MainWindow(QMainWindow):
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)
 
+    def on_about_dialog_clicked(self):
+        if self._about_dialog is None:
+            self._about_dialog = AboutDialog(parent=self)
+    
+        self._about_dialog.open()
