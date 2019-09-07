@@ -27,6 +27,7 @@ setup(
         'saccrec',
         'saccrec.core',
         'saccrec.core.models',
+        'saccrec.core.study',
         'saccrec.engine',        
         'saccrec.gui',
         'saccrec.gui.dialogs',
