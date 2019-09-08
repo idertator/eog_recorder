@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QApplication, QDialog
+from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QApplication, QDialog, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSettings
 
@@ -120,6 +120,28 @@ class MainWindow(QMainWindow):
         self._settings_action.setEnabled(True)
 
     def on_runner_finished(self):
+        report = QMessageBox.question(
+            self, 
+            'Opción',
+            '¿Desea generar un reporte sacádico?',
+            QMessageBox.Yes | QMessageBox.No
+        )
+
+        if report == QMessageBox.Yes:
+            filepath, _ = QFileDialog.getSaveFileName(
+                self,
+                'Seleccione fichero de salida',
+                self._settings.output_dir,
+                filter='Microsoft Excel (*.xls)'
+            )
+
+            if filepath:
+                from saccrec.core import Study
+                from saccrec.core.reports import excel_saccadic_report
+
+                study = Study.open(self._new_record_wizard.output_path)
+                excel_saccadic_report(study, filepath)
+
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)
 

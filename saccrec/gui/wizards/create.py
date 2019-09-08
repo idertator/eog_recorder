@@ -109,6 +109,10 @@ class RecordSetupWizard(QWizard):
             ]
         return self._tests
 
+    @property
+    def output_path(self) -> str:
+        return self._output_page.json
+
     def finish_wizard(self):
         self.finished.emit()
 
