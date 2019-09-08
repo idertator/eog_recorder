@@ -28,6 +28,9 @@ class Saccade:
     def __str__(self) -> str:
         return f'Saccade: {self.onset} -> {self.offset}'
 
+    def __json__(self) -> dict:
+        return (self._onset, self._offset)
+
     @property
     def onset(self) -> int:
         return self._onset
@@ -54,4 +57,7 @@ class Saccade:
     @property
     def max_velocity(self) -> float:
         abs_velocities = self._test.channel_absolute_velocities(self._channel)
-        return abs_velocities[self._onset:self._offset].max()
+        max_velocity = abs_velocities[self._onset:self._offset].max() 
+        scale = self._test.study.channel_calibration(self._channel) * 1000.0
+        return max_velocity * scale
+

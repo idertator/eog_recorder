@@ -1,9 +1,11 @@
-from typing import Optional, Type
+from typing import Optional, Type, List
 
-from numpy import ndarray
+from numpy import ndarray, abs
 
 from saccrec.core.enums import Channel
 from saccrec.engine.processing import differentiate
+
+from .saccades import Saccade
 
 
 class Test:
@@ -74,6 +76,9 @@ class Test:
 
     def __data__(self) -> Optional[dict]:
         return None
+
+    def __parse_data__(self, data: dict):
+        pass
 
     def __json__(self) -> dict:
         properties = {
@@ -173,7 +178,7 @@ class Test:
         velocities = self.channel_velocities(channel)
         if velocities is not None:
             if channel not in self._absolute_velocities:
-                self._absolute_velocities[channel] = velocities.abs()
+                self._absolute_velocities[channel] = abs(velocities)
             return self._absolute_velocities[channel]
         return None
 
@@ -214,6 +219,8 @@ class SaccadicTest(Test, kind='Saccadic'):
         else:
             raise AttributeError('saccades_count must be of type int or type float')
 
+        self._horizontal_saccades = None
+
     def __properties__(self) -> dict:
         return {
             'angle': self._angle,
@@ -221,6 +228,21 @@ class SaccadicTest(Test, kind='Saccadic'):
             'fixation_variability': self._fixation_variability,
             'saccades_count': self._saccades_count,
         }
+
+    def __data__(self) -> Optional[dict]:
+        return {
+            'horizontal_saccades': [saccade.__json__() for saccade in self._horizontal_saccades]
+        }
+
+    def __parse_data__(self, data: dict):
+        horizontal_saccades = data.get('horizontal_saccades', None)
+        if horizontal_saccades is not None:
+            self._horizontal_saccades = [Saccade(
+                onset=onset,
+                offset=offset,
+                test=self,
+                channel=Channel.Horizontal
+            ) for onset, offset in horizontal_saccades]
 
     @property
     def angle(self) -> int:
@@ -237,3 +259,20 @@ class SaccadicTest(Test, kind='Saccadic'):
     @property
     def saccades_count(self) -> int:
         return self._saccades_count
+
+    @property
+    def horizontal_saccades(self) -> List[Saccade]:
+        if self._horizontal_saccades is None:
+            from saccrec.engine.identification import identify_saccades
+            self._horizontal_saccades = identify_saccades(
+                test=self, 
+                channel=Channel.Horizontal
+            )
+        return self._horizontal_saccades
+
+    def identify_saccades(self):
+        from saccrec.engine.identification import identify_saccades
+        self._horizontal_saccades = identify_saccades(
+            test=self, 
+            channel=Channel.Horizontal
+        )

@@ -144,14 +144,14 @@ class Study:
 
                 TestClass = Test.from_kind(kind)
 
-                tests.append(
-                    TestClass(
-                        index=index,
-                        name=name,
-                        **properties, 
-                        **test_params
-                    )
+                test = TestClass(
+                    index=index,
+                    name=name,
+                    **properties, 
+                    **test_params
                 )
+                test.__parse_data__(test_dict.get('data', {}))
+                tests.append(test)
 
             processing = manifest.get('processing', {
                 'calibration': {

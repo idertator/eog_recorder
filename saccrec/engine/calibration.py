@@ -14,7 +14,7 @@ def _filter_amplitudes(amplitudes: List[float], threshold: float) -> List[float]
     return [amp for amp in amplitudes if min_value <= amp <= max_value]
 
 
-def horizontal_calibration(study: Study) -> Optional[float]:
+def calibrate(study: Study, channel: Channel = Channel.Horizontal) -> Optional[float]:
     tests = study.filter(test_cls=SaccadicTest, calibration=True)
 
     if len(tests) >= 2:
@@ -26,7 +26,7 @@ def horizontal_calibration(study: Study) -> Optional[float]:
                     onset=onset,
                     offset=offset,
                     test=test,
-                    channel=Channel.Horizontal,
+                    channel=channel,
                     ignore_calibration=True
                 ) for onset, offset in identify_kmeans(
                     channel=test.horizontal,
@@ -42,11 +42,13 @@ def horizontal_calibration(study: Study) -> Optional[float]:
 
         # TODO: Calibration quality check
 
-        return (first_mean + last_mean) / 2.0
+        return float(tests[0].angle) / ((first_mean + last_mean) / 2.0)
 
     return None
 
 if __name__ == '__main__':
     study = Study.open('/Users/idertator/Recordings/rgb20190831_12.rec')
 
-    print(f'Horizontal Calibration: {horizontal_calibration(study)}')
+    horizontal_calibration = calibrate(study)
+
+    print(f'Horizontal Calibration: {horizontal_calibration}')
