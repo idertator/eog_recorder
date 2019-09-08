@@ -1,6 +1,7 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource>
+        <file>eyestracker.svg</file>
         <file>diatax.svg</file>
         <file>app.png</file>
         <file>document.svg</file>

@@ -52,8 +52,8 @@ class AboutDialog(QDialog):
 
         main_layout = QVBoxLayout()
 
-        logo_svg = QSvgWidget(':diatax.svg')
-        logo_svg.setFixedSize(183, 81)
+        logo_svg = QSvgWidget(':eyestracker.svg')
+        logo_svg.setFixedSize(183, 34)
         
         logo_layout = QHBoxLayout()    
         logo_layout.addStretch()    
@@ -69,5 +69,15 @@ class AboutDialog(QDialog):
         credits_text.setStyleSheet("background: rgba(0, 0, 0, 0%)")
 
         main_layout.addWidget(credits_text)
+
+        diatax_svg = QSvgWidget(':diatax.svg')
+        diatax_svg.setFixedSize(183, 41)
+        
+        diatax_layout = QHBoxLayout()    
+        diatax_layout.addStretch()    
+        diatax_layout.addWidget(diatax_svg)
+        diatax_layout.addStretch()
+
+        main_layout.addLayout(diatax_layout)
 
         self.setLayout(main_layout)
