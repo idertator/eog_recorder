@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 class Channel(Enum):
     Unknown = 'Unknown'
+    Time = 'Time'
     Stimulus = 'Stimulus'
     Horizontal = 'Horizontal'
     Vertical = 'Vertical'

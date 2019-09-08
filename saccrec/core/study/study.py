@@ -7,6 +7,7 @@ from zipfile import ZipFile
 from numpy import load as array_load, savez_compressed
 
 from saccrec.consts import DATETIME_FORMAT
+from saccrec.core.enums import Channel
 
 from .hardware import Hardware
 from .subject import Subject
@@ -22,7 +23,9 @@ class Study:
         recorded_at: Union[str, datetime], 
         hardware: Hardware,
         subject: Subject,
-        tests: List[Test]
+        tests: List[Test],
+        horizontal_calibration: float = 1.0,
+        vertical_calibration: float = 1.0
     ):
         self._path = path
 
@@ -44,8 +47,12 @@ class Study:
         for test in tests:
             if not isinstance(test, Test):
                 raise AttributeError('tests must only contains objects of type Test')
+            test.study = self
 
         self._tests = tuple(tests)
+
+        self._horizontal_calibration = horizontal_calibration
+        self._vertical_calibration = vertical_calibration
 
     def __json__(self) -> dict:
         return {
@@ -54,6 +61,12 @@ class Study:
                 'datetime': self._recorded_at.strftime(DATETIME_FORMAT)
             },
             'hardware': self._hardware.__json__(),
+            'processing': {
+                'calibration': {
+                    'horizontal': self._horizontal_calibration,
+                    'vertical': self._vertical_calibration,
+                }
+            },
             'subject': self._subject.__json__(),
             'tests': [test.__json__() for test in self._tests]
         }
@@ -73,8 +86,12 @@ class Study:
         return self._recorded_at
 
     @property
-    def sample_rate(self) -> int:
+    def sampling_rate(self) -> int:
         return self._hardware.sample_rate.value
+
+    @property
+    def sampling_interval(self) -> float:
+        return 1000.0 / float(self.sampling_rate)
 
     @property
     def hardware(self) -> Hardware:
@@ -83,6 +100,24 @@ class Study:
     @property
     def subject(self) -> Subject:
         return self._subject
+
+    @property
+    def horizontal_calibration(self) -> float:
+        return self._horizontal_calibration
+
+    @horizontal_calibration.setter
+    def horizontal_calibration(self, value) -> float:
+        assert(isinstance(value, float))
+        self._horizontal_calibration = value
+
+    @property
+    def vertical_calibration(self) -> float:
+        return self._vertical_calibration
+
+    @vertical_calibration.setter
+    def vertical_calibration(self, value) -> float:
+        assert(isinstance(value, float))
+        self._vertical_calibration = value
 
     @classmethod
     def open(cls, path: str) -> 'Study':
@@ -117,6 +152,17 @@ class Study:
                         **test_params
                     )
                 )
+
+            processing = manifest.get('processing', {
+                'calibration': {
+                    'horizontal': 1.0,
+                    'vertical': 1.0,
+                }
+            })
+            calibration = processing.get('calibration', {
+                'horizontal': 1.0,
+                'vertical': 1.0,
+            })
                     
             return cls(
                 path=path,
@@ -124,7 +170,9 @@ class Study:
                 recorded_at=manifest['record']['datetime'],
                 hardware=Hardware(**manifest['hardware']),
                 subject=Subject(**subject_dict),
-                tests=tests
+                tests=tests,
+                horizontal_calibration=calibration['horizontal'],
+                vertical_calibration=calibration['vertical']
             )
 
     def save(self, path: Optional[str] = None):
@@ -155,3 +203,10 @@ class Study:
             return [test for test in self._tests if isinstance(test, test_cls) and test.is_calibration == calibration]
 
         return [test for test in self._tests if test.is_calibration == calibration]
+
+    def channel_calibration(self, channel: Channel) -> float:
+        if channel == Channel.Horizontal:
+            return self._horizontal_calibration
+        if channel == Channel.Vertical:
+            return self._vertical_calibration
+        return 1.0

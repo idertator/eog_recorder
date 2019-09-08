@@ -2,6 +2,9 @@ from typing import Optional, Type
 
 from numpy import ndarray
 
+from saccrec.core.enums import Channel
+from saccrec.engine.processing import differentiate
+
 
 class Test:
     _TESTS = []
@@ -17,7 +20,7 @@ class Test:
         return cls._TESTS_FROM_KIND[kind]
 
     def __init__(
-        self, 
+        self,
         index: int,
         name: str,
         time: Optional[ndarray] = None,
@@ -27,6 +30,7 @@ class Test:
         calibration: bool = False,
         **kwargs
     ):
+        self._study = None
         if isinstance(index, int):
             self._index = index
         else:
@@ -61,6 +65,9 @@ class Test:
             self._calibration = calibration
         else:
             raise AttributeError('calibration must be of type bool')
+
+        self._velocities = {}
+        self._absolute_velocities = {}
 
     def __properties__(self) -> dict:
         return {}
@@ -98,6 +105,16 @@ class Test:
         return result
 
     @property
+    def study(self):
+        return self._study
+
+    @study.setter
+    def study(self, value):
+        from saccrec.core import Study
+        assert(isinstance(value, Study))
+        self._study = value
+
+    @property
     def index(self) -> int:
         return self._index
 
@@ -124,6 +141,41 @@ class Test:
     @property
     def is_calibration(self) -> bool:
         return self._calibration
+
+    def free_memory(self):
+        self._velocities = {}
+        self._absolute_velocities = {}
+
+    def channel_samples(self, channel: Channel) -> Optional[ndarray]:
+        if channel == Channel.Time:
+            return self._time
+
+        if channel == Channel.Stimulus:
+            return self._stimulus
+
+        if channel == Channel.Horizontal:
+            return self._horizontal
+
+        if channel == Channel.Vertical:
+            return self._vertical
+
+        return None
+
+    def channel_velocities(self, channel: Channel) -> Optional[ndarray]:
+        samples = self.channel_samples(channel)
+        if samples is not None:
+            if channel not in self._velocities:
+                self._velocities[channel] = differentiate(samples, self._study.sampling_interval)
+            return self._velocities[channel]
+        return None
+
+    def channel_absolute_velocities(self, channel: Channel) -> Optional[ndarray]:
+        velocities = self.channel_velocities(channel)
+        if velocities is not None:
+            if channel not in self._absolute_velocities:
+                self._absolute_velocities[channel] = velocities.abs()
+            return self._absolute_velocities[channel]
+        return None
 
 
 class SaccadicTest(Test, kind='Saccadic'):
