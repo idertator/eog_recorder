@@ -29,7 +29,7 @@ class RecordSetupWizard(QWizard):
 
         self._subject_page = SubjectWizardPage(self)
         self._stimulus_page = StimulusWizardPage(self)
-        self._output_page = OutputWizardPage(settings=settings, parent=self)
+        self._output_page = OutputWizardPage(self._subject_page, settings=settings, parent=self)
 
         self._tests = None
 
@@ -52,12 +52,12 @@ class RecordSetupWizard(QWizard):
                 <meta charset="utf-8">
             </head>
             <body>
-                <h3>Resumen</h3>
+                <h2>Resumen</h2>
                 {self._subject_page.html}
                 {self._stimulus_page.html}
 
-                <h3>Important Notes</h3>
-                <p>Distance to subject: <strong>{self.fixed_distance_to_subject:.2f} cm</strong></p>
+                <h2>Notas importantes</h2>
+                <p>Distancia del sujeto a la pantalla: <strong>{self.fixed_distance_to_subject:.2f} cm</strong></p>
             </body>
         </html>
         '''
@@ -155,6 +155,28 @@ class SubjectWizardPage(QWizardPage):
     def subject(self) -> Subject:
         return self._subject_widget.model
 
+    @property
+    def subject_code(self) -> str:
+        def int_to_str(data: int) -> str:
+            if int(data) < 10:
+                return '0' + str(data)
+            if len(str(data)) > 2:
+                return str(data)[2:4]
+            return str(data)
+
+        full_name = self._subject_widget.full_name.upper().strip().split(' ')
+        code = ''
+        if len(full_name) == 1:
+            code = full_name[0][0:3]
+        else:
+            for text in full_name:
+                code += text[0]
+
+        day = int_to_str(self._subject_widget.borndate.day)
+        month = int_to_str(self._subject_widget.borndate.month)
+        year = int_to_str(self._subject_widget.borndate.year)
+        return code + day + month + year
+
 
 class StimulusWizardPage(QWizardPage):
 
@@ -230,9 +252,10 @@ class StimulusWizardPage(QWizardPage):
 
 class OutputWizardPage(QWizardPage):
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, subject_wizard_page: SubjectWizardPage, settings: Settings, parent=None):
         super(OutputWizardPage, self).__init__(parent=parent)
         self._settings = settings
+        self._subject_wizard_page = subject_wizard_page
 
         self.setTitle('Configuración de la salida')
 
@@ -276,7 +299,7 @@ class OutputWizardPage(QWizardPage):
         filepath, _ = QFileDialog.getSaveFileName(
             self,
             'Seleccione fichero de salida',
-            self._settings.output_dir,
+            self._settings.output_dir + '/' + self._subject_wizard_page.subject_code,
             filter='Archivo de SaccRec (*.rec)'
         )
         if not filepath.lower().endswith('.rec'):
