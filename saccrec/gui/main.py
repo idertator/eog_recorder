@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
             filepath, _ = QFileDialog.getSaveFileName(
                 self,
                 'Seleccione fichero de salida',
-                self._settings.output_dir + '/' + self._subject_wizard_page.subject_code,
+                self._settings.output_dir + '/' + self._new_record_wizard.subject_page.subject_code,
                 filter='Microsoft Excel (*.xls)'
             )
             if not filepath.lower().endswith('.xls'):

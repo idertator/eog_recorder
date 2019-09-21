@@ -15,6 +15,7 @@ from saccrec.core.math import distance_to_subject
 from saccrec.core.models import Subject
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
+from saccrec.gui.widgets.stimulus import TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
 
 
 class RecordSetupWizard(QWizard):
@@ -28,7 +29,7 @@ class RecordSetupWizard(QWizard):
         self._screen = screen
 
         self._subject_page = SubjectWizardPage(self)
-        self._stimulus_page = StimulusWizardPage(self)
+        self._stimulus_page = StimulusWizardPage(self._settings)
         self._output_page = OutputWizardPage(self._subject_page, settings=settings, parent=self)
 
         self._tests = None
@@ -113,6 +114,10 @@ class RecordSetupWizard(QWizard):
     def output_path(self) -> str:
         return self._output_page.json
 
+    @property
+    def subject_page(self):
+        return self._subject_page
+
     def finish_wizard(self):
         self.finished.emit()
 
@@ -165,6 +170,8 @@ class SubjectWizardPage(QWizardPage):
             return str(data)
 
         full_name = self._subject_widget.full_name.upper().strip().split(' ')
+        while len(full_name) > 3:
+            full_name.remove(full_name[1])
         code = ''
         if len(full_name) == 1:
             code = full_name[0][0:3]
@@ -180,10 +187,11 @@ class SubjectWizardPage(QWizardPage):
 
 class StimulusWizardPage(QWizardPage):
 
-    def __init__(self, parent=None):
+    def __init__(self, settings: Settings, parent=None):
         super(StimulusWizardPage, self).__init__(parent)
 
         self.setTitle('Configuración del estímulo')
+        self._settings = settings
 
         scroll_area = QScrollArea()
         scroll_area_widget = QWidget()
@@ -193,15 +201,15 @@ class StimulusWizardPage(QWizardPage):
         self.test_list = list()
         test_layout = QVBoxLayout()
 
-        self.initial_calibration_test = StimulusWidget(0, self.test_list, test_layout)
+        self.initial_calibration_test = InitialStimulusWidget(self._settings, self.test_list, test_layout)
         scroll_area_layout.addWidget(self.initial_calibration_test)
 
-        stimulus_widget = StimulusWidget(1, self.test_list, test_layout)
+        stimulus_widget = TestStimulusWidget(self._settings, self.test_list, test_layout)
         test_layout.addWidget(stimulus_widget)
         self.test_list.append(stimulus_widget)
         scroll_area_layout.addLayout(test_layout)
 
-        self.final_calibration_test = StimulusWidget(2)
+        self.final_calibration_test = FinalStimulusWidget(self._settings)
         scroll_area_layout.addWidget(self.final_calibration_test)
 
         scroll_area.setWidgetResizable(True)
@@ -226,7 +234,7 @@ class StimulusWizardPage(QWizardPage):
     @staticmethod
     def __test_to_html(test: StimulusWidget) -> str:
         name = test.test_name
-        if test.test_type == 1:
+        if type(test) is TestStimulusWidget:
             name = 'Prueba sacádica'
         return f'''<p>{name} a <b>{test.angle}&#176;</b> con <b>{test.saccades_count}</b> sácadas.
         La duración media de las fijaciones es de <b>{test.fixation_duration} segundos</b> con una variabilidad del <b>{test.fixation_variability}%</b>.</p>
