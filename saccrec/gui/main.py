@@ -128,9 +128,11 @@ class MainWindow(QMainWindow):
             filepath, _ = QFileDialog.getSaveFileName(
                 self,
                 'Seleccione fichero de salida',
-                self._settings.output_dir,
+                self._settings.output_dir + '/' + self._new_record_wizard.subject_page.subject_code,
                 filter='Microsoft Excel (*.xls)'
             )
+            if not filepath.lower().endswith('.xls'):
+                filepath += '.xls'
 
             if filepath:
                 from saccrec.core import Study
