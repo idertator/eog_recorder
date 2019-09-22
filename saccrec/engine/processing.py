@@ -1,12 +1,7 @@
-from multiprocessing import Process
-from typing import Dict, Tuple
-
 from numba import njit, stencil
 from numpy import array
 from scipy.signal import medfilt
 from sklearn.cluster import KMeans
-
-from saccrec.core import Channel
 
 
 @njit(fastmath=True, parallel=True)

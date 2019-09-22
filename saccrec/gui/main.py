@@ -1,8 +1,5 @@
-import sys
-
-from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QApplication, QDialog, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSettings
 
 from saccrec.core import Settings, Screen
 
@@ -114,14 +111,14 @@ class MainWindow(QMainWindow):
 
     def open_settings_dialog(self):
         self._settings_dialog.open()
-        
+
     def on_runner_stopped(self):
         self._new_action.setEnabled(True)
         self._settings_action.setEnabled(True)
 
     def on_runner_finished(self):
         report = QMessageBox.question(
-            self, 
+            self,
             'Opción',
             '¿Desea generar un reporte sacádico?',
             QMessageBox.Yes | QMessageBox.No
@@ -148,5 +145,5 @@ class MainWindow(QMainWindow):
     def on_about_dialog_clicked(self):
         if self._about_dialog is None:
             self._about_dialog = AboutDialog(parent=self)
-    
+
         self._about_dialog.open()

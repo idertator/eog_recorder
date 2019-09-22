@@ -2,7 +2,6 @@ from PyQt5.QtCore import pyqtSignal, QObject
 
 from saccrec.core import Settings, Screen, Record
 from saccrec.core.models import Subject, Hardware
-from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec.engine.recording import OpenBCIRecorder
 from saccrec.gui.widgets import StimulusPlayerWidget, SignalsWidget
 
@@ -13,10 +12,10 @@ class Runner(QObject):
     finished = pyqtSignal()
 
     def __init__(
-        self, 
+        self,
         settings: Settings,
         screen: Screen,
-        player: StimulusPlayerWidget, 
+        player: StimulusPlayerWidget,
         signals: SignalsWidget,
         parent=None
     ):
@@ -70,24 +69,24 @@ class Runner(QObject):
 
         stimuli = tests[0]
         self._player.run_stimulus(
-            stimuli, 
+            stimuli,
             '\n'.join([str(stimuli), 'Presione espacio para continuar'])
         )
         self._player.move(
-            self._screen.secondary_screen_rect.left(), 
+            self._screen.secondary_screen_rect.left(),
             self._screen.secondary_screen_rect.top()
         )
 
-        self._player.showFullScreen()        
+        self._player.showFullScreen()
         self.started.emit()
 
     def on_player_started(self):
         if not self._signals.isVisible():
-            self._signals.show()            
+            self._signals.show()
 
         if not self._signals.is_rendering:
             self._recorder = OpenBCIRecorder(
-                self._settings, 
+                self._settings,
                 self._record.folder_for_test(self._next_test - 1)
             )
             self._signals.start(self._recorder)
@@ -101,7 +100,7 @@ class Runner(QObject):
 
         self._player.close_player()
         self.stopped.emit()
-    
+
     def on_player_finished(self):
         self._signals.stop()
         self._recorder.stop_streaming()
@@ -121,7 +120,7 @@ class Runner(QObject):
             self._next_test += 1
 
             self._player.run_stimulus(
-                stimuli, 
+                stimuli,
                 '\n'.join([str(stimuli), 'Presione espacio para continuar'])
             )
         else:

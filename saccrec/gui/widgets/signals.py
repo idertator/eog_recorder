@@ -1,8 +1,7 @@
 from math import floor
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 
-from numpy import sin, cos, linspace, pi, array, float32, hstack, mean
-from numpy.random import randint, random
+from numpy import array, float32, hstack
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QColor, QPen
@@ -18,7 +17,7 @@ WINDOWS_WIDTH = 4000
 class SignalsManager:
 
     def __init__(self, window_width: int = WINDOWS_WIDTH):
-        self._window_width = window_width        
+        self._window_width = window_width
 
         self._hc_window = array([], dtype=float32)
         self._hc_max = 0
@@ -68,18 +67,18 @@ class SignalsManager:
         channel = self._vc_window - self._vc_window.mean()
         self._vc_max = max(abs(channel.min()), abs(channel.max()))
         return self._samples_to_lines(channel)
-        
+
     @property
     def horizontal_window(self) -> QRect:
         return QRect(
-            QPoint(self._x_offset, self._hc_max * SIGNALS_PADDING), 
+            QPoint(self._x_offset, self._hc_max * SIGNALS_PADDING),
             QPoint(self._x_offset + WINDOWS_WIDTH, -self._hc_max * SIGNALS_PADDING)
         )
 
     @property
     def vertical_window(self) -> QRect:
         return QRect(
-            QPoint(self._x_offset, self._vc_max * SIGNALS_PADDING), 
+            QPoint(self._x_offset, self._vc_max * SIGNALS_PADDING),
             QPoint(self._x_offset + WINDOWS_WIDTH, -self._vc_max * SIGNALS_PADDING)
         )
 
@@ -155,7 +154,9 @@ class SignalsWidget(QWidget):
         lines = self._manager.horizontal_lines
         painter.setWindow(self._manager.horizontal_window)
 
-        painter.setPen(QPen(self._signals_color, 2.0))
+        pen = QPen(self._signals_color, 2.0)
+        pen.setCosmetic(True)
+        painter.setPen(pen)
         painter.drawLines(lines)
 
         painter.restore()
@@ -180,7 +181,9 @@ class SignalsWidget(QWidget):
         lines = self._manager.vertical_lines
         painter.setWindow(self._manager.vertical_window)
 
-        painter.setPen(QPen(self._signals_color, 2.0))
+        pen = QPen(self._signals_color, 3.0)
+        pen.setCosmetic(True)
+        painter.setPen(pen)
         painter.drawLines(lines)
 
         painter.restore()

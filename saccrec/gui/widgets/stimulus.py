@@ -1,6 +1,5 @@
-from PyQt5.QtCore import pyqtSignal, QDate, Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QFrame, QGroupBox, QLabel
-from PyQt5.QtWidgets import QFormLayout
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QGroupBox, QLabel
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 
 from saccrec.consts import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE

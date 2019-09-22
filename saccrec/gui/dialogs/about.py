@@ -20,7 +20,7 @@ _HTML = '''
                 text-align: center;
                 margin-top: 2em;
             }
-        </style>        
+        </style>
     </head>
     <body>
         <ul>
@@ -29,13 +29,13 @@ _HTML = '''
             <li>Roberto Becerra (UMA), <strong>Desarrollador Principal</strong></li>
             <li>Wilmer Cedeño (UTM), <strong>Desarrollador</strong></li>
             <li>Mauro Ferrín (UTM), <strong>Desarrollador</strong></li>
-            <li>Rodolfo Becerra (UHO), <strong>Desarrollador</strong></li>            
+            <li>Rodolfo Becerra (UHO), <strong>Desarrollador</strong></li>
             <li>Luis Velázquez Rodríguez (CIRAH), <strong>Asesor Principal</strong></li>
             <li>Roberto Rodríguez Labrada (CIRAH), <strong>Asesor</strong></li>
         </ul>
 
         <p class="project">Proyecto resultado de la colaboración entre la Universidad de Málaga (España),
-        el Instituto Tecnológico de Manabí (Ecuador) y el Centro de Investigación y 
+        el Instituto Tecnológico de Manabí (Ecuador) y el Centro de Investigación y
         Rehabilitación de las Ataxias Hereditarias (Cuba)<p/>
     </body>
 </html>
@@ -43,7 +43,7 @@ _HTML = '''
 
 
 class AboutDialog(QDialog):
-    
+
     def __init__(self, parent=None):
         super(AboutDialog, self).__init__(parent=parent)
         self.setWindowTitle('Acerca de DIATAX ...')
@@ -54,9 +54,9 @@ class AboutDialog(QDialog):
 
         logo_svg = QSvgWidget(':eyestracker.svg')
         logo_svg.setFixedSize(183, 34)
-        
-        logo_layout = QHBoxLayout()    
-        logo_layout.addStretch()    
+
+        logo_layout = QHBoxLayout()
+        logo_layout.addStretch()
         logo_layout.addWidget(logo_svg)
         logo_layout.addStretch()
 
@@ -66,15 +66,14 @@ class AboutDialog(QDialog):
         credits_text.setHtml(_HTML)
         credits_text.setReadOnly(True)
         credits_text.setTextInteractionFlags(Qt.NoTextInteraction)
-        credits_text.setStyleSheet("background: rgba(0, 0, 0, 0%)")
 
         main_layout.addWidget(credits_text)
 
         diatax_svg = QSvgWidget(':diatax.svg')
         diatax_svg.setFixedSize(183, 41)
-        
-        diatax_layout = QHBoxLayout()    
-        diatax_layout.addStretch()    
+
+        diatax_layout = QHBoxLayout()
+        diatax_layout.addStretch()
         diatax_layout.addWidget(diatax_svg)
         diatax_layout.addStretch()
 
