@@ -3,3 +3,4 @@ from .formats import Record
 
 from .screen import Screen
 from .settings import Settings
+from .study import Study, Test, SaccadicTest, Saccade

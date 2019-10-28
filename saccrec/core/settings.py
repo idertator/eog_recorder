@@ -8,7 +8,8 @@ from PyQt5.QtGui import QColor
 from saccrec.consts import SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE, \
     SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS, SETTINGS_DEFAULT_STIMULUS_BALL_COLOR, \
     SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR, SETTINGS_OPENBCI_DEFAULT_GAIN, SETTINGS_OPENBCI_DEFAULT_CHANNEL_NUMBER, \
-    SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH, SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT
+    SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH, SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT, STIMULUS_DEFAULT_ANGLE, \
+    STIMULUS_DEFAULT_DURATION, STIMULUS_DEFAULT_VARIABILITY, STIMULUS_DEFAULT_SACCADES, DEFAULT_TESTS_COUNT
 from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM
 
 
@@ -46,11 +47,88 @@ class Channel(object):
         } for index, (active, gain) in enumerate(self._channels)]
 
 
+class TestSet(object):
+    def __init__(self, settings: QSettings, parent=None):
+        self._settings = settings
+        self._test = []
+        for i in range(self.test_count):
+            self._test.append(
+                (
+                    int(self._settings.value(f'CalibrationTests/Test{i}/Angle', STIMULUS_DEFAULT_ANGLE)),
+                    float(
+                        self._settings.value(f'CalibrationTests/Test{i}/FixationDuration', STIMULUS_DEFAULT_DURATION)),
+                    float(self._settings.value(f'CalibrationTests/Test{i}/FixationVariability',
+                                               STIMULUS_DEFAULT_VARIABILITY)),
+                    int(self._settings.value(f'CalibrationTests/Test{i}/SaccadesCount', STIMULUS_DEFAULT_SACCADES))
+                )
+            )
+
+    def __getitem__(self, item: int) -> tuple:
+        return self._test[item]
+
+    def __setitem__(self, index: int, value: tuple):
+        self._test[index] = (
+            self._settings.setValue(f'CalibrationTests/Test{item}/Angle', value[0]),
+            self._settings.setValue(f'CalibrationTests/Test{item}/FixationDuration', value[1]),
+            self._settings.setValue(f'CalibrationTests/Test{item}/FixationVariability', value[2]),
+            self._settings.setValue(f'CalibrationTests/Test{item}/SaccadesCount', value[3]),
+        )
+
+    @property
+    def test_count(self) -> int:
+        return int(self._settings.value('CalibrationTests/TestCount', DEFAULT_TESTS_COUNT))
+
+    @test_count.setter
+    def test_count(self, value: int):
+        self._settings.setValue('CalibrationTests/TestCount', value)
+
+    @property
+    def initial(self) -> tuple:
+        return (
+            int(self._settings.value('CalibrationTests/Initial/Angle',
+                                     STIMULUS_DEFAULT_ANGLE)),
+            float(self._settings.value('CalibrationTests/Initial/FixationDuration',
+                                       STIMULUS_DEFAULT_DURATION)),
+            float(self._settings.value('CalibrationTests/Initial/FixationVariability',
+                                       STIMULUS_DEFAULT_VARIABILITY)),
+            int(self._settings.value(f'CalibrationTests/Initial/SaccadesCount',
+                                     STIMULUS_DEFAULT_SACCADES))
+        )
+
+    @initial.setter
+    def initial(self, value: tuple):
+        self._settings.setValue('CalibrationTests/Initial/Angle', value[0])
+        self._settings.setValue('CalibrationTests/Initial/FixationDuration', value[1])
+        self._settings.setValue('CalibrationTests/Initial/FixationVariability', value[2])
+        self._settings.setValue('CalibrationTests/Initial/SaccadesCount', value[3])
+
+    @property
+    def final(self) -> tuple:
+        return (
+            int(self._settings.value('CalibrationTests/Final/Angle',
+                                     STIMULUS_DEFAULT_ANGLE)),
+            float(self._settings.value('CalibrationTests/Final/FixationDuration',
+                                       STIMULUS_DEFAULT_DURATION)),
+            float(self._settings.value('CalibrationTests/Final/FixationVariability',
+                                       STIMULUS_DEFAULT_VARIABILITY)),
+            int(self._settings.value(f'CalibrationTests/Final/SaccadesCount',
+                                     STIMULUS_DEFAULT_SACCADES))
+        )
+
+    @final.setter
+    def final(self, value: tuple):
+        self._settings.setValue('CalibrationTests/Final/Angle', value[0])
+        self._settings.setValue('CalibrationTests/Final/FixationDuration', value[1])
+        self._settings.setValue('CalibrationTests/Final/FixationVariability', value[2])
+        self._settings.setValue('CalibrationTests/Final/SaccadesCount', value[3])
+
+
 class Settings(object):
 
     def __init__(self, parent=None):
         self._settings = QSettings('SaccRec', 'SaccRec', parent)
         self._channels = Channel(self._settings)
+        self._calibration_tests = TestSet(self._settings)
 
     @property
     def output_dir(self) -> str:
@@ -121,7 +199,8 @@ class Settings(object):
 
     @property
     def stimulus_saccadic_background_color(self) -> QColor:
-        return QColor(self._settings.value('Stimulus/SaccadicBackgroundColor', SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR))
+        return QColor(
+            self._settings.value('Stimulus/SaccadicBackgroundColor', SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR))
 
     @stimulus_saccadic_background_color.setter
     def stimulus_saccadic_background_color(self, value: QColor):
@@ -130,3 +209,7 @@ class Settings(object):
     @property
     def openbci_channels(self) -> Channel:
         return self._channels
+
+    @property
+    def calibration_tests(self) -> TestSet:
+        return self._calibration_tests

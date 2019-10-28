@@ -1,10 +1,9 @@
 from datetime import datetime
-from json import dump, dumps
+from json import dumps
 from os import makedirs
 from os.path import join, exists, dirname
 from shutil import rmtree
 from tempfile import mkdtemp
-from typing import List, Tuple, Optional
 from zipfile import ZipFile
 
 from numpy import array, savez_compressed
@@ -19,21 +18,21 @@ _CURRENT_VERSION = 1
 class Record:
 
     def __init__(
-        self, 
+        self,
         subject: Subject,
         hardware: Hardware
     ):
         self._datetime = datetime.now()
         self._subject = subject
         self._hardware = hardware
-        
+
         self._tests = []
 
         self._folder = mkdtemp(prefix='saccrec-')
 
     def add_test(
         self,
-        stimulus: array, 
+        stimulus: array,
         **properties
     ):
         current_index = len(self._tests)
@@ -92,23 +91,23 @@ class Record:
 
             for test in self._tests:
                 if 'stimulus' in test:
-                    full_path = join(self._folder, test['stimulus']) 
+                    full_path = join(self._folder, test['stimulus'])
                     out.write(full_path, test['stimulus'])
 
                 if 'time' in test:
-                    full_path = join(self._folder, test['time']) 
+                    full_path = join(self._folder, test['time'])
                     out.write(full_path, test['time'])
 
                 if 'horizontal' in test:
-                    full_path = join(self._folder, test['horizontal']) 
+                    full_path = join(self._folder, test['horizontal'])
                     out.write(full_path, test['horizontal'])
-                
+
                 if 'vertical' in test:
-                    full_path = join(self._folder, test['vertical']) 
+                    full_path = join(self._folder, test['vertical'])
                     out.write(full_path, test['vertical'])
 
                 if 'annotations' in test:
-                    full_path = join(self._folder, test['annotations']) 
+                    full_path = join(self._folder, test['annotations'])
                     out.write(full_path, test['annotations'])
 
     def close(self):

@@ -3,6 +3,7 @@ from enum import IntEnum, Enum
 
 class Channel(Enum):
     Unknown = 'Unknown'
+    Time = 'Time'
     Stimulus = 'Stimulus'
     Horizontal = 'Horizontal'
     Vertical = 'Vertical'

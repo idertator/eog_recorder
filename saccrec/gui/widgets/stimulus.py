@@ -1,12 +1,12 @@
-from PyQt5.QtCore import pyqtSignal, QDate, Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QFrame, QGroupBox, QLabel
-from PyQt5.QtWidgets import QFormLayout
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QGroupBox, QLabel
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 
 from saccrec.consts import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE
 from saccrec.consts import STIMULUS_DEFAULT_DURATION
 from saccrec.consts import STIMULUS_DEFAULT_VARIABILITY
 from saccrec.consts import STIMULUS_DEFAULT_SACCADES, STIMULUS_MINUMUM_SACCADES, STIMULUS_MAXIMUM_SACCADES
+from saccrec.core import Settings
 
 
 class StimulusWidget(QGroupBox):
@@ -18,13 +18,15 @@ class StimulusWidget(QGroupBox):
         2: ('Prueba de Calibración Horizontal Final', -1, False)
     }
 
-    def __init__(self, test_type, wizard_list: list = None, wizard_layout: QVBoxLayout = None, parent=None):
+    def __init__(self, settings: Settings, wizard_list: list = None, wizard_layout: QVBoxLayout = None, parent=None):
         super(StimulusWidget, self).__init__(parent=parent)
 
-        self._test_type = test_type
-        self._title = self.TEST_TYPE_SETTINGS[test_type][0]
-        self.position = self.TEST_TYPE_SETTINGS[test_type][1]
-        self._angle_enabled = self.TEST_TYPE_SETTINGS[test_type][2]
+        test_type1 = 1
+        self._title = self.TEST_TYPE_SETTINGS[test_type1][0]
+        self.position = self.TEST_TYPE_SETTINGS[test_type1][1]
+        self._angle_enabled = self.TEST_TYPE_SETTINGS[test_type1][2]
+
+        self._settings = settings
 
         self._wizard_list = wizard_list
         self._wizard_layout = wizard_layout
@@ -32,7 +34,6 @@ class StimulusWidget(QGroupBox):
         self.setFlat(True)
         self.setMinimumHeight(90)
         self.setFixedHeight(90)
-
 
         layout = QHBoxLayout(self)
 
@@ -43,7 +44,6 @@ class StimulusWidget(QGroupBox):
         self._angle_edit.setSuffix(' \u00B0')
         self._angle_edit.setFixedWidth(60)
         self._angle_edit.setToolTip('Ángulo')
-        self._angle_edit.valueChanged.connect(self.angle_edit_changed)
         element_layout = QVBoxLayout()
         element_layout.addWidget(QLabel('Ángulo'))
         element_layout.addWidget(self._angle_edit)
@@ -121,11 +121,6 @@ class StimulusWidget(QGroupBox):
             wizard_item.cancel_widget_button.setVisible(True)
             self._wizard_layout.addWidget(wizard_item)
 
-    def angle_edit_changed(self):
-        if self._test_type != 1:
-            return
-        self.setTitle(f'Prueba sacádica a {str(self._angle_edit.value())} \u00B0')
-
     def reset(self):
         self._angle_edit.setValue(STIMULUS_DEFAULT_ANGLE)
         self._fixation_mean_duration_edit.setValue(STIMULUS_DEFAULT_DURATION)
@@ -184,3 +179,65 @@ class StimulusWidget(QGroupBox):
             'fixation_variability': self.fixation_variability,
             'saccades_count': self.saccades_count,
         }
+
+
+class InitialStimulusWidget(StimulusWidget):
+    def __init__(self, settings: Settings, wizard_list: list, wizard_layout: QVBoxLayout, parent=None):
+        super(InitialStimulusWidget, self).__init__(settings, wizard_list, wizard_layout, parent)
+        self.setTitle('Prueba de Calibración Horizontal Inicial')
+        self.position = -1
+        self._settings = settings
+
+    def reset(self):
+        super(InitialStimulusWidget, self).reset()
+
+        self._angle_edit.setValue(self._settings.calibration_tests.initial[0])
+        self._fixation_mean_duration_edit.setValue(self._settings.calibration_tests.initial[1])
+        self._fixation_variability_edit.setValue(self._settings.calibration_tests.initial[2])
+        self._saccades_count.setValue(self._settings.calibration_tests.initial[3])
+
+        self.cancel_widget_button.setVisible(False)
+        self._add_widget_button.setVisible(True)
+        self._angle_edit.setEnabled(False)
+
+
+class TestStimulusWidget(StimulusWidget):
+
+    def __init__(self, settings: Settings, wizard_list: list, wizard_layout: QVBoxLayout, parent=None):
+        super(TestStimulusWidget, self).__init__(settings, wizard_list, wizard_layout, parent)
+        self.setTitle(f'Prueba sacádica a {STIMULUS_DEFAULT_ANGLE} \u00B0')
+        self.position = 0
+        self._angle_edit.valueChanged.connect(self.angle_edit_changed)
+
+    def reset(self):
+        super(TestStimulusWidget, self).reset()
+
+        self._angle_edit.setValue(self._settings.calibration_tests[self.position][0])
+        self._fixation_mean_duration_edit.setValue(self._settings.calibration_tests[self.position][1])
+        self._fixation_variability_edit.setValue(self._settings.calibration_tests[self.position][2])
+        self._saccades_count.setValue(self._settings.calibration_tests[self.position][3])
+
+        self.cancel_widget_button.setVisible(len(self._wizard_list) > 0)
+        self._add_widget_button.setVisible(True)
+        self._angle_edit.setEnabled(True)
+
+    def angle_edit_changed(self):
+        self.setTitle(f'Prueba sacádica a {str(self._angle_edit.value())} \u00B0')
+
+
+class FinalStimulusWidget(StimulusWidget):
+    def __init__(self, settings: Settings, parent=None):
+        super(FinalStimulusWidget, self).__init__(settings, parent)
+        self.setTitle('Prueba de Calibración Horizontal Final')
+
+    def reset(self):
+        super(FinalStimulusWidget, self).reset()
+
+        self._angle_edit.setValue(self._settings.calibration_tests.final[0])
+        self._fixation_mean_duration_edit.setValue(self._settings.calibration_tests.final[1])
+        self._fixation_variability_edit.setValue(self._settings.calibration_tests.final[2])
+        self._saccades_count.setValue(self._settings.calibration_tests.final[3])
+
+        self.cancel_widget_button.setVisible(False)
+        self._add_widget_button.setVisible(False)
+        self._angle_edit.setEnabled(False)

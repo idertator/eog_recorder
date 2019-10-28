@@ -1,0 +1,120 @@
+from datetime import datetime, date
+from typing import Union, Optional
+
+from saccrec.consts import DATE_FORMAT
+from saccrec.core.enums import Genre, SubjectStatus
+
+
+class Subject:
+    
+    def __init__(
+        self, 
+        name: str = 'Unknown', 
+        genre: Union[str, Genre] = Genre.Unknown,
+        status: Union[str, SubjectStatus] = SubjectStatus.Unknown,
+        borndate: Optional[Union[str, date, datetime]] = None
+    ):
+        if isinstance(name, str):
+            self._name = name
+        else:
+            self._name = 'Unknown'
+
+        if isinstance(genre, str):
+            self._genre = Genre(genre) 
+        elif isinstance(genre, Genre):
+            self._genre = genre
+        else:
+            self._genre = Genre.Unknown
+
+        if isinstance(status, str):
+            self._status = SubjectStatus(status)
+        elif isinstance(status, SubjectStatus):
+            self._status = status
+        else:
+            self._status = SubjectStatus.Unknown
+
+        if isinstance(borndate, str):
+            self._borndate = datetime.strptime(borndate, DATE_FORMAT).date()
+        elif isinstance(borndate, datetime):
+            self._borndate = borndate.date()
+        elif isinstance(borndate, date):
+            self._borndate = borndate
+        else:
+            self._borndate = None
+
+    def __str__(self) -> str:
+        return self._name
+
+    def __json__(self) -> dict:
+        return {
+            'full_name': self._name,
+            'genre': self._genre.value,
+            'status': self._status.value,
+            'borndate': self._borndate.strftime(DATE_FORMAT) if self._borndate is not None else None,
+        }
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        if isinstance(value, str):
+            self._name = value
+        else:
+            raise AttributeError('name must be of type str')
+
+    @property
+    def genre(self) -> Genre:
+        return self._genre
+
+    @genre.setter
+    def genre(self, value: Union[str, Genre]):
+        if isinstance(value, str):
+            self._genre = Genre(value) 
+        elif isinstance(value, Genre):
+            self._genre = value
+        else:
+            raise AttributeError('genre must be of type str or type Genre')
+
+    @property
+    def status(self) -> SubjectStatus:
+        return self._status
+
+    @status.setter
+    def status(self, value: Union[str, SubjectStatus]):
+        if isinstance(value, str):
+            self._status = SubjectStatus(value)
+        elif isinstance(value, SubjectStatus):
+            self._status = value
+        else:
+            raise AttributeError('status must be of type str or type SubjectStatus')
+
+    @property
+    def borndate(self) -> date:
+        return self._borndate
+
+    @borndate.setter
+    def borndate(self, value: Optional[Union[str, date, datetime]]):
+        if isinstance(value, str):
+            self._borndate = datetime.strptime(value, DATE_FORMAT).date()
+        elif isinstance(value, datetime):
+            self._borndate = value.date()
+        elif isinstance(value, date):
+            self._borndate = value
+        else:
+            raise AttributeError('borndate must be of type str, type datetime or type date')
+
+    @property
+    def age(self) -> int:
+        today = date.today()
+        if self._borndate is not None:
+            years = today.year - self._borndate.year
+            if today.month > self._borndate.month:
+                return years + 1
+            if today.month < self._borndate.year:
+                return years
+            if today.day >= self._borndate.day:
+                return years + 1
+            return years
+        return 0

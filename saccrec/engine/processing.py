@@ -1,12 +1,7 @@
-from multiprocessing import Process
-from typing import Dict, Tuple
-
 from numba import njit, stencil
 from numpy import array
 from scipy.signal import medfilt
 from sklearn.cluster import KMeans
-
-from saccrec.core import Channel
 
 
 @njit(fastmath=True, parallel=True)
@@ -37,7 +32,7 @@ def identify_kmeans(
     Yields:
         (int, int): Onset and offset impulse points
     """
-    velocity = medfilt(differentiate(channel, sampling_interval, 'l11'), 9)
+    velocity = medfilt(differentiate(channel, sampling_interval), 9)
     estimator = KMeans(n_clusters=2)
     X = abs(velocity.reshape((len(velocity), 1)))
     labels = estimator.fit_predict(X)
