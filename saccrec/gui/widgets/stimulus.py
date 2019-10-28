@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QGroupBox, QLabel
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 
-from saccrec.consts import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE
+from saccrec.consts import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE, DEFAULT_TEST
 from saccrec.consts import STIMULUS_DEFAULT_DURATION
 from saccrec.consts import STIMULUS_DEFAULT_VARIABILITY
 from saccrec.consts import STIMULUS_DEFAULT_SACCADES, STIMULUS_MINUMUM_SACCADES, STIMULUS_MAXIMUM_SACCADES
@@ -11,26 +11,14 @@ from saccrec.core import Settings
 
 class StimulusWidget(QGroupBox):
 
-    TEST_TYPE_SETTINGS = {
-        # (name, position, angle_enabled)
-        0: ('Prueba de Calibración Horizontal Inicial', -1, False),
-        1: (f'Prueba sacádica a {STIMULUS_DEFAULT_ANGLE} \u00B0', 0, True),
-        2: ('Prueba de Calibración Horizontal Final', -1, False)
-    }
-
-    def __init__(self, settings: Settings, wizard_list: list = None, wizard_layout: QVBoxLayout = None, parent=None):
+    def __init__(self, data: dict, wizard_list: list = None, wizard_layout: QVBoxLayout = None, parent=None):
         super(StimulusWidget, self).__init__(parent=parent)
 
-        test_type1 = 1
-        self._title = self.TEST_TYPE_SETTINGS[test_type1][0]
-        self.position = self.TEST_TYPE_SETTINGS[test_type1][1]
-        self._angle_enabled = self.TEST_TYPE_SETTINGS[test_type1][2]
-
-        self._settings = settings
+        self._data = data
 
         self._wizard_list = wizard_list
         self._wizard_layout = wizard_layout
-        self.setTitle(self._title)
+        self.setTitle('')
         self.setFlat(True)
         self.setMinimumHeight(90)
         self.setFixedHeight(90)
@@ -113,7 +101,7 @@ class StimulusWidget(QGroupBox):
         # ELIMINAR TODOS LOS ELEMENTOS DEL LAYOUT
         for wizard_item in self._wizard_list:
             self._wizard_layout.removeWidget(wizard_item)
-        stimulus_widget = StimulusWidget(1, self._wizard_list, self._wizard_layout)
+        stimulus_widget = TestStimulusWidget(self._wizard_list, self._wizard_layout, 1)
         stimulus_widget.position = self.position + 1
 
         self._wizard_list.insert(stimulus_widget.position, stimulus_widget)
@@ -122,14 +110,10 @@ class StimulusWidget(QGroupBox):
             self._wizard_layout.addWidget(wizard_item)
 
     def reset(self):
-        self._angle_edit.setValue(STIMULUS_DEFAULT_ANGLE)
-        self._fixation_mean_duration_edit.setValue(STIMULUS_DEFAULT_DURATION)
-        self._fixation_variability_edit.setValue(STIMULUS_DEFAULT_VARIABILITY)
-        self._saccades_count.setValue(STIMULUS_DEFAULT_SACCADES)
-
-        self.cancel_widget_button.setVisible(self._wizard_layout is not None and len(self._wizard_list) > 0)
-        self._add_widget_button.setVisible(self._wizard_layout is not None)
-        self._angle_edit.setEnabled(self._angle_enabled)
+        self._angle_edit.setValue(int(self._data.get('angle')))
+        self._fixation_mean_duration_edit.setValue(self._data.get('fixation_duration'))
+        self._fixation_variability_edit.setValue(self._data.get('fixation_variability'))
+        self._saccades_count.setValue(self._data.get('saccades_count'))
 
     @property
     def angle(self) -> int:
@@ -182,19 +166,13 @@ class StimulusWidget(QGroupBox):
 
 
 class InitialStimulusWidget(StimulusWidget):
-    def __init__(self, settings: Settings, wizard_list: list, wizard_layout: QVBoxLayout, parent=None):
-        super(InitialStimulusWidget, self).__init__(settings, wizard_list, wizard_layout, parent)
+    def __init__(self, data: dict, wizard_list: list, wizard_layout: QVBoxLayout, parent=None):
+        super(InitialStimulusWidget, self).__init__(data, wizard_list, wizard_layout, parent)
         self.setTitle('Prueba de Calibración Horizontal Inicial')
         self.position = -1
-        self._settings = settings
 
     def reset(self):
         super(InitialStimulusWidget, self).reset()
-
-        self._angle_edit.setValue(self._settings.calibration_tests.initial[0])
-        self._fixation_mean_duration_edit.setValue(self._settings.calibration_tests.initial[1])
-        self._fixation_variability_edit.setValue(self._settings.calibration_tests.initial[2])
-        self._saccades_count.setValue(self._settings.calibration_tests.initial[3])
 
         self.cancel_widget_button.setVisible(False)
         self._add_widget_button.setVisible(True)
@@ -203,19 +181,14 @@ class InitialStimulusWidget(StimulusWidget):
 
 class TestStimulusWidget(StimulusWidget):
 
-    def __init__(self, settings: Settings, wizard_list: list, wizard_layout: QVBoxLayout, parent=None):
-        super(TestStimulusWidget, self).__init__(settings, wizard_list, wizard_layout, parent)
+    def __init__(self, wizard_list: list, wizard_layout: QVBoxLayout, position = 0, data: dict = DEFAULT_TEST,parent=None):
+        super(TestStimulusWidget, self).__init__(data, wizard_list, wizard_layout, parent)
         self.setTitle(f'Prueba sacádica a {STIMULUS_DEFAULT_ANGLE} \u00B0')
-        self.position = 0
+        self.position = position
         self._angle_edit.valueChanged.connect(self.angle_edit_changed)
 
     def reset(self):
         super(TestStimulusWidget, self).reset()
-
-        self._angle_edit.setValue(self._settings.calibration_tests[self.position][0])
-        self._fixation_mean_duration_edit.setValue(self._settings.calibration_tests[self.position][1])
-        self._fixation_variability_edit.setValue(self._settings.calibration_tests[self.position][2])
-        self._saccades_count.setValue(self._settings.calibration_tests[self.position][3])
 
         self.cancel_widget_button.setVisible(len(self._wizard_list) > 0)
         self._add_widget_button.setVisible(True)
@@ -226,17 +199,12 @@ class TestStimulusWidget(StimulusWidget):
 
 
 class FinalStimulusWidget(StimulusWidget):
-    def __init__(self, settings: Settings, parent=None):
-        super(FinalStimulusWidget, self).__init__(settings, parent)
+    def __init__(self, data: dict, parent=None):
+        super(FinalStimulusWidget, self).__init__(data, parent)
         self.setTitle('Prueba de Calibración Horizontal Final')
 
     def reset(self):
         super(FinalStimulusWidget, self).reset()
-
-        self._angle_edit.setValue(self._settings.calibration_tests.final[0])
-        self._fixation_mean_duration_edit.setValue(self._settings.calibration_tests.final[1])
-        self._fixation_variability_edit.setValue(self._settings.calibration_tests.final[2])
-        self._saccades_count.setValue(self._settings.calibration_tests.final[3])
 
         self.cancel_widget_button.setVisible(False)
         self._add_widget_button.setVisible(False)

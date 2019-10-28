@@ -6,7 +6,7 @@ def readme():
 
 setup(
     name='saccrec',
-    version='0.1',
+    version='0.2',
     description='Saccades recording using OpenBCI Hardware',
     long_description=readme(),
     classifiers=[

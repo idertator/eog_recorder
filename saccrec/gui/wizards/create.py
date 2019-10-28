@@ -91,7 +91,7 @@ class RecordSetupWizard(QWizard):
             # HACER UNA LISTA CON TODAS LAS PRUEBAS INCLUIDA LA INICIAL Y LA FINAL
             auxiliar_list = list()
             auxiliar_list.append(self._stimulus_page.initial_calibration_test)
-            for test in self._stimulus_page.test_list:
+            for test in self._stimulus_page.test_widget_list:
                 auxiliar_list.append(test)
             auxiliar_list.append(self._stimulus_page.final_calibration_test)
 
@@ -119,6 +119,7 @@ class RecordSetupWizard(QWizard):
         return self._subject_page
 
     def finish_wizard(self):
+        self._stimulus_page.save()
         self.finished.emit()
 
 
@@ -198,18 +199,23 @@ class StimulusWizardPage(QWizardPage):
         scroll_area_layout = QVBoxLayout()
 
         layout = QVBoxLayout()
-        self.test_list = list()
+        self.test_widget_list = list()
         test_layout = QVBoxLayout()
 
-        self.initial_calibration_test = InitialStimulusWidget(self._settings, self.test_list, test_layout)
+        self.initial_calibration_test = InitialStimulusWidget(self._settings.tests.get('initial_calibration'), self.test_widget_list, test_layout)
         scroll_area_layout.addWidget(self.initial_calibration_test)
 
-        stimulus_widget = TestStimulusWidget(self._settings, self.test_list, test_layout)
-        test_layout.addWidget(stimulus_widget)
-        self.test_list.append(stimulus_widget)
+        test_list = self._settings.tests.get('tests')
+        cont = 0
+        for test in test_list:
+            stimulus_widget = TestStimulusWidget(self.test_widget_list, test_layout, cont, test)
+            test_layout.addWidget(stimulus_widget)
+            self.test_widget_list.append(stimulus_widget)
+            cont += 1
+
         scroll_area_layout.addLayout(test_layout)
 
-        self.final_calibration_test = FinalStimulusWidget(self._settings)
+        self.final_calibration_test = FinalStimulusWidget(self._settings.tests.get('final_calibration'))
         scroll_area_layout.addWidget(self.final_calibration_test)
 
         scroll_area.setWidgetResizable(True)
@@ -226,7 +232,7 @@ class StimulusWizardPage(QWizardPage):
         # duration = self._stimulus_widget.fixation_duration
         # variability = self._stimulus_widget.fixation_variability
         text += self.__test_to_html(self.initial_calibration_test)
-        for test in self.test_list:
+        for test in self.test_widget_list:
             text += self.__test_to_html(test)
         text += self.__test_to_html(self.final_calibration_test)
         return text
@@ -243,19 +249,22 @@ class StimulusWizardPage(QWizardPage):
     @property
     def json(self) -> dict:
         json = {
-            'initial_calibration_test': self.initial_calibration_test.json,
-            'final_calibration_test': self.final_calibration_test.json,
+            'initial_calibration': self.initial_calibration_test.json,
+            'final_calibration': self.final_calibration_test.json,
         }
-        count = 0
-        for test in self.test_list:
-            json.setdefault(f'calibration_test_{count}', test)
-            count += 1
+        test_list = list()
+        for test in self.test_widget_list:
+            test_list.append(test.json)
+        json.setdefault('tests', test_list)
         return json
 
     @property
     def max_angle(self) -> float:
-        return float(max(max(test.angle for test in self.test_list), self.initial_calibration_test.angle,
+        return float(max(max(test.angle for test in self.test_widget_list), self.initial_calibration_test.angle,
                          self.final_calibration_test.angle))
+
+    def save(self):
+        self._settings.tests = self.json
 
 
 class OutputWizardPage(QWizardPage):
