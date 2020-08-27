@@ -1,16 +1,28 @@
-# Subject Parameters
+from enum import IntEnum
+
 from PyQt5.QtGui import QColor
 
-DEBUG = False
+from saccrec.i18n import _
+
+DEBUG = True
 
 DATE_FORMAT = '%d/%m/%Y'
 DATETIME_FORMAT = '%d/%m/%Y %H:%M'
 
-GENRES = (
-    ('Unknown', 'Desconocido'),
-    ('Male', 'Masculino'),
-    ('Female', 'Femenino'),
-)
+
+class Genre(IntEnum):
+    Unknown = 0
+    Male = 1
+    Female = 2
+
+    @property
+    def label(self) -> str:
+        return {
+            Genre.Unknown: _('Desconocido'),
+            Genre.Male: _('Masculino'),
+            Genre.Female: _('Femenino'),
+        }[self]
+
 
 SUBJECT_STATUSES = (
     ('Unknown', 'Desconocido'),
@@ -29,7 +41,6 @@ OPENBCI_SAMPLE_RATES = (
     (16000, '16000'),
 )
 
-GENRES_DICT = {value: index for index, (value, _) in enumerate(GENRES)}
 SUBJECT_STATUSES_DICT = {value: index for index, (value, _) in enumerate(SUBJECT_STATUSES)}
 SUBJECT_STATUSES_LABELS = {value: label for value, label in SUBJECT_STATUSES}
 

@@ -1,21 +1,19 @@
 from os.path import exists, dirname
 from typing import List
 
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5.QtCore import pyqtProperty, pyqtSignal, Qt, QDate
-from PyQt5.QtGui import QPalette
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QWizard, QWizardPage, QScrollArea, QWidget
-from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
 
 from saccrec.core import Settings, Screen
 from saccrec.core.math import distance_to_subject
 from saccrec.core.models import Subject
+from saccrec.consts import Genre
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 from saccrec.gui.widgets.stimulus import TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
+from saccrec.i18n import _
 
 
 class RecordSetupWizard(QWizard):
@@ -145,7 +143,11 @@ class SubjectWizardPage(QWizardPage):
 
     @property
     def html(self) -> str:
-        genre = 'hombre nacido el' if self._subject_widget.genre == 0 else 'mujer nacida el'
+        genre = {
+            Genre.Unknown: _('persona nacida el'),
+            Genre.Male: _('hombre nacido el'),
+            Genre.Female: _('mujer nacida el'),
+        }[self._subject_widget.genre]
         borndate = self._subject_widget.borndate.strftime('%d/%m/%Y')
         status = self._subject_widget.status_label
 
@@ -312,7 +314,6 @@ class OutputWizardPage(QWizardPage):
         self.completeChanged.emit()
 
     def on_output_select_clicked(self):
-        wizard = self.wizard()
         filepath, _ = QFileDialog.getSaveFileName(
             self,
             'Seleccione fichero de salida',

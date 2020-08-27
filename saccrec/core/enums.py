@@ -16,12 +16,6 @@ class StimulusPosition(IntEnum):
     Right = 1
 
 
-class Genre(Enum):
-    Unknown = 'Unknown'
-    Male = 'Male'
-    Female = 'Female'
-
-
 class SubjectStatus(Enum):
     Unknown = 'Unknown'
     Control = 'Control'

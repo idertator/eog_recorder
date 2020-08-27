@@ -1,8 +1,10 @@
 from setuptools import setup
 
+
 def readme():
     with open('./README.md') as f:
         return f.read()
+
 
 setup(
     name='saccrec',
@@ -29,7 +31,7 @@ setup(
         'saccrec.core.models',
         'saccrec.core.reports',
         'saccrec.core.study',
-        'saccrec.engine',        
+        'saccrec.engine',
         'saccrec.gui',
         'saccrec.gui.dialogs',
         'saccrec.gui.dialogs.settings',

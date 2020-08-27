@@ -1,4 +1,4 @@
-from .enums import Channel, StimulusPosition, Genre, SubjectStatus, BoardTypes, BoardModes, SampleRates
+from .enums import Channel, StimulusPosition, SubjectStatus, BoardTypes, BoardModes, SampleRates
 from .formats import Record
 
 from .screen import Screen

@@ -2,8 +2,8 @@ from typing import Optional, Union
 
 from datetime import date, datetime
 
-from saccrec.consts import DATE_FORMAT
-from saccrec.core import Genre, SubjectStatus
+from saccrec.consts import DATE_FORMAT, Genre
+from saccrec.core import SubjectStatus
 
 
 _FULL_NAME_FIELD = 'full_name'
@@ -13,17 +13,17 @@ _STATUS_FIELD = 'status'
 
 
 class Subject:
-    
+
     def __init__(
         self,
         full_name: str = '',
-        genre: Optional[Union[Genre, str]] = None,
+        genre: Optional[Union[Genre, int]] = None,
         borndate: [date, str] = None,
         status: Optional[Union[SubjectStatus, str]] = None
     ):
         self._full_name = full_name
 
-        if isinstance(genre, str):
+        if isinstance(genre, int):
             self._genre = Genre(genre)
         else:
             self._genre = genre
@@ -44,8 +44,8 @@ class Subject:
 
     @full_name.setter
     def full_name(self, value: str):
-        self._full_name = full_name
-    
+        self._full_name = value
+
     @property
     def genre(self) -> Optional[Genre]:
         return self._genre
@@ -63,7 +63,7 @@ class Subject:
 
     @borndate.setter
     def borndate(self, value: date):
-        self._borndate = borndate
+        self._borndate = value
 
     @property
     def status(self) -> Optional[SubjectStatus]:
@@ -93,4 +93,3 @@ class Subject:
             borndate=json.get(_BORNDATE_FIELD, None),
             status=json.get(_STATUS_FIELD, SubjectStatus.Unknown)
         )
-    

@@ -1,15 +1,15 @@
 from datetime import datetime, date
 from typing import Union, Optional
 
-from saccrec.consts import DATE_FORMAT
-from saccrec.core.enums import Genre, SubjectStatus
+from saccrec.consts import DATE_FORMAT, Genre
+from saccrec.core.enums import SubjectStatus
 
 
 class Subject:
-    
+
     def __init__(
-        self, 
-        name: str = 'Unknown', 
+        self,
+        name: str = 'Unknown',
         genre: Union[str, Genre] = Genre.Unknown,
         status: Union[str, SubjectStatus] = SubjectStatus.Unknown,
         borndate: Optional[Union[str, date, datetime]] = None
@@ -20,7 +20,7 @@ class Subject:
             self._name = 'Unknown'
 
         if isinstance(genre, str):
-            self._genre = Genre(genre) 
+            self._genre = Genre(genre)
         elif isinstance(genre, Genre):
             self._genre = genre
         else:
@@ -69,9 +69,9 @@ class Subject:
         return self._genre
 
     @genre.setter
-    def genre(self, value: Union[str, Genre]):
-        if isinstance(value, str):
-            self._genre = Genre(value) 
+    def genre(self, value: Union[int, Genre]):
+        if isinstance(value, int):
+            self._genre = Genre(value)
         elif isinstance(value, Genre):
             self._genre = value
         else:
