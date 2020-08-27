@@ -58,15 +58,19 @@ class SignalsManager:
 
     @property
     def horizontal_lines(self) -> List[QLineF]:
-        channel = self._hc_window - self._hc_window.mean()
-        self._hc_max = max(abs(channel.min()), abs(channel.max()))
-        return self._samples_to_lines(channel)
+        if self._hc_window.any():
+            channel = self._hc_window - self._hc_window.mean()
+            self._hc_max = max(abs(channel.min()), abs(channel.max()))
+            return self._samples_to_lines(channel)
+        return []
 
     @property
     def vertical_lines(self) -> List[QLineF]:
-        channel = self._vc_window - self._vc_window.mean()
-        self._vc_max = max(abs(channel.min()), abs(channel.max()))
-        return self._samples_to_lines(channel)
+        if self._vc_window.any():
+            channel = self._vc_window - self._vc_window.mean()
+            self._vc_max = max(abs(channel.min()), abs(channel.max()))
+            return self._samples_to_lines(channel)
+        return []
 
     @property
     def horizontal_window(self) -> QRect:

@@ -1,0 +1,8 @@
+artwork
+bin
+data
+docs
+requirements
+*.egg-info
+tests
+venv
