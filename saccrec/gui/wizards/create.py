@@ -7,9 +7,8 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
 
 from saccrec.core import Settings, Screen
+from saccrec.core import Subject, Gender
 from saccrec.core.math import distance_to_subject
-from saccrec.core.models import Subject
-from saccrec.consts import Genre
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 from saccrec.gui.widgets.stimulus import TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
@@ -38,7 +37,7 @@ class RecordSetupWizard(QWizard):
 
         self.padre = parent
 
-        self.setWindowTitle('Configuración de nuevo registro')
+        self.setWindowTitle(_('Configuración de nuevo registro'))
         self.resize(640, 480)
 
         self.button(QWizard.FinishButton).clicked.connect(self.finish_wizard)
@@ -143,16 +142,16 @@ class SubjectWizardPage(QWizardPage):
 
     @property
     def html(self) -> str:
-        genre = {
-            Genre.Unknown: _('persona nacida el'),
-            Genre.Male: _('hombre nacido el'),
-            Genre.Female: _('mujer nacida el'),
-        }[self._subject_widget.genre]
+        gender = {
+            Gender.Unknown: _('persona nacida el'),
+            Gender.Male: _('hombre nacido el'),
+            Gender.Female: _('mujer nacida el'),
+        }[self._subject_widget.gender]
         borndate = self._subject_widget.borndate.strftime('%d/%m/%Y')
-        status = self._subject_widget.status_label
+        status = self._subject_widget.status.label
 
         return f'''<h4>Sujeto</h4>
-            <p>{self._subject_widget.full_name}, {genre} {borndate} ({status})</p>
+            <p>{self._subject_widget.full_name}, {gender} {borndate} ({status})</p>
         '''
 
     @property

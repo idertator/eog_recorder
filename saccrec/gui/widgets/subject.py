@@ -1,13 +1,13 @@
 from datetime import date
+from typing import Union
 
 from PyQt5.QtCore import pyqtSignal, QDate
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFormLayout
 from PyQt5.QtWidgets import QLineEdit, QComboBox, QDateEdit
 
-from saccrec.core.models import Subject
-from saccrec.consts import Genre
-from saccrec.consts import SUBJECT_STATUSES, SUBJECT_STATUSES_DICT, SUBJECT_STATUSES_LABELS
+from saccrec.core import Subject, Gender, SubjectStatus
+from saccrec.i18n import _
 
 
 INITIAL_DATE = QDate(2000, 1, 1)
@@ -23,27 +23,27 @@ class SubjectWidget(QWidget):
 
         self._full_name_edit = QLineEdit()
         self._full_name_edit.textChanged.connect(self.on_full_name_changed)
-        layout.addRow('Nombre(s)', self._full_name_edit)
+        layout.addRow(_('Nombre(s)'), self._full_name_edit)
 
-        self._genre_combo = QComboBox()
-        for genre in Genre:
-            self._genre_combo.addItem(genre.label, genre.value)
-        layout.addRow('Género', self._genre_combo)
+        self._gender_combo = QComboBox()
+        for gender in Gender:
+            self._gender_combo.addItem(gender.label, gender.value)
+        layout.addRow(_('Género'), self._gender_combo)
 
         self._borndate_edit = QDateEdit()
         self._borndate_edit.setCalendarPopup(True)
-        layout.addRow('Fecha de nacimiento', self._borndate_edit)
+        layout.addRow(_('Fecha de nacimiento'), self._borndate_edit)
 
         self._status_combo = QComboBox()
-        for status_value, status_label in SUBJECT_STATUSES:
-            self._status_combo.addItem(status_label, status_value)
-        layout.addRow('Estado', self._status_combo)
+        for status in SubjectStatus:
+            self._status_combo.addItem(status.label, status.value)
+        layout.addRow(_('Estado'), self._status_combo)
 
         self.setLayout(layout)
 
     def reset(self):
         self._full_name_edit.setText('')
-        self._genre_combo.setCurrentIndex(0)
+        self._gender_combo.setCurrentIndex(0)
         self._borndate_edit.setDate(INITIAL_DATE)
         self._status_combo.setCurrentIndex(0)
 
@@ -59,12 +59,15 @@ class SubjectWidget(QWidget):
             self.fullnameChanged.emit(value)
 
     @property
-    def genre(self) -> int:
-        return self._genre_combo.currentData()
+    def gender(self) -> Gender:
+        return Gender(self._gender_combo.currentData())
 
-    @genre.setter
-    def genre(self, value: int):
-        self._genre_combo.setCurrentIndex(value)
+    @gender.setter
+    def gender(self, value: Union[int, Gender]):
+        if isinstance(value, int):
+            self._gender_combo.setCurrentText(Gender(value).label)
+        elif isinstance(value, SubjectStatus):
+            self._gender_combo.setCurrentText(value.label)
 
     @property
     def borndate(self) -> date:
@@ -76,31 +79,30 @@ class SubjectWidget(QWidget):
         self._borndate_edit.setDate(qdate)
 
     @property
-    def status(self) -> str:
-        return self._status_combo.currentData()
+    def status(self) -> SubjectStatus:
+        return SubjectStatus(self._status_combo.currentData())
 
     @status.setter
-    def status(self, value: str):
-        self._status_combo.setCurrentIndex(SUBJECT_STATUSES_DICT[value])
-
-    @property
-    def status_label(self) -> str:
-        return SUBJECT_STATUSES_LABELS[self.status]
+    def status(self, value: Union[int, SubjectStatus]):
+        if isinstance(value, int):
+            self._status_combo.setCurrentText(SubjectStatus(value).label)
+        elif isinstance(value, SubjectStatus):
+            self._status_combo.setCurrentText(value.label)
 
     @property
     def json(self) -> dict:
         return {
             'full_name': self.full_name,
-            'genre': self.genre,
+            'gender': self.gender,
             'borndate': self.borndate,
             'status': self.status,
         }
 
     @property
-    def model(self) -> Subject:
+    def subject(self) -> Subject:
         return Subject(
             full_name=self.full_name,
-            genre=self.genre,
+            gender=self.gender,
             borndate=self.borndate,
             status=self.status
         )

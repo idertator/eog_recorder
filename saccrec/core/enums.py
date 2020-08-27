@@ -1,5 +1,37 @@
 from enum import IntEnum, Enum
 
+from saccrec.i18n import _
+
+
+class Gender(IntEnum):
+    Unknown = 0
+    Male = 1
+    Female = 2
+
+    @property
+    def label(self) -> str:
+        return {
+            Gender.Unknown: _('Desconocido'),
+            Gender.Male: _('Masculino'),
+            Gender.Female: _('Femenino'),
+        }[self]
+
+
+class SubjectStatus(IntEnum):
+    Unknown = 0
+    Control = 1
+    Presymptomatic = 2
+    SCA2 = 3
+
+    @property
+    def label(self) -> str:
+        return {
+            SubjectStatus.Unknown: _('Desconocido'),
+            SubjectStatus.Control: _('Control'),
+            SubjectStatus.Presymptomatic: _('Presintomático'),
+            SubjectStatus.SCA2: _('SCA2'),
+        }[self]
+
 
 class Channel(Enum):
     Unknown = 'Unknown'
@@ -14,13 +46,6 @@ class StimulusPosition(IntEnum):
     Left = -1
     Center = 0
     Right = 1
-
-
-class SubjectStatus(Enum):
-    Unknown = 'Unknown'
-    Control = 'Control'
-    Presymptomatic = 'Presymptomatic'
-    SCA2 = 'SCA2'
 
 
 class BoardTypes(Enum):

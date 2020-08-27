@@ -1,8 +1,8 @@
 from datetime import datetime, date
 from typing import Union, Optional
 
-from saccrec.consts import DATE_FORMAT, Genre
-from saccrec.core.enums import SubjectStatus
+from saccrec.consts import DATE_FORMAT
+from saccrec.core.enums import Gender, SubjectStatus
 
 
 class Subject:
@@ -10,7 +10,7 @@ class Subject:
     def __init__(
         self,
         name: str = 'Unknown',
-        genre: Union[str, Genre] = Genre.Unknown,
+        gender: Union[str, Gender] = Gender.Unknown,
         status: Union[str, SubjectStatus] = SubjectStatus.Unknown,
         borndate: Optional[Union[str, date, datetime]] = None
     ):
@@ -19,12 +19,12 @@ class Subject:
         else:
             self._name = 'Unknown'
 
-        if isinstance(genre, str):
-            self._genre = Genre(genre)
-        elif isinstance(genre, Genre):
-            self._genre = genre
+        if isinstance(gender, str):
+            self._gender = Gender(gender)
+        elif isinstance(gender, Gender):
+            self._gender = gender
         else:
-            self._genre = Genre.Unknown
+            self._gender = Gender.Unknown
 
         if isinstance(status, str):
             self._status = SubjectStatus(status)
@@ -48,7 +48,7 @@ class Subject:
     def __json__(self) -> dict:
         return {
             'full_name': self._name,
-            'genre': self._genre.value,
+            'gender': self._gender.value,
             'status': self._status.value,
             'borndate': self._borndate.strftime(DATE_FORMAT) if self._borndate is not None else None,
         }
@@ -65,17 +65,17 @@ class Subject:
             raise AttributeError('name must be of type str')
 
     @property
-    def genre(self) -> Genre:
-        return self._genre
+    def gender(self) -> Gender:
+        return self._gender
 
-    @genre.setter
-    def genre(self, value: Union[int, Genre]):
+    @gender.setter
+    def gender(self, value: Union[int, Gender]):
         if isinstance(value, int):
-            self._genre = Genre(value)
-        elif isinstance(value, Genre):
-            self._genre = value
+            self._gender = Gender(value)
+        elif isinstance(value, Gender):
+            self._gender = value
         else:
-            raise AttributeError('genre must be of type str or type Genre')
+            raise AttributeError('gender must be of type str or type Gender')
 
     @property
     def status(self) -> SubjectStatus:
