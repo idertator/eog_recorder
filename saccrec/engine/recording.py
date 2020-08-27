@@ -7,13 +7,17 @@ from typing import Optional, List, Tuple
 from os import remove
 from os.path import join, exists
 
-from numpy import array, savez_compressed, int32, float32
+from numpy import array, savez_compressed, int32
 
 from openbci_interface import Cyton
 from openbci_interface.util import list_devices
+from openbci_interface.exception import DeviceNotConnected
 
 from saccrec.consts import DEBUG
 from saccrec.core import Settings
+
+from .commands import CMD_DEVICE_NOT_CONNECTED, CMD_STOP
+from .errors import BoardNotConnectedError
 
 
 def list_ports():
@@ -33,9 +37,12 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
             timeout=2
         )
 
-        board = Cyton(port)
-        board.set_board_mode('default')
-        board.set_sample_rate(settings.openbci_sample_rate)
+        try:
+            board = Cyton(port)
+            board.set_board_mode('default')
+            board.set_sample_rate(settings.openbci_sample_rate)
+        except DeviceNotConnected:
+            raise BoardNotConnectedError()
 
         # board.configure_channel(1, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
         # board.configure_channel(2, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
@@ -60,12 +67,12 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         # board.disable_channel(9)
         # board.disable_channel(10)
         # board.disable_channel(11)
-        # board.disable_channel(12)    
+        # board.disable_channel(12)
         # board.disable_channel(13)
         # board.disable_channel(14)
         # board.disable_channel(15)
         # board.disable_channel(16)
-        
+
         for index in range(8):
             channel = index + 1
             active, gain = settings.openbci_channels[index]
@@ -103,7 +110,7 @@ class OpenBCIRecorder(Process):
         self._data_queue = Queue()
 
         self._tmp_folder = tmp_folder
-
+        self._connected = False
 
     def run(self):
         pid_path = join(gettempdir(), 'saccrec.pid')
@@ -112,8 +119,12 @@ class OpenBCIRecorder(Process):
 
         board = None
         if not DEBUG:
-            board = initialize_board(self._settings)
-            board.start_streaming()
+            try:
+                board = initialize_board(self._settings)
+                board.start_streaming()
+            except BoardNotConnectedError as error:
+                self._command_queue.put(CMD_DEVICE_NOT_CONNECTED)
+                raise error
 
         if self._tmp_folder is not None:
             ts_file = open(join(self._tmp_folder, 'time.tmp'), 'wt')
@@ -125,7 +136,7 @@ class OpenBCIRecorder(Process):
             vc_file = None
 
         timestamp = 0
-        while self._command_queue.empty() or self._command_queue.get() != 'stop':
+        while self._command_queue.empty() or self._command_queue.get() != CMD_STOP:
             if not DEBUG:
                 sample = board.read_sample()
                 sample = [
@@ -137,8 +148,8 @@ class OpenBCIRecorder(Process):
                     self._data_queue.put(sample)
             else:
                 sample = [
-                    timestamp, 
-                    randrange(-300, 300), 
+                    timestamp,
+                    randrange(-300, 300),
                     randrange(-300, 300)
                 ]
                 if timestamp > 0:
@@ -146,7 +157,7 @@ class OpenBCIRecorder(Process):
                 sleep(1.0 / 250)
 
             timestamp += 1
-            
+
             ts, hc, vc = sample
 
             if ts_file is not None:
@@ -159,7 +170,7 @@ class OpenBCIRecorder(Process):
                 vc_file.write(f'{vc}\n')
 
         if not DEBUG:
-            board.stop_streaming()            
+            board.stop_streaming()
             close_board(board)
 
         if ts_file is not None:
@@ -184,6 +195,11 @@ class OpenBCIRecorder(Process):
         self.start()
 
     def read_samples(self) -> List[Tuple[int, float, float]]:
+        if not self._command_queue.empty():
+            cmd = self._command_queue.get()
+            if cmd == CMD_DEVICE_NOT_CONNECTED:
+                raise BoardNotConnectedError()
+
         result = []
 
         while not self._data_queue.empty():
@@ -192,7 +208,7 @@ class OpenBCIRecorder(Process):
         return result
 
     def stop_streaming(self):
-        self._command_queue.put('stop')
+        self._command_queue.put(CMD_STOP)
         self.join()
 
 
@@ -217,4 +233,4 @@ if __name__ == '__main__':
 
     recorder.stop_streaming()
 
-# openbci_interface.exception.UnexpectedMessageFormat: Device returned a message not in OpenBCI format; 
+# openbci_interface.exception.UnexpectedMessageFormat: Device returned a message not in OpenBCI format;

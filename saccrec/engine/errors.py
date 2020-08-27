@@ -1,0 +1,2 @@
+class BoardNotConnectedError(Exception):
+    pass
