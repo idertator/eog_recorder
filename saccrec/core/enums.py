@@ -1,7 +1,5 @@
 from enum import IntEnum, Enum
 
-from saccrec.i18n import _
-
 
 class Gender(IntEnum):
     Unknown = 0

@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QFormLayout
 from PyQt5.QtWidgets import QLineEdit, QComboBox, QDateEdit
 
 from saccrec.core import Subject, Gender, SubjectStatus
-from saccrec.i18n import _
 
 
 INITIAL_DATE = QDate(2000, 1, 1)

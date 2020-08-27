@@ -12,7 +12,6 @@ from saccrec.core.math import distance_to_subject
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec.gui.widgets import SubjectWidget, StimulusWidget
 from saccrec.gui.widgets.stimulus import TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
-from saccrec.i18n import _
 
 
 class RecordSetupWizard(QWizard):
@@ -44,18 +43,22 @@ class RecordSetupWizard(QWizard):
 
     @property
     def html(self) -> str:
+        summary_str = _('Resumen')
+        notes_str = _('Notas importantes')
+        distance_str = _('Distancia del sujeto a la pantalla')
+
         return f'''<!DOCTYPE html>
         <html>
             <head>
                 <meta charset="utf-8">
             </head>
             <body>
-                <h2>Resumen</h2>
+                <h2>{summary_str}</h2>
                 {self._subject_page.html}
                 {self._stimulus_page.html}
 
-                <h2>Notas importantes</h2>
-                <p>Distancia del sujeto a la pantalla: <strong>{self.fixed_distance_to_subject:.2f} cm</strong></p>
+                <h2>{notes_str}</h2>
+                <p>{distance_str}: <strong>{self.fixed_distance_to_subject:.2f} cm</strong></p>
             </body>
         </html>
         '''
@@ -125,7 +128,7 @@ class SubjectWizardPage(QWizardPage):
     def __init__(self, parent=None):
         super(SubjectWizardPage, self).__init__(parent)
 
-        self.setTitle('Datos del sujeto')
+        self.setTitle(_('Datos del sujeto'))
 
         layout = QVBoxLayout()
         self._subject_widget = SubjectWidget(self)
@@ -150,7 +153,9 @@ class SubjectWizardPage(QWizardPage):
         borndate = self._subject_widget.borndate.strftime('%d/%m/%Y')
         status = self._subject_widget.status.label
 
-        return f'''<h4>Sujeto</h4>
+        subject_str = _('Sujeto')
+
+        return f'''<h4>{subject_str}</h4>
             <p>{self._subject_widget.full_name}, {gender} {borndate} ({status})</p>
         '''
 
@@ -192,7 +197,7 @@ class StimulusWizardPage(QWizardPage):
     def __init__(self, settings: Settings, parent=None):
         super(StimulusWizardPage, self).__init__(parent)
 
-        self.setTitle('Configuración del estímulo')
+        self.setTitle(_('Configuración del estímulo'))
         self._settings = settings
 
         scroll_area = QScrollArea()
@@ -227,7 +232,9 @@ class StimulusWizardPage(QWizardPage):
 
     @property
     def html(self) -> str:
-        text = '<h4>Estímulos</h4>'
+        stimuli_str = _('Estímulos')
+
+        text = f'<h4>{stimuli_str}</h4>'
         # angle = self._stimulus_widget.angle
         # count = self._stimulus_widget.saccades_count
         # duration = self._stimulus_widget.fixation_duration
@@ -242,7 +249,8 @@ class StimulusWizardPage(QWizardPage):
     def __test_to_html(test: StimulusWidget) -> str:
         name = test.test_name
         if type(test) is TestStimulusWidget:
-            name = 'Prueba sacádica'
+            name = _('Prueba sacádica')
+
         return f'''<p>{name} a <b>{test.angle}&#176;</b> con <b>{test.saccades_count}</b> sácadas.
         La duración media de las fijaciones es de <b>{test.fixation_duration} segundos</b> con una variabilidad del <b>{test.fixation_variability}%</b>.</p>
         '''

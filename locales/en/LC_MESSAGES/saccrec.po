@@ -1,0 +1,113 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: saccrec\n"
+"POT-Creation-Date: 2020-08-28 01:18+0200\n"
+"PO-Revision-Date: 2020-08-28 01:19+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.1\n"
+"X-Poedit-Basepath: ../../..\n"
+"X-Poedit-SearchPath-0: bin\n"
+"X-Poedit-SearchPath-1: saccrec\n"
+
+#: bin/SaccRec.py:47
+msgid "La tarjeta no está conectada"
+msgstr "Board is not connected"
+
+#: saccrec/core/enums.py:12 saccrec/core/enums.py:27
+msgid "Desconocido"
+msgstr "Unknown"
+
+#: saccrec/core/enums.py:13
+msgid "Masculino"
+msgstr "Male"
+
+#: saccrec/core/enums.py:14
+msgid "Femenino"
+msgstr "Female"
+
+#: saccrec/core/enums.py:28
+msgid "Control"
+msgstr "Control"
+
+#: saccrec/core/enums.py:29
+msgid "Presintomático"
+msgstr "Presymptomatic"
+
+#: saccrec/core/enums.py:30
+msgid "SCA2"
+msgstr "SCA2"
+
+#: saccrec/gui/widgets/subject.py:25
+msgid "Nombre(s)"
+msgstr "Name(s)"
+
+#: saccrec/gui/widgets/subject.py:30
+msgid "Género"
+msgstr "Gender"
+
+#: saccrec/gui/widgets/subject.py:34
+msgid "Fecha de nacimiento"
+msgstr "Birthdate"
+
+#: saccrec/gui/widgets/subject.py:39
+msgid "Estado"
+msgstr "Status"
+
+#: saccrec/gui/wizards/create.py:39
+msgid "Configuración de nuevo registro"
+msgstr "Setup new record"
+
+#: saccrec/gui/wizards/create.py:46
+msgid "Resumen"
+msgstr "Summary"
+
+#: saccrec/gui/wizards/create.py:47
+msgid "Notas importantes"
+msgstr "Important notes"
+
+#: saccrec/gui/wizards/create.py:48
+msgid "Distancia del sujeto a la pantalla"
+msgstr "Distance of the subject to the screen"
+
+#: saccrec/gui/wizards/create.py:131
+msgid "Datos del sujeto"
+msgstr "Subject info"
+
+#: saccrec/gui/wizards/create.py:149
+msgid "persona nacida el"
+msgstr "person born at"
+
+#: saccrec/gui/wizards/create.py:150
+msgid "hombre nacido el"
+msgstr "male born at"
+
+#: saccrec/gui/wizards/create.py:151
+msgid "mujer nacida el"
+msgstr "female born at"
+
+#: saccrec/gui/wizards/create.py:156
+msgid "Sujeto"
+msgstr "Subject"
+
+#: saccrec/gui/wizards/create.py:200
+msgid "Configuración del estímulo"
+msgstr "Stimuli settings"
+
+#: saccrec/gui/wizards/create.py:235
+msgid "Estímulos"
+msgstr "Stimuli"
+
+#: saccrec/gui/wizards/create.py:252
+msgid "Prueba sacádica"
+msgstr "Saccadic test"
