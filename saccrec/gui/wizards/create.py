@@ -157,7 +157,7 @@ class SubjectWizardPage(QWizardPage):
         status = self._subject_widget.status.label
 
         return '''<h4>{title}</h4>
-            <p>fullname{}, {gender} {borndate} ({status})</p>
+            <p>{fullname}, {gender} {borndate} ({status})</p>
         '''.format(
             title=_('Sujeto'),
             fullname=self._subject_widget.full_name,
@@ -340,12 +340,13 @@ class OutputWizardPage(QWizardPage):
         self.completeChanged.emit()
 
     def on_output_select_clicked(self):
-        filepath, _ = QFileDialog.getSaveFileName(
+        output = QFileDialog.getSaveFileName(
             self,
             _('Seleccione fichero de salida'),
             self._settings.output_dir + '/' + self._subject_wizard_page.subject_code,
             filter=_('Archivo de SaccRec (*.rec)')
         )
+        filepath = output[0]
         if not filepath.lower().endswith('.rec'):
             filepath += '.rec'
 

@@ -56,10 +56,10 @@ class StimulusSettingsPage(QWidget):
         layout.addRow(_('Radio del estímulo sacádico'), self._stimulus_saccadic_ball_radius_edit)
 
         self._stimulus_saccadic_ball_color_select = ColorButton()
-        layout.addRow(('Color del estímulo'), self._stimulus_saccadic_ball_color_select)
+        layout.addRow(_('Color del estímulo'), self._stimulus_saccadic_ball_color_select)
 
         self._stimulus_saccadic_background_color_select = ColorButton()
-        layout.addRow(('Color de fondo'), self._stimulus_saccadic_background_color_select)
+        layout.addRow(_('Color de fondo'), self._stimulus_saccadic_background_color_select)
 
         layout.addRow('', QLabel())
         layout.addRow('', QLabel())
