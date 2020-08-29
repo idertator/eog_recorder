@@ -12,20 +12,20 @@ class ScreenSettingsPage(QWidget):
         self._settings = settings
 
         layout = QFormLayout()
-        self.setWindowTitle("Pantalla de estímulo")
+        self.setWindowTitle(_('Pantalla de estímulo'))
         self._stimulus_screen_width_edit = QDoubleSpinBox()
         self._stimulus_screen_width_edit.setMinimum(SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH_MINIMUM)
         self._stimulus_screen_width_edit.setMaximum(SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH_MAXIMUM)
         self._stimulus_screen_width_edit.setFixedWidth(85)
         self._stimulus_screen_width_edit.setSuffix(' cm')
-        layout.addRow('Ancho', self._stimulus_screen_width_edit)
+        layout.addRow(_('Ancho'), self._stimulus_screen_width_edit)
 
         self._stimulus_screen_height_edit = QDoubleSpinBox()
         self._stimulus_screen_height_edit.setMinimum(SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT_MINIMUM)
         self._stimulus_screen_height_edit.setMaximum(SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT_MAXIMUM)
         self._stimulus_screen_height_edit.setFixedWidth(85)
         self._stimulus_screen_height_edit.setSuffix(' cm')
-        layout.addRow('Alto', self._stimulus_screen_height_edit)
+        layout.addRow(_('Alto'), self._stimulus_screen_height_edit)
 
         self.setLayout(layout)
 
@@ -39,4 +39,4 @@ class ScreenSettingsPage(QWidget):
 
     @property
     def title(self):
-        return 'Configuración de pantalla'
+        return _('Configuración de pantalla')

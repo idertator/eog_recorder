@@ -16,11 +16,11 @@ class StimulusPlayerWidget(QWidget):
     started = pyqtSignal(float)
     stopped = pyqtSignal()
     finished = pyqtSignal()
-    
+
     def __init__(self, settings: Settings, parent=None):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
         self._settings = settings
-        
+
         self._sampling_step = 1000 / self._settings.openbci_sample_rate
 
         self._stimuli = None
@@ -35,7 +35,6 @@ class StimulusPlayerWidget(QWidget):
         self._first_paint = None
 
         self._load_settings()
-
 
     def _load_settings(self):
         if self._stimuli is None:
@@ -54,14 +53,14 @@ class StimulusPlayerWidget(QWidget):
         self.started.emit(self._start_time)
 
     def run_stimulus(
-        self, 
-        stimuli: SaccadicStimuli, 
+        self,
+        stimuli: SaccadicStimuli,
         initial_message: str = None
     ):
         self._stimuli = stimuli
         self._load_settings()
         self._initial_message = initial_message
-    
+
         if initial_message is None:
             self._start_stimulus()
         else:
@@ -81,7 +80,7 @@ class StimulusPlayerWidget(QWidget):
         if self._ball_position is None:
             self._timer.stop()
             self.finished.emit()
-            
+
     def paintEvent(self, event):
         painter = QPainter()
         painter.begin(self)
@@ -92,7 +91,7 @@ class StimulusPlayerWidget(QWidget):
         if self._initial_message is not None:
             painter.save()
             painter.setPen(self._ball_color)
-            
+
             font = painter.font()
             font.setPixelSize(48)
             painter.setFont(font)

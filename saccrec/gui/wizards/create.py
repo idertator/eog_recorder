@@ -43,25 +43,28 @@ class RecordSetupWizard(QWizard):
 
     @property
     def html(self) -> str:
-        summary_str = _('Resumen')
-        notes_str = _('Notas importantes')
-        distance_str = _('Distancia del sujeto a la pantalla')
-
-        return f'''<!DOCTYPE html>
+        return '''<!DOCTYPE html>
         <html>
             <head>
                 <meta charset="utf-8">
             </head>
             <body>
-                <h2>{summary_str}</h2>
-                {self._subject_page.html}
-                {self._stimulus_page.html}
+                <h2>{title}</h2>
+                {subject}
+                {stimulus}
 
-                <h2>{notes_str}</h2>
-                <p>{distance_str}: <strong>{self.fixed_distance_to_subject:.2f} cm</strong></p>
+                <h2>{notes}</h2>
+                <p>{distance_title}: <strong>{distance} cm</strong></p>
             </body>
         </html>
-        '''
+        '''.format(
+            title=_('Resumen'),
+            subject=self._subject_page.html,
+            stimulus=self._stimulus_page.html,
+            notes=_('Notas importantes'),
+            distance_title=_('Distancia del sujeto a la pantalla'),
+            distance=f'{self.fixed_distance_to_subject:.2f}'
+        )
 
     @property
     def json(self) -> dict:
@@ -153,11 +156,15 @@ class SubjectWizardPage(QWizardPage):
         borndate = self._subject_widget.borndate.strftime('%d/%m/%Y')
         status = self._subject_widget.status.label
 
-        subject_str = _('Sujeto')
-
-        return f'''<h4>{subject_str}</h4>
-            <p>{self._subject_widget.full_name}, {gender} {borndate} ({status})</p>
-        '''
+        return '''<h4>{title}</h4>
+            <p>fullname{}, {gender} {borndate} ({status})</p>
+        '''.format(
+            title=_('Sujeto'),
+            fullname=self._subject_widget.full_name,
+            gender=gender,
+            borndate=borndate,
+            status=status
+        )
 
     @property
     def json(self) -> dict:
@@ -232,9 +239,9 @@ class StimulusWizardPage(QWizardPage):
 
     @property
     def html(self) -> str:
-        stimuli_str = _('Estímulos')
-
-        text = f'<h4>{stimuli_str}</h4>'
+        text = '<h4>{title}</h4>'.format(
+            title=_('Estímulos')
+        )
         # angle = self._stimulus_widget.angle
         # count = self._stimulus_widget.saccades_count
         # duration = self._stimulus_widget.fixation_duration
@@ -251,9 +258,21 @@ class StimulusWizardPage(QWizardPage):
         if type(test) is TestStimulusWidget:
             name = _('Prueba sacádica')
 
-        return f'''<p>{name} a <b>{test.angle}&#176;</b> con <b>{test.saccades_count}</b> sácadas.
-        La duración media de las fijaciones es de <b>{test.fixation_duration} segundos</b> con una variabilidad del <b>{test.fixation_variability}%</b>.</p>
-        '''
+        return '''<p>{name} {of_str} <b>{angle}&#176;</b> {with_str} <b>{saccades_count}</b> {saccades_str}.
+        {duration_str} <b>{fixation_duration} {seconds_str}</b> {variability_str} <b>{fixation_variability}%</b>.</p>
+        '''.format(
+            name=name,
+            of_str=_('a'),
+            angle=test.angle,
+            with_str=_('con'),
+            saccades_count=test.saccades_count,
+            saccades_str=_('sácadas'),
+            duration_str=_('La duración media de las fijaciones es de'),
+            fixation_duration=test.fixation_duration,
+            seconds_str=_('segundos'),
+            variability_str=_('con una variabilidad del'),
+            fixation_variability=test.fixation_variability
+        )
 
     @property
     def json(self) -> dict:
@@ -283,7 +302,7 @@ class OutputWizardPage(QWizardPage):
         self._settings = settings
         self._subject_wizard_page = subject_wizard_page
 
-        self.setTitle('Configuración de la salida')
+        self.setTitle(_('Configuración de la salida'))
 
         layout = QVBoxLayout()
 
@@ -293,7 +312,7 @@ class OutputWizardPage(QWizardPage):
         self._output_path_edit.textChanged.connect(self.on_output_path_changed)
         output_layout.addWidget(self._output_path_edit)
 
-        self._output_select_button = QPushButton('Seleccionar', self)
+        self._output_select_button = QPushButton(_('Seleccionar'), self)
         self._output_select_button.pressed.connect(self.on_output_select_clicked)
         output_layout.addWidget(self._output_select_button)
 
@@ -323,9 +342,9 @@ class OutputWizardPage(QWizardPage):
     def on_output_select_clicked(self):
         filepath, _ = QFileDialog.getSaveFileName(
             self,
-            'Seleccione fichero de salida',
+            _('Seleccione fichero de salida'),
             self._settings.output_dir + '/' + self._subject_wizard_page.subject_code,
-            filter='Archivo de SaccRec (*.rec)'
+            filter=_('Archivo de SaccRec (*.rec)')
         )
         if not filepath.lower().endswith('.rec'):
             filepath += '.rec'

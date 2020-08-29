@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QStackedWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout, \
-    QDialogButtonBox
+from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QStackedWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QDialogButtonBox
 
 from saccrec.core import Settings
 from saccrec.gui.dialogs.settings.openbci_channels import OpenBCIChannelsSettingsPage
@@ -31,7 +31,6 @@ class SettingsDialog(QDialog):
         self.pagesWidget.addWidget(ScreenSettingsPage(self._settings))
         self.pagesWidget.addWidget(StimulusSettingsPage(self._settings))
         self.contentsWidget.setCurrentRow(0)
-
 
         # MENUS
         openbci_button = QListWidgetItem(QIcon(':openbci.png'), 'OpenBCI')
@@ -67,8 +66,8 @@ class SettingsDialog(QDialog):
         horizontal_layout.addWidget(self.pagesWidget, 1)
 
         dialog_buttons = QDialogButtonBox()
-        dialog_buttons.addButton('Aplicar', QDialogButtonBox.AcceptRole)
-        dialog_buttons.addButton('Cancelar', QDialogButtonBox.RejectRole)
+        dialog_buttons.addButton(_('Aplicar'), QDialogButtonBox.AcceptRole)
+        dialog_buttons.addButton(_('Cancelar'), QDialogButtonBox.RejectRole)
         dialog_buttons.accepted.connect(self.on_accepted)
         dialog_buttons.rejected.connect(self.on_rejected)
         layout.addLayout(horizontal_layout)

@@ -70,7 +70,7 @@ class Runner(QObject):
         stimuli = tests[0]
         self._player.run_stimulus(
             stimuli,
-            '\n'.join([str(stimuli), 'Presione espacio para continuar'])
+            '\n'.join([str(stimuli), _('Presione espacio para continuar')])
         )
         self._player.move(
             self._screen.secondary_screen_rect.left(),
@@ -121,7 +121,7 @@ class Runner(QObject):
 
             self._player.run_stimulus(
                 stimuli,
-                '\n'.join([str(stimuli), 'Presione espacio para continuar'])
+                '\n'.join([str(stimuli), _('Presione espacio para continuar')])
             )
         else:
             self._recorder = None

@@ -165,7 +165,7 @@ class SignalsWidget(QWidget):
 
         painter.restore()
 
-        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), 'Horizontal Channel')
+        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), _('Canal Horizontal'))
 
         painter.restore()
 
@@ -192,7 +192,7 @@ class SignalsWidget(QWidget):
 
         painter.restore()
 
-        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), 'Vertical Channel')
+        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), _('Canal Vertical'))
 
         painter.restore()
 

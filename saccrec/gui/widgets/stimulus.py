@@ -3,10 +3,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QGroupBox, QL
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 
 from saccrec.consts import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE, DEFAULT_TEST
-from saccrec.consts import STIMULUS_DEFAULT_DURATION
-from saccrec.consts import STIMULUS_DEFAULT_VARIABILITY
-from saccrec.consts import STIMULUS_DEFAULT_SACCADES, STIMULUS_MINUMUM_SACCADES, STIMULUS_MAXIMUM_SACCADES
-from saccrec.core import Settings
+from saccrec.consts import STIMULUS_MINUMUM_SACCADES, STIMULUS_MAXIMUM_SACCADES
 
 
 class StimulusWidget(QGroupBox):
@@ -31,19 +28,19 @@ class StimulusWidget(QGroupBox):
         self._angle_edit.setSingleStep(1)
         self._angle_edit.setSuffix(' \u00B0')
         self._angle_edit.setFixedWidth(60)
-        self._angle_edit.setToolTip('Ángulo')
+        self._angle_edit.setToolTip(_('Ángulo'))
         element_layout = QVBoxLayout()
-        element_layout.addWidget(QLabel('Ángulo'))
+        element_layout.addWidget(QLabel(_('Ángulo')))
         element_layout.addWidget(self._angle_edit)
         layout.addLayout(element_layout)
 
         self._fixation_mean_duration_edit = QDoubleSpinBox(self)
         self._fixation_mean_duration_edit.setSingleStep(0.01)
-        self._fixation_mean_duration_edit.setSuffix(' seg')
+        self._fixation_mean_duration_edit.setSuffix(_(' seg'))
         self._fixation_mean_duration_edit.setFixedWidth(80)
-        self._fixation_mean_duration_edit.setToolTip('Duración de fijaciones')
+        self._fixation_mean_duration_edit.setToolTip(_('Duración de fijaciones'))
         element_layout = QVBoxLayout()
-        element_layout.addWidget(QLabel('T. Fijación'))
+        element_layout.addWidget(QLabel(_('T. Fijación')))
         element_layout.addWidget(self._fixation_mean_duration_edit)
         layout.addLayout(element_layout)
 
@@ -52,9 +49,9 @@ class StimulusWidget(QGroupBox):
         self._fixation_variability_edit.setSingleStep(0.01)
         self._fixation_variability_edit.setSuffix(' %')
         self._fixation_variability_edit.setFixedWidth(80)
-        self._fixation_variability_edit.setToolTip('Variabilidad de fijaciones')
+        self._fixation_variability_edit.setToolTip(_('Variabilidad de fijaciones'))
         element_layout = QVBoxLayout()
-        element_layout.addWidget(QLabel('Variabilidad'))
+        element_layout.addWidget(QLabel(_('Variabilidad')))
         element_layout.addWidget(self._fixation_variability_edit)
         layout.addLayout(element_layout)
 
@@ -63,9 +60,9 @@ class StimulusWidget(QGroupBox):
         self._saccades_count.setMaximum(STIMULUS_MAXIMUM_SACCADES)
         self._saccades_count.setSingleStep(1)
         self._saccades_count.setFixedWidth(60)
-        self._saccades_count.setToolTip('Cantidad de sácadas')
+        self._saccades_count.setToolTip(_('Cantidad de sácadas'))
         element_layout = QVBoxLayout()
-        element_layout.addWidget(QLabel('Cantidad'))
+        element_layout.addWidget(QLabel(_('Cantidad')))
         element_layout.addWidget(self._saccades_count)
         layout.addLayout(element_layout)
 
@@ -168,7 +165,7 @@ class StimulusWidget(QGroupBox):
 class InitialStimulusWidget(StimulusWidget):
     def __init__(self, data: dict, wizard_list: list, wizard_layout: QVBoxLayout, parent=None):
         super(InitialStimulusWidget, self).__init__(data, wizard_list, wizard_layout, parent)
-        self.setTitle('Prueba de Calibración Horizontal Inicial')
+        self.setTitle(_('Prueba de Calibración Horizontal Inicial'))
         self.position = -1
 
     def reset(self):
@@ -181,9 +178,12 @@ class InitialStimulusWidget(StimulusWidget):
 
 class TestStimulusWidget(StimulusWidget):
 
-    def __init__(self, wizard_list: list, wizard_layout: QVBoxLayout, position = 0, data: dict = DEFAULT_TEST,parent=None):
+    def __init__(self, wizard_list: list, wizard_layout: QVBoxLayout, position=0, data: dict = DEFAULT_TEST,parent=None):
         super(TestStimulusWidget, self).__init__(data, wizard_list, wizard_layout, parent)
-        self.setTitle(f'Prueba sacádica a {STIMULUS_DEFAULT_ANGLE} \u00B0')
+        self.setTitle('{test_name} {angle} \u00B0'.format(
+            test_name=_('Prueba sacádica a'),
+            angle=STIMULUS_DEFAULT_ANGLE
+        ))
         self.position = position
         self._angle_edit.valueChanged.connect(self.angle_edit_changed)
 
@@ -195,13 +195,16 @@ class TestStimulusWidget(StimulusWidget):
         self._angle_edit.setEnabled(True)
 
     def angle_edit_changed(self):
-        self.setTitle(f'Prueba sacádica a {str(self._angle_edit.value())} \u00B0')
+        self.setTitle('{test_name} {angle} \u00B0'.format(
+            test_name=_('Prueba sacádica a'),
+            angle=str(self._angle_edit.value())
+        ))
 
 
 class FinalStimulusWidget(StimulusWidget):
     def __init__(self, data: dict, parent=None):
         super(FinalStimulusWidget, self).__init__(data, parent)
-        self.setTitle('Prueba de Calibración Horizontal Final')
+        self.setTitle(_('Prueba de Calibración Horizontal Final'))
 
     def reset(self):
         super(FinalStimulusWidget, self).reset()

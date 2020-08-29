@@ -43,7 +43,7 @@ mainWindow.showMaximized()
 if not BOARD_CONNECTED:
     QMessageBox.critical(
         mainWindow,
-        'Error',
+        _('Error'),
         _('La tarjeta no está conectada'),
         QMessageBox.Close
     )

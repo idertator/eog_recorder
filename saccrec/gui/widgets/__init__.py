@@ -5,8 +5,8 @@ from .subject import SubjectWidget
 
 
 __all__ = [
-	'StimulusPlayerWidget',
-	'SignalsWidget',
-	'StimulusWidget',
-	'SubjectWidget'
+    'StimulusPlayerWidget',
+    'SignalsWidget',
+    'StimulusWidget',
+    'SubjectWidget'
 ]

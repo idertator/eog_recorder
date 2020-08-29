@@ -51,24 +51,24 @@ class MainWindow(QMainWindow):
         # Setting up top level menus
         menubar = self.menuBar()
 
-        file_menu = menubar.addMenu('&Estudio')
-        help_menu = menubar.addMenu('&Ayuda')
+        file_menu = menubar.addMenu(_('&Estudio'))
+        help_menu = menubar.addMenu(_('&Ayuda'))
 
         # Setting up actions
-        self._new_action = QAction(QIcon(':document.svg'), '&Iniciar Prueba', self)
+        self._new_action = QAction(QIcon(':document.svg'), _('&Iniciar Prueba'), self)
         self._new_action.triggered.connect(self.on_new_test_wizard_clicked)
 
-        exit_action = QAction(QIcon(':exit.svg'), '&Salir', self)
+        exit_action = QAction(QIcon(':exit.svg'), _('&Salir'), self)
         exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Salir de la aplicación')
+        exit_action.setStatusTip(_('Salir de la aplicación'))
         exit_action.triggered.connect(qApp.quit)
 
-        self._settings_action = QAction(QIcon(':settings.svg'), '&Configuración', self)
+        self._settings_action = QAction(QIcon(':settings.svg'), _('&Configuración'), self)
         self._settings_action.setShortcut('Ctrl+P')
-        self._settings_action.setStatusTip('Configurar aplicación')
+        self._settings_action.setStatusTip(_('Configurar aplicación'))
         self._settings_action.triggered.connect(self.open_settings_dialog)
 
-        self._about_action = QAction(QIcon(':help.svg'), '&Acerca de ...', self)
+        self._about_action = QAction(QIcon(':help.svg'), _('&Acerca de ...'), self)
         self._about_action.triggered.connect(self.on_about_dialog_clicked)
 
         help_menu.addAction(self._about_action)
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
 
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle('EyeTracker OpenBCI')
+        self.setWindowTitle('SaccRec')
         self.setWindowIcon(QIcon(':app.png'))
 
         self.setCentralWidget(self._signals_widget)
@@ -119,15 +119,15 @@ class MainWindow(QMainWindow):
     def on_runner_finished(self):
         report = QMessageBox.question(
             self,
-            'Opción',
-            '¿Desea generar un reporte sacádico?',
+            _('Opción'),
+            _('¿Desea generar un reporte sacádico?'),
             QMessageBox.Yes | QMessageBox.No
         )
 
         if report == QMessageBox.Yes:
             filepath, _ = QFileDialog.getSaveFileName(
                 self,
-                'Seleccione fichero de salida',
+                _('Seleccione fichero de salida'),
                 self._settings.output_dir + '/' + self._new_record_wizard.subject_page.subject_code,
                 filter='Microsoft Excel (*.xls)'
             )

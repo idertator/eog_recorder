@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox, QSpinBox
+from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox
 
 from saccrec.consts import OPENBCI_SAMPLE_RATES
 from saccrec.core import Settings
@@ -16,13 +16,13 @@ class OpenBCISettingsPage(QWidget):
         self._openbci_ports_combo.setDuplicatesEnabled(False)
         for port in list_ports():
             self._openbci_ports_combo.addItem(port, port)
-        layout.addRow('Puerto', self._openbci_ports_combo)
+        layout.addRow(_('Puerto'), self._openbci_ports_combo)
 
         self._openbci_sample_rate_combo = QComboBox()
         self._openbci_sample_rate_combo.setDuplicatesEnabled(False)
         for key, value in OPENBCI_SAMPLE_RATES:
             self._openbci_sample_rate_combo.addItem(value, key)
-        layout.addRow('Frecuencia de muestreo', self._openbci_sample_rate_combo)
+        layout.addRow(_('Frecuencia de muestreo'), self._openbci_sample_rate_combo)
 
         self.load_settings()
         self.setLayout(layout)
@@ -45,7 +45,6 @@ class OpenBCISettingsPage(QWidget):
         self._settings.openbci_port = self._openbci_ports_combo.currentData()
         self._settings.openbci_sample_rate = self._openbci_sample_rate_combo.currentData()
 
-
     @property
     def title(self) -> str:
-        return 'Configuración del OpenBCI'
+        return _('Configuración del OpenBCI')

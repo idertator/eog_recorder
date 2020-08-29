@@ -17,9 +17,15 @@ class OpenBCIChannelWidget(QWidget):
 
         self._openbci_channel_activated_check = QCheckBox()
         self._openbci_channel_activated_check.stateChanged.connect(self.on_activated_change)
-        layout.addRow(f'Canal {self._channel_number + 1}    ', self._openbci_channel_activated_check)
+        layout.addRow(
+            '{channel} {number}    '.format(
+                channel=_('Canal'),
+                number=self._channel_number + 1
+            ),
+            self._openbci_channel_activated_check
+        )
 
-        self._gain_label = QLabel('Ganancia')
+        self._gain_label = QLabel(_('Ganancia'))
         gain_layout.addWidget(self._gain_label)
 
         self._openbci_channel_gain_edit = QSpinBox()
@@ -75,4 +81,4 @@ class OpenBCIChannelsSettingsPage(QWidget):
 
     @property
     def title(self) -> str:
-        return 'Configuración de los canales del OpenBCI'
+        return _('Configuración de los canales del OpenBCI')

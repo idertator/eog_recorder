@@ -26,7 +26,7 @@ class ColorButton(QPushButton):
         if self._color:
             self.setStyleSheet(f'background-color: {self._color.name()};')
         else:
-            self.setStyleSheet("")
+            self.setStyleSheet('')
 
     def onColorPicker(self):
         dlg = QColorDialog(self._color)
@@ -46,24 +46,24 @@ class StimulusSettingsPage(QWidget):
         self._stimulus_saccadic_distance_edit.setMaximum(SETTINGS_STIMULUS_SACCADIC_DISTANCE_MAXIMUM)
         self._stimulus_saccadic_distance_edit.setSuffix(' cm')
 
-        layout.addRow('Distancia máxima de estímulo sacádico *', self._stimulus_saccadic_distance_edit)
+        layout.addRow(_('Distancia máxima de estímulo sacádico *'), self._stimulus_saccadic_distance_edit)
 
         self._stimulus_saccadic_ball_radius_edit = QDoubleSpinBox()
         self._stimulus_saccadic_ball_radius_edit.setFixedWidth(85)
         self._stimulus_saccadic_ball_radius_edit.setMinimum(SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MINIMUM)
         self._stimulus_saccadic_ball_radius_edit.setMaximum(SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS_MAXIMUM)
         self._stimulus_saccadic_ball_radius_edit.setSuffix(' cm')
-        layout.addRow('Radio del estímulo sacádico', self._stimulus_saccadic_ball_radius_edit)
+        layout.addRow(_('Radio del estímulo sacádico'), self._stimulus_saccadic_ball_radius_edit)
 
         self._stimulus_saccadic_ball_color_select = ColorButton()
-        layout.addRow('Color del estímulo', self._stimulus_saccadic_ball_color_select)
+        layout.addRow(('Color del estímulo'), self._stimulus_saccadic_ball_color_select)
 
         self._stimulus_saccadic_background_color_select = ColorButton()
-        layout.addRow('Color de fondo', self._stimulus_saccadic_background_color_select)
+        layout.addRow(('Color de fondo'), self._stimulus_saccadic_background_color_select)
 
         layout.addRow('', QLabel())
         layout.addRow('', QLabel())
-        layout.addRow(QLabel('* Define la distancia entre los puntos de estímulo para la prueba con mayor ángulo de estimulación'))
+        layout.addRow(QLabel(_('* Define la distancia entre los puntos de estímulo para la prueba con mayor ángulo de estimulación')))
 
         self.setLayout(layout)
 
@@ -81,4 +81,4 @@ class StimulusSettingsPage(QWidget):
 
     @property
     def title(self):
-        return 'Configuración de estímulo'
+        return _('Configuración de estímulo')
