@@ -1,18 +1,75 @@
-from enum import IntEnum
+from enum import Enum
 
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, QSettings
 from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QStackedWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QDialogButtonBox, QColorDialog, QPushButton
+from PyQt5.QtWidgets import QDialogButtonBox, QColorDialog, QPushButton, QMessageBox
 from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox, QCheckBox, QSpinBox, QLabel, QDoubleSpinBox
 
+from saccrec.settings import GUI_LANG
 from saccrec.core import Settings
 from saccrec.engine.recording import list_ports
 
+settings = QSettings()
+
+
+class _Language(Enum):
+    English = 'en'
+    Spanish = 'es'
+
+    @property
+    def label(self) -> str:
+        return {
+            _Language.English: _('Inglés'),
+            _Language.Spanish: _('Español'),
+        }[self]
+
+
+class _GUISettingsPage(QWidget):
+
+    def __init__(self, settings: Settings, parent=None):
+        super(_GUISettingsPage, self).__init__(parent)
+
+        self._initial_lang = None
+
+        layout = QFormLayout()
+
+        self._languages_combo = QComboBox()
+        self._languages_combo.setDuplicatesEnabled(False)
+
+        for lang in _Language:
+            self._languages_combo.addItem(lang.label, lang.value)
+
+        layout.addRow(_('Idioma'), self._languages_combo)
+        self.setLayout(layout)
+
+        self.load_settings()
+
+    def load_settings(self):
+        self._initial_lang = settings.value(GUI_LANG, 'en')
+        self._languages_combo.setCurrentText(_Language(self._initial_lang).label)
+
+    def save(self):
+        selected_lang = str(self._languages_combo.currentData())
+        if selected_lang != self._initial_lang:
+            settings.setValue(GUI_LANG, selected_lang)
+
+            answer = QMessageBox.question(
+                self,
+                _('Alerta'),
+                _('Para establecer los cambios se necesita reiniciar la aplicación. ¿Desea cerrar la aplicación?')
+            )
+
+            if answer == QMessageBox.Yes:
+                QApplication.exit(0)
+
+    @property
+    def title(self) -> str:
+        return _('Interfaz de Usuario')
+
 
 class _OpenBCISettingsPage(QWidget):
-
-    SAMPLE_RATES = (250, 500, 1000, 2000, 4000, 8000, 16000)
 
     def __init__(self, settings: Settings, parent=None):
         super(_OpenBCISettingsPage, self).__init__(parent)
@@ -28,7 +85,7 @@ class _OpenBCISettingsPage(QWidget):
 
         self._openbci_sample_rate_combo = QComboBox()
         self._openbci_sample_rate_combo.setDuplicatesEnabled(False)
-        for sr in self.SAMPLE_RATES:
+        for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
             self._openbci_sample_rate_combo.addItem(str(sr), sr)
         layout.addRow(_('Frecuencia de muestreo'), self._openbci_sample_rate_combo)
 
@@ -265,12 +322,13 @@ class SettingsDialog(QDialog):
         self.contentsWidget.setViewMode(QListView.IconMode)
         self.contentsWidget.setMovement(QListView.Static)
         self.contentsWidget.setFixedWidth(90)
-        self.contentsWidget.setFixedHeight(380)
+        self.contentsWidget.setFixedHeight(475)
         self.contentsWidget.setSpacing(5)
         self.contentsWidget.setIconSize(QSize(60, 60))
         self.adjustSize()
 
         self.pagesWidget = QStackedWidget()
+        self.pagesWidget.addWidget(_GUISettingsPage(self._settings))
         self.pagesWidget.addWidget(_OpenBCISettingsPage(self._settings))
         self.pagesWidget.addWidget(_OpenBCIChannelsSettingsPage(self._settings))
         self.pagesWidget.addWidget(_ScreenSettingsPage(self._settings))
@@ -278,31 +336,31 @@ class SettingsDialog(QDialog):
         self.contentsWidget.setCurrentRow(0)
 
         # MENUS
-        openbci_button = QListWidgetItem(QIcon(':openbci.png'), 'OpenBCI')
+        gui_button = QListWidgetItem(QIcon(':gui.svg'), _('Interfaz'))
+        self.contentsWidget.addItem(gui_button)
+        gui_button.setTextAlignment(Qt.AlignHCenter)
+        gui_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+        openbci_button = QListWidgetItem(QIcon(':openbci.png'), _('OpenBCI'))
         self.contentsWidget.addItem(openbci_button)
         openbci_button.setTextAlignment(Qt.AlignHCenter)
         openbci_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-        channel_button = QListWidgetItem(QIcon(':channels.svg'), 'Canales')
+        channel_button = QListWidgetItem(QIcon(':channels.svg'), _('Canales'))
         self.contentsWidget.addItem(channel_button)
         channel_button.setTextAlignment(Qt.AlignHCenter)
         channel_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-        screen_button = QListWidgetItem(QIcon(':screen.svg'), 'Pantalla')
+        screen_button = QListWidgetItem(QIcon(':screen.svg'), _('Pantalla'))
         self.contentsWidget.addItem(screen_button)
         screen_button.setTextAlignment(Qt.AlignHCenter)
         screen_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-        stimulus_button = QListWidgetItem(QIcon(':stimuli.svg'), 'Estimulo')
+        stimulus_button = QListWidgetItem(QIcon(':stimuli.svg'), _('Estímulo'))
         self.contentsWidget.addItem(stimulus_button)
         stimulus_button.setTextAlignment(Qt.AlignHCenter)
         stimulus_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-        screen_button.setTextAlignment(Qt.AlignHCenter)
-        openbci_button.setTextAlignment(Qt.AlignHCenter)
-        channel_button.setTextAlignment(Qt.AlignHCenter)
-        screen_button.setTextAlignment(Qt.AlignHCenter)
-        stimulus_button.setTextAlignment(Qt.AlignHCenter)
         self.contentsWidget.currentItemChanged.connect(self.change_page)
 
         layout = QVBoxLayout()

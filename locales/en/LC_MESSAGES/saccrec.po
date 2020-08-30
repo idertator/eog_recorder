@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: saccrec\n"
-"POT-Creation-Date: 2020-08-30 02:32+0200\n"
-"PO-Revision-Date: 2020-08-30 02:32+0200\n"
+"POT-Creation-Date: 2020-08-30 03:22+0200\n"
+"PO-Revision-Date: 2020-08-30 03:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -20,23 +20,23 @@ msgstr ""
 "X-Poedit-SearchPath-0: bin\n"
 "X-Poedit-SearchPath-1: saccrec\n"
 
-#: bin/SaccRec.py:53 bin/SaccRec.py:61
+#: bin/SaccRec.py:60 bin/SaccRec.py:68
 msgid "Error"
 msgstr "Error"
 
-#: bin/SaccRec.py:54
+#: bin/SaccRec.py:61
 msgid "El recibidor Bluetooth no está conectado al ordenador"
 msgstr "The Bluetooth receiver is not connected to the computer"
 
-#: bin/SaccRec.py:62
+#: bin/SaccRec.py:69
 msgid "La tarjeta no está conectada"
 msgstr "Board is not connected"
 
-#: saccrec/consts.py:16
+#: saccrec/consts.py:16 saccrec/gui/settings.py:24
 msgid "Inglés"
 msgstr "English"
 
-#: saccrec/consts.py:17
+#: saccrec/consts.py:17 saccrec/gui/settings.py:25
 msgid "Español"
 msgstr "Spanish"
 
@@ -108,71 +108,91 @@ msgstr "Option"
 msgid "¿Desea generar un reporte sacádico?"
 msgstr "Do you wish to generate a saccadic report?"
 
-#: saccrec/gui/main.py:131 saccrec/gui/wizards.py:345
+#: saccrec/gui/main.py:131 saccrec/gui/wizards.py:346
 msgid "Seleccione fichero de salida"
 msgstr "Select an output file"
 
-#: saccrec/gui/runner.py:73 saccrec/gui/runner.py:124
+#: saccrec/gui/runner.py:75 saccrec/gui/runner.py:126
 msgid "Presione espacio para continuar"
 msgstr "Press space to continue"
 
-#: saccrec/gui/settings.py:27
+#: saccrec/gui/settings.py:44
+msgid "Idioma"
+msgstr "Language"
+
+#: saccrec/gui/settings.py:60
+msgid "Alerta"
+msgstr "Alert"
+
+#: saccrec/gui/settings.py:61
+msgid ""
+"Para establecer los cambios se necesita reiniciar la aplicación. ¿Desea "
+"cerrar la aplicación?"
+msgstr ""
+"The application needs to be restarted to set the changes. Do you want to "
+"close it?"
+
+#: saccrec/gui/settings.py:69
+msgid "Interfaz de Usuario"
+msgstr "User Interface"
+
+#: saccrec/gui/settings.py:84
 msgid "Puerto"
 msgstr "Port"
 
-#: saccrec/gui/settings.py:33
+#: saccrec/gui/settings.py:90
 msgid "Frecuencia de muestreo"
 msgstr "Sampling Frequency"
 
-#: saccrec/gui/settings.py:58
+#: saccrec/gui/settings.py:115
 msgid "Configuración del OpenBCI"
 msgstr "OpenBCI Settings"
 
-#: saccrec/gui/settings.py:77
+#: saccrec/gui/settings.py:134
 msgid "Canal"
 msgstr "Channel"
 
-#: saccrec/gui/settings.py:83
+#: saccrec/gui/settings.py:140
 msgid "Ganancia"
 msgstr "Gain"
 
-#: saccrec/gui/settings.py:140
+#: saccrec/gui/settings.py:197
 msgid "Configuración de los canales del OpenBCI"
 msgstr "OpenBCI Channels Settings"
 
-#: saccrec/gui/settings.py:150
+#: saccrec/gui/settings.py:207
 msgid "Pantalla de estímulo"
 msgstr "Stimulus screen"
 
-#: saccrec/gui/settings.py:156
+#: saccrec/gui/settings.py:213
 msgid "Ancho"
 msgstr "Width"
 
-#: saccrec/gui/settings.py:163
+#: saccrec/gui/settings.py:220
 msgid "Alto"
 msgstr "Height"
 
-#: saccrec/gui/settings.py:177
+#: saccrec/gui/settings.py:234
 msgid "Configuración de pantalla"
 msgstr "Screen settings"
 
-#: saccrec/gui/settings.py:219
+#: saccrec/gui/settings.py:276
 msgid "Distancia máxima de estímulo sacádico *"
 msgstr "Saccadic stimulus maximum distance *"
 
-#: saccrec/gui/settings.py:226
+#: saccrec/gui/settings.py:283
 msgid "Radio del estímulo sacádico"
 msgstr "Saccadic stimulus radius"
 
-#: saccrec/gui/settings.py:229
+#: saccrec/gui/settings.py:286
 msgid "Color del estímulo"
 msgstr "Stimulus color"
 
-#: saccrec/gui/settings.py:232
+#: saccrec/gui/settings.py:289
 msgid "Color de fondo"
 msgstr "Background color"
 
-#: saccrec/gui/settings.py:236
+#: saccrec/gui/settings.py:293
 msgid ""
 "* Define la distancia entre los puntos de estímulo para la prueba con mayor "
 "ángulo de estimulación"
@@ -180,15 +200,35 @@ msgstr ""
 "* Define the distance between the stimulus points for the test with the "
 "higher stimulus angle"
 
-#: saccrec/gui/settings.py:254
+#: saccrec/gui/settings.py:311
 msgid "Configuración de estímulo"
 msgstr "Stimulus settings"
 
-#: saccrec/gui/settings.py:314
+#: saccrec/gui/settings.py:339
+msgid "Interfaz"
+msgstr "Interface"
+
+#: saccrec/gui/settings.py:344
+msgid "OpenBCI"
+msgstr "OpenBCI"
+
+#: saccrec/gui/settings.py:349
+msgid "Canales"
+msgstr "Channels"
+
+#: saccrec/gui/settings.py:354
+msgid "Pantalla"
+msgstr "Screen"
+
+#: saccrec/gui/settings.py:359
+msgid "Estímulo"
+msgstr "Stimuli"
+
+#: saccrec/gui/settings.py:372
 msgid "Aplicar"
 msgstr "Apply"
 
-#: saccrec/gui/settings.py:315
+#: saccrec/gui/settings.py:373
 msgid "Cancelar"
 msgstr "Cancel"
 
@@ -260,86 +300,86 @@ msgstr "Birthdate"
 msgid "Estado"
 msgstr "Status"
 
-#: saccrec/gui/wizards.py:39
+#: saccrec/gui/wizards.py:40
 msgid "Configuración de nuevo registro"
 msgstr "Setup new record"
 
-#: saccrec/gui/wizards.py:61
+#: saccrec/gui/wizards.py:62
 msgid "Resumen"
 msgstr "Summary"
 
-#: saccrec/gui/wizards.py:64
+#: saccrec/gui/wizards.py:65
 msgid "Notas importantes"
 msgstr "Important notes"
 
-#: saccrec/gui/wizards.py:65
+#: saccrec/gui/wizards.py:66
 msgid "Distancia del sujeto a la pantalla"
 msgstr "Distance of the subject to the screen"
 
-#: saccrec/gui/wizards.py:134
+#: saccrec/gui/wizards.py:135
 msgid "Datos del sujeto"
 msgstr "Subject info"
 
-#: saccrec/gui/wizards.py:152
+#: saccrec/gui/wizards.py:153
 msgid "persona nacida el"
 msgstr "person born at"
 
-#: saccrec/gui/wizards.py:153
+#: saccrec/gui/wizards.py:154
 msgid "hombre nacido el"
 msgstr "male born at"
 
-#: saccrec/gui/wizards.py:154
+#: saccrec/gui/wizards.py:155
 msgid "mujer nacida el"
 msgstr "female born at"
 
-#: saccrec/gui/wizards.py:162
+#: saccrec/gui/wizards.py:163
 msgid "Sujeto"
 msgstr "Subject"
 
-#: saccrec/gui/wizards.py:207
+#: saccrec/gui/wizards.py:208
 msgid "Configuración del estímulo"
 msgstr "Stimuli settings"
 
-#: saccrec/gui/wizards.py:243
+#: saccrec/gui/wizards.py:244
 msgid "Estímulos"
 msgstr "Stimuli"
 
-#: saccrec/gui/wizards.py:259
+#: saccrec/gui/wizards.py:260
 msgid "Prueba sacádica"
 msgstr "Saccadic test"
 
-#: saccrec/gui/wizards.py:265
+#: saccrec/gui/wizards.py:266
 msgid "a"
 msgstr "of"
 
-#: saccrec/gui/wizards.py:267
+#: saccrec/gui/wizards.py:268
 msgid "con"
 msgstr "with"
 
-#: saccrec/gui/wizards.py:269
+#: saccrec/gui/wizards.py:270
 msgid "sácadas"
 msgstr "saccades"
 
-#: saccrec/gui/wizards.py:270
+#: saccrec/gui/wizards.py:271
 msgid "La duración media de las fijaciones es de"
 msgstr "The mean duration of fixations is"
 
-#: saccrec/gui/wizards.py:272
+#: saccrec/gui/wizards.py:273
 msgid "segundos"
 msgstr "seconds"
 
-#: saccrec/gui/wizards.py:273
+#: saccrec/gui/wizards.py:274
 msgid "con una variabilidad del"
 msgstr "with a variability of"
 
-#: saccrec/gui/wizards.py:305
+#: saccrec/gui/wizards.py:306
 msgid "Configuración de la salida"
 msgstr "Output settings"
 
-#: saccrec/gui/wizards.py:315
+#: saccrec/gui/wizards.py:316
 msgid "Seleccionar"
 msgstr "Select"
 
-#: saccrec/gui/wizards.py:347
+#: saccrec/gui/wizards.py:348
 msgid "Archivo de SaccRec (*.rec)"
 msgstr "SaccRec File (*.rec)"
