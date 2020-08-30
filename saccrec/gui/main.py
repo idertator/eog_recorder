@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
 
         self._settings_dialog = SettingsDialog(self._settings, self)
         self._about_dialog = None
-        self._stimulus_player = StimulusPlayerWidget(self._settings, None)
+        self._stimulus_player = StimulusPlayerWidget(None)
 
         self._runner = Runner(
             settings=self._settings,

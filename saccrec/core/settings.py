@@ -58,22 +58,6 @@ class Settings(object):
 
     # OPENBCI SETTINGS
     @property
-    def openbci_port(self) -> str:
-        return self._settings.value('OpenBCI/Port', '')
-
-    @openbci_port.setter
-    def openbci_port(self, value: str):
-        self._settings.setValue('OpenBCI/Port', value)
-
-    @property
-    def openbci_sample_rate(self) -> int:
-        return int(self._settings.value('OpenBCI/SampleRate', 250))
-
-    @openbci_sample_rate.setter
-    def openbci_sample_rate(self, value: int):
-        self._settings.setValue('OpenBCI/SampleRate', value)
-
-    @property
     def openbci_channels(self) -> Channel:
         return self._channels
 

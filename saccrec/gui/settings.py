@@ -44,9 +44,9 @@ class _GUISettingsPage(QWidget):
         layout.addRow(_('Idioma'), self._languages_combo)
         self.setLayout(layout)
 
-        self.load_settings()
+        self.load()
 
-    def load_settings(self):
+    def load(self):
         lang = settings.value(SETTINGS.GUI_LANG, 'en')
 
         self._initial_lang = lang
@@ -92,26 +92,26 @@ class _OpenBCISettingsPage(QWidget):
             self._openbci_sample_rate_combo.addItem(f'{sr} Hz', sr)
         layout.addRow(_('Frecuencia de muestreo'), self._openbci_sample_rate_combo)
 
-        self.load_settings()
+        self.load()
         self.setLayout(layout)
 
-    def load_settings(self):
-        # openbci_ports_combo
-        if self._openbci_ports_combo.count() > 0 and self._settings.openbci_port != '':
-            self._openbci_ports_combo.setCurrentIndex(self._openbci_ports_combo.findText(self._settings.openbci_port))
+    def load(self):
+        openbci_port = settings.value(SETTINGS.OPENBCI_PORT)
+        openbci_sampling_rate = settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250)
+
+        if openbci_port is not None:
+            self._openbci_ports_combo.setCurrentText(str(openbci_port))
         else:
             self._openbci_ports_combo.setCurrentIndex(0)
 
-        # openbci_sample_rate_combo
-        if self._openbci_sample_rate_combo.count() > 0 and self._settings.openbci_sample_rate != '':
-            self._openbci_sample_rate_combo.setCurrentIndex(
-                self._openbci_sample_rate_combo.findText(str(self._settings.openbci_sample_rate)))
-        else:
-            self._openbci_sample_rate_combo.setCurrentIndex(0)
+        self._openbci_sample_rate_combo.setCurrentText(f'{openbci_sampling_rate} Hz')
 
     def save(self):
-        self._settings.openbci_port = self._openbci_ports_combo.currentData()
-        self._settings.openbci_sample_rate = self._openbci_sample_rate_combo.currentData()
+        openbci_port = str(self._openbci_ports_combo.currentData())
+        openbci_sampling_rate = int(self._openbci_sample_rate_combo.currentData())
+
+        settings.setValue(SETTINGS.OPENBCI_PORT, openbci_port)
+        settings.setValue(SETTINGS.OPENBCI_SAMPLING_RATE, openbci_sampling_rate)
 
     @property
     def title(self) -> str:
@@ -154,7 +154,7 @@ class _OpenBCIChannelWidget(QWidget):
         self._openbci_channel_gain_edit.setVisible(self._openbci_channel_activated_check.checkState())
         self._gain_label.setVisible(self._openbci_channel_activated_check.checkState())
 
-    def load_settings(self):
+    def load(self):
         self._openbci_channel_activated_check.setChecked(self._settings.openbci_channels[self._channel_number][0])
         self._gain_label.setVisible(self._openbci_channel_activated_check.isChecked())
         self._openbci_channel_gain_edit.setVisible(self._openbci_channel_activated_check.isChecked())
@@ -187,9 +187,9 @@ class _OpenBCIChannelsSettingsPage(QWidget):
         layout.addLayout(bottom_layout)
         self.setLayout(layout)
 
-    def load_settings(self):
+    def load(self):
         for channel in self.channel_list:
-            channel.load_settings()
+            channel.load()
 
     def save(self):
         for channel in self.channel_list:
@@ -223,7 +223,7 @@ class _ScreenSettingsPage(QWidget):
 
         self.setLayout(layout)
 
-    def load_settings(self):
+    def load(self):
         screen_width = float(settings.value(SETTINGS.STIMULUS_SCREEN_WIDTH, 47.5))
         screen_height = float(settings.value(SETTINGS.STIMULUS_SCREEN_HEIGHT, 30.0))
 
@@ -301,7 +301,7 @@ class _StimulusSettingsPage(QWidget):
 
         self.setLayout(layout)
 
-    def load_settings(self):
+    def load(self):
         distance = float(settings.value(SETTINGS.STIMULUS_SACCADIC_DISTANCE, 40.0))
         ball_radius = float(settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, 0.5))
         ball_color = settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_COLOR, QColor(255, 255, 255))
@@ -412,5 +412,5 @@ class SettingsDialog(QDialog):
 
     def open(self):
         for i in range(self.pagesWidget.count()):
-            self.pagesWidget.widget(i).load_settings()
+            self.pagesWidget.widget(i).load()
         super(SettingsDialog, self).open()

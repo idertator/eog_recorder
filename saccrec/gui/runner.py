@@ -1,11 +1,14 @@
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject, QSettings
 
 from saccrec.core import Settings, Screen, Record
 from saccrec.core.models import Subject, Hardware
 from saccrec.engine.recording import OpenBCIRecorder
+from saccrec import settings as SETTINGS
 
 from .player import StimulusPlayerWidget
 from .signals import SignalsWidget
+
+settings = QSettings()
 
 
 class Runner(QObject):
@@ -54,8 +57,11 @@ class Runner(QObject):
         self._recorder = None
 
         subject = Subject.from_json(subject)
+
+        sampling_rate = int(settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250))
+
         hardware = Hardware(
-            sample_rate=self._settings.openbci_sample_rate,
+            sample_rate=sampling_rate,
             channels=self._settings.openbci_channels.json
         )
 
@@ -87,9 +93,14 @@ class Runner(QObject):
             self._signals.show()
 
         if not self._signals.is_rendering:
+            openbci_port = settings.value(SETTINGS.OPENBCI_PORT)
+            openbci_sampling_rate = settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250)
+
             self._recorder = OpenBCIRecorder(
                 self._settings,
-                self._record.folder_for_test(self._next_test - 1)
+                openbci_port=openbci_port,
+                openbci_sampling_rate=openbci_sampling_rate,
+                tmp_folder=self._record.folder_for_test(self._next_test - 1)
             )
             self._signals.start(self._recorder)
             self._recorder.start_streaming()

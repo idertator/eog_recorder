@@ -29,10 +29,20 @@ def list_ports():
     ]
 
 
-def initialize_board(settings: Settings) -> Optional[Cyton]:
+def initialize_board(
+    settings: Settings,
+    openbci_port: str = None,
+    sampling_rate: int = 250
+) -> Optional[Cyton]:
     if not DEBUG:
+        if openbci_port is None:
+            ports = list_ports()
+            if not ports:
+                raise BoardNotConnectedError()
+            openbci_port = ports[0]
+
         port = Serial(
-            port=settings.openbci_port,
+            port=openbci_port,
             baudrate=115200,
             timeout=2
         )
@@ -40,7 +50,7 @@ def initialize_board(settings: Settings) -> Optional[Cyton]:
         try:
             board = Cyton(port)
             board.set_board_mode('default')
-            board.set_sample_rate(settings.openbci_sample_rate)
+            board.set_sample_rate(sampling_rate)
         except DeviceNotConnected:
             raise BoardNotConnectedError()
 
@@ -103,9 +113,18 @@ def textfile_to_array(filepath: str, dtype) -> array:
 
 class OpenBCIRecorder(Process):
 
-    def __init__(self, settings: Settings, tmp_folder: str = None):
+    def __init__(
+        self,
+        settings: Settings,
+        openbci_port: str = None,
+        openbci_sampling_rate: int = 250,
+        tmp_folder: str = None
+    ):
         super(OpenBCIRecorder, self).__init__(name='saccrec_recording')
         self._settings = settings
+        self._openbci_port = openbci_port
+        self._openbci_sampling_rate = openbci_sampling_rate
+
         self._command_queue = Queue()
         self._data_queue = Queue()
 
@@ -120,7 +139,11 @@ class OpenBCIRecorder(Process):
         board = None
         if not DEBUG:
             try:
-                board = initialize_board(self._settings)
+                board = initialize_board(
+                    self._settings,
+                    openbci_port=self._openbci_port,
+                    openbci_sampling_rate=self._openbci_sampling_rate
+                )
                 board.start_streaming()
             except BoardNotConnectedError as error:
                 self._command_queue.put(CMD_DEVICE_NOT_CONNECTED)
@@ -211,26 +234,3 @@ class OpenBCIRecorder(Process):
         self._command_queue.put(CMD_STOP)
         self.join()
 
-
-if __name__ == '__main__':
-    command_queue = Queue()
-    queue = Queue()
-
-    settings = Settings()
-
-    recorder = OpenBCIRecorder(settings)
-    recorder.start_streaming()
-
-    count = 0
-    stop = 1000
-
-    while count < stop:
-        samples = recorder.read_samples()
-        if samples:
-            print(samples)
-            count += len(samples)
-        sleep(0.001)
-
-    recorder.stop_streaming()
-
-# openbci_interface.exception.UnexpectedMessageFormat: Device returned a message not in OpenBCI format;

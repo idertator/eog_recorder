@@ -52,7 +52,7 @@ class SaccadicStimuli(object):
         self._right_ball = None
         self._cm_to_pixels_x = 1.0
 
-        sampling_rate = settings.openbci_sample_rate
+        sampling_rate = int(settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250))
 
         samples = floor(fixation_duration * sampling_rate)
         delta = floor(((fixation_variability / 100.0) * samples) / 2)

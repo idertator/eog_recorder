@@ -5,7 +5,6 @@ from PyQt5.QtCore import pyqtSignal, Qt, QTimer, QSettings
 from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import qApp, QWidget
 
-from saccrec.core import Settings
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec import settings as SETTINGS
 
@@ -19,11 +18,13 @@ class StimulusPlayerWidget(QWidget):
     stopped = pyqtSignal()
     finished = pyqtSignal()
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, parent=None):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
         self._settings = settings
 
-        self._sampling_step = 1000 / self._settings.openbci_sample_rate
+        sampling_rate = int(settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250))
+
+        self._sampling_step = 1000 / sampling_rate
 
         self._stimuli = None
         self._ball_position = None

@@ -17,8 +17,6 @@ settings = QSettings()
 LOCALE_PATH = join(abspath(dirname(dirname(__file__))), 'locales')
 CURRENT_LANG = settings.value(GUI_LANG, 'en')
 
-print(CURRENT_LANG)
-
 tr = gettext.translation('saccrec', LOCALE_PATH, languages=[CURRENT_LANG])
 tr.install('saccrec')
 
@@ -39,7 +37,15 @@ if exists(pid_path):
             from saccrec.engine.errors import BoardNotConnectedError
             settings = Settings()
             try:
-                board = initialize_board(settings)
+                from saccrec.settings import OPENBCI_PORT, OPENBCI_SAMPLING_RATE
+                openbci_port = settings.value(OPENBCI_PORT)
+                openbci_sampling_rate = settings.value(OPENBCI_SAMPLING_RATE, 250)
+
+                board = initialize_board(
+                    settings,
+                    openbci_port=openbci_port,
+                    openbci_sampling_rate=openbci_sampling_rate
+                )
                 close_board(board)
             except BoardNotConnectedError:
                 BOARD_CONNECTED = False
