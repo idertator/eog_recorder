@@ -10,8 +10,9 @@ from saccrec.core import Settings, Screen
 from saccrec.core import Subject, Gender
 from saccrec.core.math import distance_to_subject
 from saccrec.engine.stimulus import SaccadicStimuli
-from saccrec.gui.widgets import SubjectWidget, StimulusWidget
-from saccrec.gui.widgets.stimulus import TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
+
+from .subject import SubjectWidget
+from .stimulus import StimulusWidget, TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
 
 
 class RecordSetupWizard(QWizard):

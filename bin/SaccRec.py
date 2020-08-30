@@ -7,13 +7,14 @@ from tempfile import gettempdir
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from saccrec.core import Settings
-from saccrec.gui import MainWindow
+from saccrec.gui.main import MainWindow
 
 # Setting up i18n
 LOCALE_PATH = join(abspath(dirname(dirname(__file__))), 'locales')
 tr = gettext.translation('saccrec', LOCALE_PATH, languages=['en'])
 tr.install('saccrec')
 
+DONGLE_CONNECTED = True
 BOARD_CONNECTED = True
 
 pid_path = join(gettempdir(), 'saccrec.pid')
@@ -23,6 +24,8 @@ if exists(pid_path):
         try:
             kill(pid, 0)
         except OSError:
+            from serial.serialutil import SerialException
+
             from saccrec.engine.recording import initialize_board, close_board
             from saccrec.engine.errors import BoardNotConnectedError
             settings = Settings()
@@ -31,16 +34,28 @@ if exists(pid_path):
                 close_board(board)
             except BoardNotConnectedError:
                 BOARD_CONNECTED = False
+            except SerialException:
+                DONGLE_CONNECTED = False
         else:
             print('Killed hanged process')
 
 
 app = QApplication([])
+app.setOrganizationName('SaccRec')
+app.setApplicationName('SaccRec')
 
 mainWindow = MainWindow()
 mainWindow.showMaximized()
 
-if not BOARD_CONNECTED:
+if not DONGLE_CONNECTED:
+    QMessageBox.critical(
+        mainWindow,
+        _('Error'),
+        _('El recibidor Bluetooth no está conectado al ordenador'),
+        QMessageBox.Close
+    )
+    QApplication.exit(0)
+elif not BOARD_CONNECTED:
     QMessageBox.critical(
         mainWindow,
         _('Error'),

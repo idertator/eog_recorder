@@ -2,8 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QGroupBox, QLabel
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 
-from saccrec.consts import STIMULUS_DEFAULT_ANGLE, STIMULUS_MINIMUM_ANGLE, STIMULUS_MAXIMUM_ANGLE, DEFAULT_TEST
-from saccrec.consts import STIMULUS_MINUMUM_SACCADES, STIMULUS_MAXIMUM_SACCADES
+from saccrec.consts import DEFAULT_TEST
 
 
 class StimulusWidget(QGroupBox):
@@ -23,8 +22,8 @@ class StimulusWidget(QGroupBox):
         layout = QHBoxLayout(self)
 
         self._angle_edit = QSpinBox(self)
-        self._angle_edit.setMinimum(STIMULUS_MINIMUM_ANGLE)
-        self._angle_edit.setMaximum(STIMULUS_MAXIMUM_ANGLE)
+        self._angle_edit.setMinimum(10)
+        self._angle_edit.setMaximum(60)
         self._angle_edit.setSingleStep(1)
         self._angle_edit.setSuffix(' \u00B0')
         self._angle_edit.setFixedWidth(60)
@@ -56,8 +55,8 @@ class StimulusWidget(QGroupBox):
         layout.addLayout(element_layout)
 
         self._saccades_count = QSpinBox(self)
-        self._saccades_count.setMinimum(STIMULUS_MINUMUM_SACCADES)
-        self._saccades_count.setMaximum(STIMULUS_MAXIMUM_SACCADES)
+        self._saccades_count.setMinimum(5)
+        self._saccades_count.setMaximum(100)
         self._saccades_count.setSingleStep(1)
         self._saccades_count.setFixedWidth(60)
         self._saccades_count.setToolTip(_('Cantidad de sácadas'))
@@ -182,7 +181,7 @@ class TestStimulusWidget(StimulusWidget):
         super(TestStimulusWidget, self).__init__(data, wizard_list, wizard_layout, parent)
         self.setTitle('{test_name} {angle} \u00B0'.format(
             test_name=_('Prueba sacádica a'),
-            angle=STIMULUS_DEFAULT_ANGLE
+            angle=30
         ))
         self.position = position
         self._angle_edit.valueChanged.connect(self.angle_edit_changed)

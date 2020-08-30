@@ -3,7 +3,9 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from saccrec.core import Settings, Screen, Record
 from saccrec.core.models import Subject, Hardware
 from saccrec.engine.recording import OpenBCIRecorder
-from saccrec.gui.widgets import StimulusPlayerWidget, SignalsWidget
+
+from .player import StimulusPlayerWidget
+from .signals import SignalsWidget
 
 
 class Runner(QObject):

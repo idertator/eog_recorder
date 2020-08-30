@@ -5,23 +5,18 @@ from typing import List
 from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QColor
 
-from saccrec.consts import SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE, \
-    SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS, SETTINGS_DEFAULT_STIMULUS_BALL_COLOR, \
-    SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR, SETTINGS_OPENBCI_DEFAULT_GAIN, SETTINGS_OPENBCI_DEFAULT_CHANNEL_NUMBER, \
-    SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH, SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT, STIMULUS_DEFAULT_ANGLE, \
-    STIMULUS_DEFAULT_DURATION, STIMULUS_DEFAULT_VARIABILITY, STIMULUS_DEFAULT_SACCADES, DEFAULT_TESTS_COUNT, \
-    DEFAULT_TEST, TESTS
-from saccrec.consts import SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM
+from saccrec.consts import DEFAULT_TEST, TESTS
 
 
 class Channel(object):
+
     def __init__(self, settings: QSettings, parent=None):
         self._settings = settings
         self._channels = [
             (
                 bool(int(self._settings.value(f'OpenBCIChannels/Activated{index}', 1))),
-                int(self._settings.value(f'OpenBCIChannels/Gain{index}', SETTINGS_OPENBCI_DEFAULT_GAIN))
-            ) for index in range(SETTINGS_OPENBCI_DEFAULT_CHANNEL_NUMBER)
+                int(self._settings.value(f'OpenBCIChannels/Gain{index}', 24))
+            ) for index in range(8)
         ]
 
     def __getitem__(self, index: int):
@@ -73,7 +68,7 @@ class Settings(object):
 
     @property
     def openbci_sample_rate(self) -> int:
-        return int(self._settings.value('OpenBCI/SampleRate', SETTINGS_OPENBCI_DEFAULT_SAMPLE_RATE))
+        return int(self._settings.value('OpenBCI/SampleRate', 250))
 
     @openbci_sample_rate.setter
     def openbci_sample_rate(self, value: int):
@@ -82,7 +77,7 @@ class Settings(object):
     # SCREEN SETTINGS
     @property
     def stimulus_screen_width(self) -> float:
-        return float(self._settings.value('Stimulus/ScreenWidth', SETTINGS_STIMULUS_SCREEN_DEFAULT_WIDTH))
+        return float(self._settings.value('Stimulus/ScreenWidth', 30.0))
 
     @stimulus_screen_width.setter
     def stimulus_screen_width(self, value: float):
@@ -90,7 +85,7 @@ class Settings(object):
 
     @property
     def stimulus_screen_height(self) -> float:
-        return float(self._settings.value('Stimulus/ScreenHeight', SETTINGS_STIMULUS_SCREEN_DEFAULT_HEIGHT))
+        return float(self._settings.value('Stimulus/ScreenHeight', 17.0))
 
     @stimulus_screen_height.setter
     def stimulus_screen_height(self, value: float):
@@ -99,7 +94,7 @@ class Settings(object):
     # STIMULUS SETTINGS
     @property
     def stimulus_saccadic_distance(self) -> float:
-        return float(self._settings.value('Stimulus/SaccadicDistance', SETTINGS_STIMULUS_SACCADIC_DISTANCE_MINIMUM))
+        return float(self._settings.value('Stimulus/SaccadicDistance', 5.0))
 
     @stimulus_saccadic_distance.setter
     def stimulus_saccadic_distance(self, value: float):
@@ -107,7 +102,7 @@ class Settings(object):
 
     @property
     def stimulus_saccadic_ball_radius(self) -> float:
-        return float(self._settings.value('Stimulus/SaccadicBallRadius', SETTINGS_DEFAULT_STIMULUS_BALL_RADIUS))
+        return float(self._settings.value('Stimulus/SaccadicBallRadius', 0.5))
 
     @stimulus_saccadic_ball_radius.setter
     def stimulus_saccadic_ball_radius(self, value: float):
@@ -115,7 +110,7 @@ class Settings(object):
 
     @property
     def stimulus_saccadic_ball_color(self) -> QColor:
-        return QColor(self._settings.value('Stimulus/SaccadicBallColor', SETTINGS_DEFAULT_STIMULUS_BALL_COLOR))
+        return QColor(self._settings.value('Stimulus/SaccadicBallColor', QColor(255, 255, 255)))
 
     @stimulus_saccadic_ball_color.setter
     def stimulus_saccadic_ball_color(self, value: QColor):
@@ -124,7 +119,7 @@ class Settings(object):
     @property
     def stimulus_saccadic_background_color(self) -> QColor:
         return QColor(
-            self._settings.value('Stimulus/SaccadicBackgroundColor', SETTINGS_DEFAULT_STIMULUS_BACKGROUND_COLOR))
+            self._settings.value('Stimulus/SaccadicBackgroundColor', QColor(0, 0, 0)))
 
     @stimulus_saccadic_background_color.setter
     def stimulus_saccadic_background_color(self, value: QColor):

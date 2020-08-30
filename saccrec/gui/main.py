@@ -3,13 +3,14 @@ from PyQt5.QtGui import QIcon
 
 from saccrec.core import Settings, Screen
 
-from saccrec.gui.dialogs import SettingsDialog, AboutDialog
-from saccrec.gui.widgets import SignalsWidget, StimulusPlayerWidget
-from saccrec.gui.wizards import RecordSetupWizard
+import saccrec.gui.icons  # noqa: F401
 
-import saccrec.gui.icons
-
+from .about import AboutDialog
+from .player import StimulusPlayerWidget
 from .runner import Runner
+from .settings import SettingsDialog
+from .signals import SignalsWidget
+from .wizards import RecordSetupWizard
 
 
 class MainWindow(QMainWindow):
