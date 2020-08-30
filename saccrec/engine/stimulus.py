@@ -3,26 +3,30 @@ from random import randint
 
 from numpy import array, int8, zeros, ones, hstack
 
-from PyQt5.QtCore import QPoint
+from PyQt5.QtCore import QPoint, QSettings
 
 from saccrec.core import Settings, Screen, StimulusPosition
 from saccrec.core.math import points_distance
+from saccrec import settings as SETTINGS
+
+settings = QSettings()
 
 
 class SaccadicStimuli(object):
-    
-    def __init__(self,
+
+    def __init__(
+        self,
         settings: Settings,
         screen: Screen,
         distance_to_subject: float,
         angle: int,
-        fixation_duration: float,   
+        fixation_duration: float,
         fixation_variability: float,
         saccades_count: int,
         test_name: str = 'Prueba Sacádica'
     ):
         """Constructor
-    
+
         Args:
             settings (saccrec.core.Settings): Settings object
             screen: (saccrec.core.Screen): Screen object
@@ -52,7 +56,7 @@ class SaccadicStimuli(object):
 
         samples = floor(fixation_duration * sampling_rate)
         delta = floor(((fixation_variability / 100.0) * samples) / 2)
-        
+
         durations = [randint(samples - delta, samples + delta) for _ in range(saccades_count + 2)]
 
         first, *main, last = durations
@@ -74,14 +78,14 @@ class SaccadicStimuli(object):
     def _update_positions(self):
         distance = points_distance(self._distance_to_subject, self._angle)
 
-        cm_width = self._settings.stimulus_screen_width
+        cm_width = settings.value(SETTINGS.STIMULUS_SCREEN_WIDTH, 47.5)
         cm_center = cm_width / 2
         cm_delta = distance / 2
         self._cm_to_pixels_x = self._screen.secondary_screen_rect.width() / cm_width
 
         left_x = (cm_center - cm_delta) * self._cm_to_pixels_x
         right_x = (cm_center + cm_delta) * self._cm_to_pixels_x
-        center_x = (left_x + right_x ) / 2
+        center_x = (left_x + right_x) / 2
 
         y = self._screen.secondary_screen_rect.center().y()
 

@@ -1,13 +1,15 @@
 from math import ceil
 from time import time
 
-from PyQt5.QtCore import pyqtSignal, Qt, QTimer
-from PyQt5.QtGui import QPainter
+from PyQt5.QtCore import pyqtSignal, Qt, QTimer, QSettings
+from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import qApp, QWidget
 
 from saccrec.core import Settings
 from saccrec.engine.stimulus import SaccadicStimuli
+from saccrec import settings as SETTINGS
 
+settings = QSettings()
 
 STIMULUS_TIMEOUT = 7    # TODO: Calculate this from the refresh rate of the monitor
 
@@ -37,12 +39,16 @@ class StimulusPlayerWidget(QWidget):
         self._load_settings()
 
     def _load_settings(self):
+        ball_radius = settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, 0.5)
+        ball_color = settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_COLOR, QColor(255, 255, 255))
+        back_color = settings.value(SETTINGS.STIMULUS_BACKGROUND_COLOR, QColor(0, 0, 0))
+
         if self._stimuli is None:
-            self._ball_radius = self._settings.stimulus_saccadic_ball_radius
+            self._ball_radius = ball_radius
         else:
-            self._ball_radius = self._stimuli.cm_to_pixels_x(self._settings.stimulus_saccadic_ball_radius)
-        self._ball_color = self._settings.stimulus_saccadic_ball_color
-        self._background_color = self._settings.stimulus_saccadic_background_color
+            self._ball_radius = self._stimuli.cm_to_pixels_x(ball_radius)
+        self._ball_color = ball_color
+        self._background_color = back_color
 
     def _start_stimulus(self):
         self._ball_position = self._stimuli.screen_position(0)

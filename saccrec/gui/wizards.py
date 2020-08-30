@@ -1,7 +1,7 @@
 from os.path import exists, dirname
 from typing import List
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QSettings
 from PyQt5.QtWidgets import QWizard, QWizardPage, QScrollArea, QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
@@ -10,9 +10,12 @@ from saccrec.core import Settings, Screen
 from saccrec.core import Subject, Gender
 from saccrec.core.math import distance_to_subject
 from saccrec.engine.stimulus import SaccadicStimuli
+from saccrec import settings as SETTINGS
 
 from .subject import SubjectWidget
 from .stimulus import StimulusWidget, TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
+
+settings = QSettings()
 
 
 class RecordSetupWizard(QWizard):
@@ -83,8 +86,9 @@ class RecordSetupWizard(QWizard):
 
     @property
     def fixed_distance_to_subject(self) -> float:
+        distance = settings.value(SETTINGS.STIMULUS_SACCADIC_DISTANCE, 40)
         return distance_to_subject(
-            self._settings.stimulus_saccadic_distance,
+            distance,
             self._stimulus_page.max_angle
         )
 

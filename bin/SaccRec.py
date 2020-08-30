@@ -17,6 +17,8 @@ settings = QSettings()
 LOCALE_PATH = join(abspath(dirname(dirname(__file__))), 'locales')
 CURRENT_LANG = settings.value(GUI_LANG, 'en')
 
+print(CURRENT_LANG)
+
 tr = gettext.translation('saccrec', LOCALE_PATH, languages=[CURRENT_LANG])
 tr.install('saccrec')
 

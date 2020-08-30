@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QStackedWidget, QLi
 from PyQt5.QtWidgets import QDialogButtonBox, QColorDialog, QPushButton, QMessageBox
 from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox, QCheckBox, QSpinBox, QLabel, QDoubleSpinBox
 
-from saccrec.settings import GUI_LANG
+from saccrec import settings as SETTINGS
 from saccrec.core import Settings
 from saccrec.engine.recording import list_ports
 
@@ -47,13 +47,16 @@ class _GUISettingsPage(QWidget):
         self.load_settings()
 
     def load_settings(self):
-        self._initial_lang = settings.value(GUI_LANG, 'en')
-        self._languages_combo.setCurrentText(_Language(self._initial_lang).label)
+        lang = settings.value(SETTINGS.GUI_LANG, 'en')
+
+        self._initial_lang = lang
+        self._languages_combo.setCurrentText(_Language(lang).label)
 
     def save(self):
-        selected_lang = str(self._languages_combo.currentData())
-        if selected_lang != self._initial_lang:
-            settings.setValue(GUI_LANG, selected_lang)
+        lang = str(self._languages_combo.currentData())
+
+        if lang != self._initial_lang:
+            settings.setValue(SETTINGS.GUI_LANG, lang)
 
             answer = QMessageBox.question(
                 self,
@@ -86,7 +89,7 @@ class _OpenBCISettingsPage(QWidget):
         self._openbci_sample_rate_combo = QComboBox()
         self._openbci_sample_rate_combo.setDuplicatesEnabled(False)
         for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
-            self._openbci_sample_rate_combo.addItem(str(sr), sr)
+            self._openbci_sample_rate_combo.addItem(f'{sr} Hz', sr)
         layout.addRow(_('Frecuencia de muestreo'), self._openbci_sample_rate_combo)
 
         self.load_settings()
@@ -201,7 +204,6 @@ class _ScreenSettingsPage(QWidget):
 
     def __init__(self, settings: Settings = Settings, parent=None):
         super(_ScreenSettingsPage, self).__init__(parent)
-        self._settings = settings
 
         layout = QFormLayout()
         self.setWindowTitle(_('Pantalla de estímulo'))
@@ -222,12 +224,18 @@ class _ScreenSettingsPage(QWidget):
         self.setLayout(layout)
 
     def load_settings(self):
-        self._stimulus_screen_width_edit.setValue(self._settings.stimulus_screen_width)
-        self._stimulus_screen_height_edit.setValue(self._settings.stimulus_screen_height)
+        screen_width = float(settings.value(SETTINGS.STIMULUS_SCREEN_WIDTH, 47.5))
+        screen_height = float(settings.value(SETTINGS.STIMULUS_SCREEN_HEIGHT, 30.0))
+
+        self._stimulus_screen_width_edit.setValue(screen_width)
+        self._stimulus_screen_height_edit.setValue(screen_height)
 
     def save(self):
-        self._settings.stimulus_screen_width = self._stimulus_screen_width_edit.value()
-        self._settings.stimulus_screen_height = self._stimulus_screen_height_edit.value()
+        screen_width = self._stimulus_screen_width_edit.value()
+        screen_height = self._stimulus_screen_height_edit.value()
+
+        settings.setValue(SETTINGS.STIMULUS_SCREEN_WIDTH, screen_width)
+        settings.setValue(SETTINGS.STIMULUS_SCREEN_HEIGHT, screen_height)
 
     @property
     def title(self):
@@ -264,7 +272,6 @@ class _StimulusSettingsPage(QWidget):
 
     def __init__(self, settings: Settings, parent=None):
         super(_StimulusSettingsPage, self).__init__(parent)
-        self._settings = settings
         layout = QFormLayout()
 
         self._stimulus_saccadic_distance_edit = QDoubleSpinBox()
@@ -295,16 +302,26 @@ class _StimulusSettingsPage(QWidget):
         self.setLayout(layout)
 
     def load_settings(self):
-        self._stimulus_saccadic_distance_edit.setValue(self._settings.stimulus_saccadic_distance)
-        self._stimulus_saccadic_ball_radius_edit.setValue(self._settings.stimulus_saccadic_ball_radius)
-        self._stimulus_saccadic_ball_color_select.setColor(self._settings.stimulus_saccadic_ball_color)
-        self._stimulus_saccadic_background_color_select.setColor(self._settings.stimulus_saccadic_background_color)
+        distance = float(settings.value(SETTINGS.STIMULUS_SACCADIC_DISTANCE, 40.0))
+        ball_radius = float(settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, 0.5))
+        ball_color = settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_COLOR, QColor(255, 255, 255))
+        back_color = settings.value(SETTINGS.STIMULUS_BACKGROUND_COLOR, QColor(0, 0, 0))
+
+        self._stimulus_saccadic_distance_edit.setValue(distance)
+        self._stimulus_saccadic_ball_radius_edit.setValue(ball_radius)
+        self._stimulus_saccadic_ball_color_select.setColor(ball_color)
+        self._stimulus_saccadic_background_color_select.setColor(back_color)
 
     def save(self):
-        self._settings.stimulus_saccadic_distance = self._stimulus_saccadic_distance_edit.value()
-        self._settings.stimulus_saccadic_ball_radius = self._stimulus_saccadic_ball_radius_edit.value()
-        self._settings.stimulus_saccadic_ball_color = self._stimulus_saccadic_ball_color_select.value()
-        self._settings.stimulus_saccadic_background_color = self._stimulus_saccadic_background_color_select.value()
+        distance = self._stimulus_saccadic_distance_edit.value()
+        ball_radius = self._stimulus_saccadic_ball_radius_edit.value()
+        ball_color = self._stimulus_saccadic_ball_color_select.value()
+        back_color = self._stimulus_saccadic_background_color_select.value()
+
+        settings.setValue(SETTINGS.STIMULUS_SACCADIC_DISTANCE, distance)
+        settings.setValue(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, ball_radius)
+        settings.setValue(SETTINGS.STIMULUS_SACCADIC_BALL_COLOR, ball_color)
+        settings.setValue(SETTINGS.STIMULUS_BACKGROUND_COLOR, back_color)
 
     @property
     def title(self):
