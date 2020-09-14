@@ -9,3 +9,5 @@ STIMULUS_BACKGROUND_COLOR = 'Stimulus/SaccadicBackgroundColor'
 
 OPENBCI_PORT = 'OpenBCI/Port'
 OPENBCI_SAMPLING_RATE = 'OpenBCI/SampleRate'
+OPENBCI_CHANNEL_ACTIVE = 'OpenBCIChannels/Activated{index}'
+OPENBCI_CHANNEL_GAIN = 'OpenBCIChannels/Gain{index}'

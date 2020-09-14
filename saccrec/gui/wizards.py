@@ -86,7 +86,7 @@ class RecordSetupWizard(QWizard):
 
     @property
     def fixed_distance_to_subject(self) -> float:
-        distance = settings.value(SETTINGS.STIMULUS_SACCADIC_DISTANCE, 40)
+        distance = float(settings.value(SETTINGS.STIMULUS_SACCADIC_DISTANCE, 40))
         return distance_to_subject(
             distance,
             self._stimulus_page.max_angle
@@ -105,7 +105,6 @@ class RecordSetupWizard(QWizard):
 
             self._tests = [
                 SaccadicStimuli(
-                    settings=self._settings,
                     screen=self._screen,
                     distance_to_subject=distance_to_subject,
                     angle=test.angle,

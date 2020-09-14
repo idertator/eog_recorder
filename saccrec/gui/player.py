@@ -40,7 +40,7 @@ class StimulusPlayerWidget(QWidget):
         self._load_settings()
 
     def _load_settings(self):
-        ball_radius = settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, 0.5)
+        ball_radius = float(settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, 0.5))
         ball_color = settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_COLOR, QColor(255, 255, 255))
         back_color = settings.value(SETTINGS.STIMULUS_BACKGROUND_COLOR, QColor(0, 0, 0))
 

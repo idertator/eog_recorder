@@ -1,6 +1,6 @@
 from enum import Enum
 
-DEBUG = True
+DEBUG = False
 
 DATE_FORMAT = '%d/%m/%Y'
 DATETIME_FORMAT = '%d/%m/%Y %H:%M'

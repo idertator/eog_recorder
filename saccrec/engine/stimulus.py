@@ -16,7 +16,6 @@ class SaccadicStimuli(object):
 
     def __init__(
         self,
-        settings: Settings,
         screen: Screen,
         distance_to_subject: float,
         angle: int,
@@ -28,7 +27,6 @@ class SaccadicStimuli(object):
         """Constructor
 
         Args:
-            settings (saccrec.core.Settings): Settings object
             screen: (saccrec.core.Screen): Screen object
             distance_to_subject (float): Distance to the subject in cm
             angle (int): Stimuli angle
@@ -37,7 +35,6 @@ class SaccadicStimuli(object):
             saccades_count (int): Amounts of saccades to generate
             test_name (str): Name of the stimulation pattern
         """
-        self._settings = settings
         self._screen = screen
         self._distance_to_subject = distance_to_subject
 
@@ -78,7 +75,7 @@ class SaccadicStimuli(object):
     def _update_positions(self):
         distance = points_distance(self._distance_to_subject, self._angle)
 
-        cm_width = settings.value(SETTINGS.STIMULUS_SCREEN_WIDTH, 47.5)
+        cm_width = float(settings.value(SETTINGS.STIMULUS_SCREEN_WIDTH, 47.5))
         cm_center = cm_width / 2
         cm_delta = distance / 2
         self._cm_to_pixels_x = self._screen.secondary_screen_rect.width() / cm_width

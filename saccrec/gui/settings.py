@@ -188,6 +188,13 @@ class _OpenBCIChannelsSettingsPage(QWidget):
         self.setLayout(layout)
 
     def load(self):
+        # channels = []
+        # for index in range(8):
+        #     channels.append({
+        #         'active': str(settings.value(SETTINGS.OPENBCI_CHANNEL_ACTIVE.format(index=index), '1')) == '1',
+        #         'gain': int(settings.value(SETTINGS.OPENBCI_CHANNEL_GAIN.format(index=index), 24)),
+        #     })
+
         for channel in self.channel_list:
             channel.load()
 

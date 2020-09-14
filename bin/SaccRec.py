@@ -35,16 +35,15 @@ if exists(pid_path):
 
             from saccrec.engine.recording import initialize_board, close_board
             from saccrec.engine.errors import BoardNotConnectedError
-            settings = Settings()
             try:
                 from saccrec.settings import OPENBCI_PORT, OPENBCI_SAMPLING_RATE
                 openbci_port = settings.value(OPENBCI_PORT)
                 openbci_sampling_rate = settings.value(OPENBCI_SAMPLING_RATE, 250)
 
                 board = initialize_board(
-                    settings,
+                    settings=Settings(),
                     openbci_port=openbci_port,
-                    openbci_sampling_rate=openbci_sampling_rate
+                    sampling_rate=openbci_sampling_rate
                 )
                 close_board(board)
             except BoardNotConnectedError:

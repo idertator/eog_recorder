@@ -36,7 +36,7 @@ def initialize_board(
 ) -> Optional[Cyton]:
     if not DEBUG:
         if openbci_port is None:
-            ports = list_ports()
+            ports = list(list_ports())
             if not ports:
                 raise BoardNotConnectedError()
             openbci_port = ports[0]
@@ -50,7 +50,7 @@ def initialize_board(
         try:
             board = Cyton(port)
             board.set_board_mode('default')
-            board.set_sample_rate(sampling_rate)
+            board.set_sample_rate(int(sampling_rate))
         except DeviceNotConnected:
             raise BoardNotConnectedError()
 
@@ -142,7 +142,7 @@ class OpenBCIRecorder(Process):
                 board = initialize_board(
                     self._settings,
                     openbci_port=self._openbci_port,
-                    openbci_sampling_rate=self._openbci_sampling_rate
+                    sampling_rate=self._openbci_sampling_rate
                 )
                 board.start_streaming()
             except BoardNotConnectedError as error:
