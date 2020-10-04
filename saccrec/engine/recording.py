@@ -17,6 +17,7 @@ from saccrec.consts import DEBUG
 from saccrec.core import Settings
 
 from .commands import CMD_DEVICE_NOT_CONNECTED, CMD_STOP
+from .cyton import CytonBoard
 from .errors import BoardNotConnectedError
 
 
@@ -33,7 +34,7 @@ def initialize_board(
     settings: Settings,
     openbci_port: str = None,
     sampling_rate: int = 250
-) -> Optional[Cyton]:
+) -> Optional[CytonBoard]:
     if not DEBUG:
         if openbci_port is None:
             ports = list(list_ports())
@@ -41,18 +42,20 @@ def initialize_board(
                 raise BoardNotConnectedError()
             openbci_port = ports[0]
 
-        port = Serial(
-            port=openbci_port,
-            baudrate=115200,
-            timeout=2
-        )
+        # port = Serial(
+        #     port=openbci_port,
+        #     baudrate=115200,
+        #     timeout=2
+        # )
 
-        try:
-            board = Cyton(port)
-            board.set_board_mode('default')
-            board.set_sample_rate(int(sampling_rate))
-        except DeviceNotConnected:
-            raise BoardNotConnectedError()
+        # try:
+        #     board = Cyton(port)
+        #     board.set_board_mode('default')
+        #     board.set_sample_rate(int(sampling_rate))
+        # except DeviceNotConnected:
+        #     raise BoardNotConnectedError()
+
+        board = CytonBoard(channels='1')
 
         # board.configure_channel(1, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
         # board.configure_channel(2, power_down='ON', gain=24, input_type='NORMAL', bias=0, srb2=0, srb1=1)
@@ -83,22 +86,22 @@ def initialize_board(
         # board.disable_channel(15)
         # board.disable_channel(16)
 
-        for index in range(8):
-            channel = index + 1
-            active, gain = settings.openbci_channels[index]
-            if active:
-                board.configure_channel(channel, power_down='ON', gain=gain, input_type='NORMAL', bias=0, srb2=0, srb1=0)
-            else:
-                board.disable_channel(channel)
+        # for index in range(8):
+        #     channel = index + 1
+        #     active, gain = settings.openbci_channels[index]
+        #     if active:
+        #         board.configure_channel(channel, power_down='ON', gain=gain, input_type='NORMAL', bias=0, srb2=0, srb1=0)
+        #     else:
+        #         board.disable_channel(channel)
 
         return board
 
     return None
 
 
-def close_board(board: Cyton):
+def close_board(board: CytonBoard):
     if not DEBUG:
-        board.terminate()
+        board.stop()
 
 
 def textfile_to_array(filepath: str, dtype) -> array:
@@ -144,7 +147,7 @@ class OpenBCIRecorder(Process):
                     openbci_port=self._openbci_port,
                     sampling_rate=self._openbci_sampling_rate
                 )
-                board.start_streaming()
+                board.start()
             except BoardNotConnectedError as error:
                 self._command_queue.put(CMD_DEVICE_NOT_CONNECTED)
                 raise error
@@ -161,14 +164,19 @@ class OpenBCIRecorder(Process):
         timestamp = 0
         while self._command_queue.empty() or self._command_queue.get() != CMD_STOP:
             if not DEBUG:
-                sample = board.read_sample()
-                sample = [
-                    timestamp,
-                    sample['eeg'][0],
-                    sample['eeg'][1],
-                ]
-                if timestamp > 0:
-                    self._data_queue.put(sample)
+                sample = board.read()
+
+                if len(sample) > 0:
+                    for s in sample:
+                        sample = [
+                            timestamp,
+                            s[0],
+                            s[1],
+                        ]
+                        if timestamp > 0:
+                            self._data_queue.put(sample)
+                        timestamp += 1
+                sleep(1.0 / 500.0)
             else:
                 sample = [
                     timestamp,
@@ -177,23 +185,24 @@ class OpenBCIRecorder(Process):
                 ]
                 if timestamp > 0:
                     self._data_queue.put(sample)
-                sleep(1.0 / 250)
+                # sleep(1.0 / 250)
 
-            timestamp += 1
+                timestamp += 1
 
-            ts, hc, vc = sample
+            if len(sample) > 0:
+                ts, hc, vc = sample
 
-            if ts_file is not None:
-                ts_file.write(f'{ts}\n')
+                if ts_file is not None:
+                    ts_file.write(f'{ts}\n')
 
-            if hc_file is not None:
-                hc_file.write(f'{hc}\n')
+                if hc_file is not None:
+                    hc_file.write(f'{hc}\n')
 
-            if vc_file is not None:
-                vc_file.write(f'{vc}\n')
+                if vc_file is not None:
+                    vc_file.write(f'{vc}\n')
 
         if not DEBUG:
-            board.stop_streaming()
+            board.stop()
             close_board(board)
 
         if ts_file is not None:
