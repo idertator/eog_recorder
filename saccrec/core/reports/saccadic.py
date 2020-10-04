@@ -10,7 +10,10 @@ _HEADERS = ['#', 'Onset', 'Offset', 'Amplitud', 'Duración', 'Velocidad Máxima'
 
 def excel_saccadic_report(study: Study, output_path: str):
     if abs(study.horizontal_calibration - 1) < 0.00001:
-        study.horizontal_calibration = calibrate(study, channel=Channel.Horizontal)
+        if (calibration := calibrate(study, channel=Channel.Horizontal)) is not None:
+            study.horizontal_calibration = calibration
+        else:
+            study.horizontal_calibration = 1.0
 
     databook = Databook()
     for idx, test in enumerate(study.filter(test_cls=SaccadicTest)):
@@ -21,13 +24,13 @@ def excel_saccadic_report(study: Study, output_path: str):
         max_velocities = [x.max_velocity for x in saccades]
 
         dataset = Dataset(
-            headers=_HEADERS, 
+            headers=_HEADERS,
             title=f'{idx:02}. Saccadic {test.angle}' + (' Calibration' if test.is_calibration else '')
         )
 
         for index, saccade in enumerate(saccades):
             dataset.append([
-                index + 1, 
+                index + 1,
                 saccade.onset,
                 saccade.offset,
                 saccade.amplitude,
@@ -36,12 +39,18 @@ def excel_saccadic_report(study: Study, output_path: str):
             ])
 
         dataset.append(['', '', '', '', '', ''])
-        dataset.append(['', '', 'Media:',
+        dataset.append([
+            '',
+            '',
+            'Media:',
             mean(amplitudes),
             mean(durations),
             mean(max_velocities)
         ])
-        dataset.append(['', '', 'Desv. Típica:',
+        dataset.append([
+            '',
+            '',
+            'Desv. Típica:',
             std(amplitudes),
             std(durations),
             std(max_velocities)
@@ -57,3 +66,4 @@ if __name__ == '__main__':
     study = Study.open('/Users/idertator/Recordings/rgb20190831_12.rec')
     excel_saccadic_report(study, '/Users/idertator/Recordings/rgb20190831_12.xls')
     study.save('/Users/idertator/Recordings/rgb20190831_12_saccades.rec')
+

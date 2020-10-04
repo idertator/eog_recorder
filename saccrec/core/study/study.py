@@ -17,10 +17,10 @@ from .tests import Test, SaccadicTest
 class Study:
 
     def __init__(
-        self, 
+        self,
         path: str,
         version: int,
-        recorded_at: Union[str, datetime], 
+        recorded_at: Union[str, datetime],
         hardware: Hardware,
         subject: Subject,
         tests: List[Test],
@@ -147,7 +147,7 @@ class Study:
                 test = TestClass(
                     index=index,
                     name=name,
-                    **properties, 
+                    **properties,
                     **test_params
                 )
                 test.__parse_data__(test_dict.get('data', {}))
@@ -163,7 +163,7 @@ class Study:
                 'horizontal': 1.0,
                 'vertical': 1.0,
             })
-                    
+
             return cls(
                 path=path,
                 version=manifest['version'],
