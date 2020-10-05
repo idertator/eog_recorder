@@ -31,6 +31,7 @@ class SubjectWidget(QWidget):
 
         self._borndate_edit = QDateEdit()
         self._borndate_edit.setCalendarPopup(True)
+        self._borndate_edit.setDisplayFormat('dd/MM/yyyy')
         layout.addRow(_('Fecha de nacimiento'), self._borndate_edit)
 
         self._status_combo = QComboBox()
