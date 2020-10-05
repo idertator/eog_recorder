@@ -1,12 +1,11 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR ORGANIZATION
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#  <>, YEAR-2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: saccrec\n"
 "POT-Creation-Date: 2020-08-30 03:22+0200\n"
-"PO-Revision-Date: 2020-08-30 13:06+0200\n"
+"PO-Revision-Date: 2020-10-05 09:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -15,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Gtranslator 3.38.0\n"
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: bin\n"
 "X-Poedit-SearchPath-1: saccrec\n"
