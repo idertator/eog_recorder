@@ -86,7 +86,6 @@ class CytonBoard:
         sleep(0.2)
         self._serial.read_all()
 
-
     def start(self):
         self._serial.write(b'b')
 
@@ -116,28 +115,9 @@ class CytonBoard:
             if sample.is_ok:
                 index = sample.sample
                 channels = sample.all_channels
-                data.append(channels)
-                print(index, channels)
+                data.append((index, channels))
 
         self._buffer = self._buffer[samples * 33:]
 
         return data
-
-if __name__ == '__main__':
-    from datetime import datetime, timedelta
-
-    board = CytonBoard(channels='1')
-    board.start()
-
-    start = datetime.now()
-
-    count = 0
-    while count < 500:
-        count += len(board.read())
-        sleep(0.002)
-
-    board.stop()
-
-    print((datetime.now() - start).microseconds / 1000)
-
 

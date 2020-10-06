@@ -49,6 +49,11 @@ class Record:
             savez_compressed(full_path, stimulus=stimulus)
             data['stimulus'] = path
 
+        path = f'{current_index:02}/timestamps.npz'
+        full_path = join(self._folder, path)
+        if exists(full_path):
+            data['timestamps'] = path
+
         path = f'{current_index:02}/time.npz'
         full_path = join(self._folder, path)
         if exists(full_path):
@@ -90,25 +95,17 @@ class Record:
             out.writestr('manifest.json', manifest)
 
             for test in self._tests:
-                if 'stimulus' in test:
-                    full_path = join(self._folder, test['stimulus'])
-                    out.write(full_path, test['stimulus'])
-
-                if 'time' in test:
-                    full_path = join(self._folder, test['time'])
-                    out.write(full_path, test['time'])
-
-                if 'horizontal' in test:
-                    full_path = join(self._folder, test['horizontal'])
-                    out.write(full_path, test['horizontal'])
-
-                if 'vertical' in test:
-                    full_path = join(self._folder, test['vertical'])
-                    out.write(full_path, test['vertical'])
-
-                if 'annotations' in test:
-                    full_path = join(self._folder, test['annotations'])
-                    out.write(full_path, test['annotations'])
+                for channel in (
+                    'timestamps',
+                    'stimulus',
+                    'time',
+                    'horizontal',
+                    'vertical',
+                    'annotations',
+                ):
+                    if channel in test:
+                        full_path = join(self._folder, test[channel])
+                        out.write(full_path, test[channel])
 
     def close(self):
         rmtree(self._folder, ignore_errors=True)

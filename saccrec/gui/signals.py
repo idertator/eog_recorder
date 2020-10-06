@@ -40,7 +40,7 @@ class SignalsManager:
     def add_samples(self, samples: List[Tuple[int, float, float]]):
         horizontal = []
         vertical = []
-        for timestamp, h, v in samples:
+        for _, timestamp, h, v in samples:
             horizontal.append(h)
             vertical.append(v)
 

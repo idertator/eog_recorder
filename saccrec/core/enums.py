@@ -33,6 +33,7 @@ class SubjectStatus(IntEnum):
 
 class Channel(Enum):
     Unknown = 'Unknown'
+    Timestamps = 'Timestamps'
     Time = 'Time'
     Stimulus = 'Stimulus'
     Horizontal = 'Horizontal'

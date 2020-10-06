@@ -1,17 +1,14 @@
 from random import randrange
 from multiprocessing import Process, Queue
-from serial import Serial
 from tempfile import gettempdir
 from time import sleep
 from typing import Optional, List, Tuple
 from os import remove
 from os.path import join, exists
 
-from numpy import array, savez_compressed, int32
+from numpy import array, savez_compressed, int32, uint8
 
-from openbci_interface import Cyton
 from openbci_interface.util import list_devices
-from openbci_interface.exception import DeviceNotConnected
 
 from saccrec.consts import DEBUG
 from saccrec.core import Settings
@@ -153,10 +150,12 @@ class OpenBCIRecorder(Process):
                 raise error
 
         if self._tmp_folder is not None:
+            tp_file = open(join(self._tmp_folder, 'timestamps.tmp'), 'wt')
             ts_file = open(join(self._tmp_folder, 'time.tmp'), 'wt')
             hc_file = open(join(self._tmp_folder, 'horizontal.tmp'), 'wt')
             vc_file = open(join(self._tmp_folder, 'vertical.tmp'), 'wt')
         else:
+            tp_file = None
             ts_file = None
             hc_file = None
             vc_file = None
@@ -167,8 +166,9 @@ class OpenBCIRecorder(Process):
                 sample = board.read()
 
                 if len(sample) > 0:
-                    for s in sample:
+                    for index, s in sample:
                         sample = [
+                            index,
                             timestamp,
                             s[0],
                             s[1],
@@ -180,6 +180,7 @@ class OpenBCIRecorder(Process):
             else:
                 sample = [
                     timestamp,
+                    timestamp,
                     randrange(-300, 300),
                     randrange(-300, 300)
                 ]
@@ -190,7 +191,10 @@ class OpenBCIRecorder(Process):
                 timestamp += 1
 
             if len(sample) > 0:
-                ts, hc, vc = sample
+                tp, ts, hc, vc = sample
+
+                if tp_file is not None:
+                    tp_file.write(f'{tp}\n')
 
                 if ts_file is not None:
                     ts_file.write(f'{ts}\n')
@@ -204,6 +208,11 @@ class OpenBCIRecorder(Process):
         if not DEBUG:
             board.stop()
             close_board(board)
+
+        if tp_file is not None:
+            tp_file.close()
+            tp_array = textfile_to_array(join(self._tmp_folder, 'timestamps.tmp'), uint8)
+            savez_compressed(join(self._tmp_folder, 'timestamps.npz'), timestamps=tp_array)
 
         if ts_file is not None:
             ts_file.close()
@@ -226,7 +235,7 @@ class OpenBCIRecorder(Process):
     def start_streaming(self):
         self.start()
 
-    def read_samples(self) -> List[Tuple[int, float, float]]:
+    def read_samples(self) -> List[Tuple[int, int, float, float]]:
         if not self._command_queue.empty():
             cmd = self._command_queue.get()
             if cmd == CMD_DEVICE_NOT_CONNECTED:

@@ -11,7 +11,7 @@ from .saccades import Saccade
 class Test:
     _TESTS = []
     _TESTS_FROM_KIND = {}
-    
+
     def __init_subclass__(cls, kind, **kwargs):
         cls.kind = kind
         cls._TESTS.append(cls)
@@ -25,6 +25,7 @@ class Test:
         self,
         index: int,
         name: str,
+        timestamps: Optional[ndarray] = None,
         time: Optional[ndarray] = None,
         stimulus: Optional[ndarray] = None,
         horizontal: Optional[ndarray] = None,
@@ -43,6 +44,11 @@ class Test:
         else:
             raise AttributeError('name must be of type str')
 
+        if timestamps is None or isinstance(timestamps, ndarray):
+            self._timestamps = timestamps
+        else:
+            raise AttributeError('timestamps must be of type ndarray or None')
+
         if time is None or isinstance(time, ndarray):
             self._time = time
         else:
@@ -56,7 +62,7 @@ class Test:
         if horizontal is None or isinstance(horizontal, ndarray):
             self._horizontal = horizontal
         else:
-            raise AttributeError('horizontal must be of type ndarray or None')        
+            raise AttributeError('horizontal must be of type ndarray or None')
 
         if vertical is None or isinstance(vertical, ndarray):
             self._vertical = vertical
@@ -91,6 +97,9 @@ class Test:
             'kind': type(self).kind,
             'properties': properties
         }
+        if self._timestamps is not None:
+            result['timestamps'] = f'{self._index:02}/timestamps.npz'
+
         if self._time is not None:
             result['time'] = f'{self._index:02}/time.npz'
 
@@ -152,6 +161,9 @@ class Test:
         self._absolute_velocities = {}
 
     def channel_samples(self, channel: Channel) -> Optional[ndarray]:
+        if channel == Channel.Timestamps:
+            return self._timestamps
+
         if channel == Channel.Time:
             return self._time
 
@@ -186,8 +198,8 @@ class Test:
 class SaccadicTest(Test, kind='Saccadic'):
 
     def __init__(
-        self, 
-        angle: int, 
+        self,
+        angle: int,
         fixation_duration: float,
         fixation_variability: float,
         saccades_count: int,
@@ -265,7 +277,7 @@ class SaccadicTest(Test, kind='Saccadic'):
         if self._horizontal_saccades is None:
             from saccrec.engine.identification import identify_saccades
             self._horizontal_saccades = identify_saccades(
-                test=self, 
+                test=self,
                 channel=Channel.Horizontal
             )
         return self._horizontal_saccades
@@ -273,6 +285,6 @@ class SaccadicTest(Test, kind='Saccadic'):
     def identify_saccades(self):
         from saccrec.engine.identification import identify_saccades
         self._horizontal_saccades = identify_saccades(
-            test=self, 
+            test=self,
             channel=Channel.Horizontal
         )
