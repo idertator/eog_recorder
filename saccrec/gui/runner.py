@@ -8,7 +8,7 @@ from saccrec import settings as SETTINGS
 from .player import StimulusPlayerWidget
 from .signals import SignalsWidget
 
-settings = QSettings()
+_settings = QSettings()
 
 
 class Runner(QObject):
@@ -30,7 +30,10 @@ class Runner(QObject):
         self._player = player
         self._signals = signals
 
-        self._recorder = None
+        port = _settings.value(SETTINGS.OPENBCI_PORT)
+        sampling_rate = _settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 1000)
+
+        self._recorder = OpenBCIRecorder(port=port, sampling_rate=sampling_rate)
 
         self._tests = None
         self._next_test = None
@@ -39,13 +42,13 @@ class Runner(QObject):
         self._stimulus = None
         self._output = None
         self._distance_to_subject = None
-
         self._tests = None
         self._record = None
 
         self._player.started.connect(self.on_player_started)
         self._player.stopped.connect(self.on_player_stopped)
         self._player.finished.connect(self.on_player_finished)
+        self._player.moved.connect(self.on_player_moved)
 
     def run(self, subject, stimulus, output, distance_to_subject, tests, **kwargs):
         self._subject = subject
@@ -54,11 +57,9 @@ class Runner(QObject):
         self._distance_to_subject = distance_to_subject
         self._tests = tests
 
-        self._recorder = None
-
         subject = Subject.from_json(subject)
 
-        sampling_rate = int(settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250))
+        sampling_rate = int(_settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250))
 
         hardware = Hardware(
             sample_rate=sampling_rate,
@@ -92,31 +93,25 @@ class Runner(QObject):
         if not self._signals.isVisible():
             self._signals.show()
 
-        if not self._signals.is_rendering:
-            openbci_port = settings.value(SETTINGS.OPENBCI_PORT)
-            openbci_sampling_rate = settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250)
+        if not self._recorder.is_alive():
+            self._recorder.start()
+            self._recorder.wait_until_ready()
 
-            self._recorder = OpenBCIRecorder(
-                self._settings,
-                openbci_port=openbci_port,
-                openbci_sampling_rate=openbci_sampling_rate,
-                tmp_folder=self._record.folder_for_test(self._next_test - 1)
-            )
+        if not self._signals.is_rendering:
             self._signals.start(self._recorder)
-            self._recorder.start_streaming()
+
+        test_filename = self._recorder.start_recording()
+        print(test_filename)
 
     def on_player_stopped(self):
         self._signals.stop()
-        self._recorder.stop_streaming()
+        self._recorder.stop_recording()
 
-        self._recorder = None
-
-        self._player.close_player()
         self.stopped.emit()
 
     def on_player_finished(self):
         self._signals.stop()
-        self._recorder.stop_streaming()
+        self._recorder.stop_recording()
 
         current_test = self._tests[self._next_test - 1]
         self._record.add_test(
@@ -137,8 +132,9 @@ class Runner(QObject):
                 '\n'.join([str(stimuli), _('Presione espacio para continuar')])
             )
         else:
-            self._recorder = None
-
             self._player.close_player()
             self._record.save(self._output)
             self.finished.emit()
+
+    def on_player_moved(self, position: int):
+        self._recorder.put_marker(position)

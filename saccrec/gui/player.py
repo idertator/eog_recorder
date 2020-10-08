@@ -17,6 +17,7 @@ class StimulusPlayerWidget(QWidget):
     started = pyqtSignal(float)
     stopped = pyqtSignal()
     finished = pyqtSignal()
+    moved = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(StimulusPlayerWidget, self).__init__(parent=parent)
@@ -35,9 +36,10 @@ class StimulusPlayerWidget(QWidget):
         self._timer.timeout.connect(self.on_timeout)
 
         self._start_time = 0
-        self._first_paint = None
 
         self._load_settings()
+
+        self._moved = None
 
     def _load_settings(self):
         ball_radius = float(settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, 0.5))
@@ -81,12 +83,18 @@ class StimulusPlayerWidget(QWidget):
     def on_timeout(self):
         elapsed = (time() - self._start_time) * 1000.0
         current_sample = ceil(elapsed / self._sampling_step)
+        previous_position = self._ball_position
         self._ball_position = self._stimuli.screen_position(current_sample)
-        self.update()
+
+        if previous_position != self._ball_position:
+            new_position = self._stimuli.position(current_sample)
+            self.update()
+            if new_position is not None:
+                self._moved = new_position.value
 
         if self._ball_position is None:
             self._timer.stop()
-            self.finished.emit()
+            self.stopped.emit()
 
     def paintEvent(self, event):
         painter = QPainter()
@@ -117,9 +125,9 @@ class StimulusPlayerWidget(QWidget):
 
         painter.end()
 
-        if self._first_paint is None and self._ball_position is not None:
-            self._first_paint = time()
-            print(f'Latency from player initialization: {self._first_paint - self._start_time}')
+        if self._moved is not None:
+            self.moved.emit(self._moved)
+            self._moved = None
 
     def keyPressEvent(self, event):
         if not self._timer.isActive() and event.key() == Qt.Key_Space:
@@ -127,4 +135,4 @@ class StimulusPlayerWidget(QWidget):
             self._start_stimulus()
         elif self._timer.isActive() and (event.modifiers() & Qt.ControlModifier) and event.key() == Qt.Key_C:
             self._timer.stop()
-            self.stopped.emit()
+            self.finished.emit()

@@ -94,11 +94,13 @@ class SaccadicStimuli(object):
         self._update_positions()
 
     def position(self, sample: int) -> StimulusPosition:
-        if self._channel[sample] < 0:
-            return StimulusPosition.Left
-        if self._channel[sample] > 0:
-            return StimulusPosition.Right
-        return StimulusPosition.Center
+        if sample < len(self._channel):
+            if self._channel[sample] < 0:
+                return StimulusPosition.Left
+            if self._channel[sample] > 0:
+                return StimulusPosition.Right
+            return StimulusPosition.Center
+        return None
 
     def screen_position(self, sample: int) -> QPoint:
         if self._left_ball is None or self._right_ball is None or self._center_ball is None:

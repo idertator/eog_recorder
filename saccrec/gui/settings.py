@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox, QCheckBox, QSpinBox
 
 from saccrec import settings as SETTINGS
 from saccrec.core import Settings
-from saccrec.engine.recording import list_ports
+from saccrec.engine.openbci import list_ports
 
 settings = QSettings()
 

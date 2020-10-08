@@ -50,25 +50,7 @@ if exists(pid_path):
         try:
             kill(pid, 0)
         except OSError:
-            from serial.serialutil import SerialException
-
-            from saccrec.engine.recording import initialize_board, close_board
-            from saccrec.engine.errors import BoardNotConnectedError
-            try:
-                from saccrec.settings import OPENBCI_SAMPLING_RATE
-                openbci_port = settings.value(OPENBCI_PORT)
-                openbci_sampling_rate = settings.value(OPENBCI_SAMPLING_RATE, 250)
-
-                board = initialize_board(
-                    settings=Settings(),
-                    openbci_port=openbci_port,
-                    sampling_rate=openbci_sampling_rate
-                )
-                close_board(board)
-            except BoardNotConnectedError:
-                BOARD_CONNECTED = False
-            except SerialException:
-                DONGLE_CONNECTED = False
+            pass
         else:
             print('Killed hanged process')
 

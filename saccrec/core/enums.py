@@ -42,9 +42,9 @@ class Channel(Enum):
 
 
 class StimulusPosition(IntEnum):
-    Left = -1
-    Center = 0
-    Right = 1
+    Left = 1
+    Center = 2
+    Right = 3
 
 
 class BoardTypes(Enum):
