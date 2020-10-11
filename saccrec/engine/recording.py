@@ -118,4 +118,3 @@ class OpenBCIRecorder(Process):
 
     def put_marker(self, label: int):
         self._command_queue.put(f'{CMD_MARKER}{label}')
-

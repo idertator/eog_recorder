@@ -1,36 +1,33 @@
-from os.path import exists, dirname
+from os.path import exists, dirname, join
 from typing import List
 
-from PyQt5.QtCore import pyqtSignal, Qt, QSettings
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QWizard, QWizardPage, QScrollArea, QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLineEdit, QTextEdit, QFileDialog, QPushButton
 
-from saccrec.core import Settings, Screen
+from saccrec.core import Screen
 from saccrec.core import Subject, Gender
 from saccrec.core.math import distance_to_subject
 from saccrec.engine.stimulus import SaccadicStimuli
-from saccrec import settings as SETTINGS
+from saccrec import settings
 
 from .subject import SubjectWidget
 from .stimulus import StimulusWidget, TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
-
-settings = QSettings()
 
 
 class RecordSetupWizard(QWizard):
     finished = pyqtSignal()
 
-    def __init__(self, settings: Settings, screen: Screen, parent=None):
+    def __init__(self, screen: Screen, parent=None):
         super(RecordSetupWizard, self).__init__(parent)
         self.setWizardStyle(QWizard.ClassicStyle)
 
-        self._settings = settings
         self._screen = screen
 
         self._subject_page = SubjectWizardPage(self)
-        self._stimulus_page = StimulusWizardPage(self._settings)
-        self._output_page = OutputWizardPage(self._subject_page, settings=settings, parent=self)
+        self._stimulus_page = StimulusWizardPage(self)
+        self._output_page = OutputWizardPage(self._subject_page, parent=self)
 
         self._tests = None
 
@@ -85,10 +82,13 @@ class RecordSetupWizard(QWizard):
         return self._subject_page.subject
 
     @property
+    def stimulus(self) -> dict:
+        return self._stimulus_page.json
+
+    @property
     def fixed_distance_to_subject(self) -> float:
-        distance = float(settings.value(SETTINGS.STIMULUS_SACCADIC_DISTANCE, 40))
         return distance_to_subject(
-            distance,
+            settings.stimuli.saccadic_distance,
             self._stimulus_page.max_angle
         )
 
@@ -205,11 +205,10 @@ class SubjectWizardPage(QWizardPage):
 
 class StimulusWizardPage(QWizardPage):
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, parent=None):
         super(StimulusWizardPage, self).__init__(parent)
 
         self.setTitle(_('Configuración del estímulo'))
-        self._settings = settings
 
         scroll_area = QScrollArea()
         scroll_area_widget = QWidget()
@@ -219,10 +218,14 @@ class StimulusWizardPage(QWizardPage):
         self.test_widget_list = list()
         test_layout = QVBoxLayout()
 
-        self.initial_calibration_test = InitialStimulusWidget(self._settings.tests.get('initial_calibration'), self.test_widget_list, test_layout)
+        self.initial_calibration_test = InitialStimulusWidget(
+            settings.tests.initial_calibration,
+            self.test_widget_list,
+            test_layout
+        )
         scroll_area_layout.addWidget(self.initial_calibration_test)
 
-        test_list = self._settings.tests.get('tests')
+        test_list = settings.tests.tests
         cont = 0
         for test in test_list:
             stimulus_widget = TestStimulusWidget(self.test_widget_list, test_layout, cont, test)
@@ -232,7 +235,9 @@ class StimulusWizardPage(QWizardPage):
 
         scroll_area_layout.addLayout(test_layout)
 
-        self.final_calibration_test = FinalStimulusWidget(self._settings.tests.get('final_calibration'))
+        self.final_calibration_test = FinalStimulusWidget(
+            settings.tests.final_calibration
+        )
         scroll_area_layout.addWidget(self.final_calibration_test)
 
         scroll_area.setWidgetResizable(True)
@@ -296,14 +301,13 @@ class StimulusWizardPage(QWizardPage):
                          self.final_calibration_test.angle))
 
     def save(self):
-        self._settings.tests = self.json
+        settings.tests.tests = self.json
 
 
 class OutputWizardPage(QWizardPage):
 
-    def __init__(self, subject_wizard_page: SubjectWizardPage, settings: Settings, parent=None):
+    def __init__(self, subject_wizard_page: SubjectWizardPage, parent=None):
         super(OutputWizardPage, self).__init__(parent=parent)
-        self._settings = settings
         self._subject_wizard_page = subject_wizard_page
 
         self.setTitle(_('Configuración de la salida'))
@@ -347,7 +351,7 @@ class OutputWizardPage(QWizardPage):
         output = QFileDialog.getSaveFileName(
             self,
             _('Seleccione fichero de salida'),
-            self._settings.output_dir + '/' + self._subject_wizard_page.subject_code,
+            join(settings.gui.records_path, self._subject_wizard_page.subject_code),
             filter=_('Archivo de SaccRec (*.rec)')
         )
         filepath = output[0]

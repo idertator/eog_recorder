@@ -1,17 +1,14 @@
 from enum import Enum
 
-from PyQt5.QtCore import QSize, Qt, QSettings
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QStackedWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QDialogButtonBox, QColorDialog, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QDialogButtonBox, QColorDialog, QPushButton, QMessageBox, QGroupBox
 from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox, QCheckBox, QSpinBox, QLabel, QDoubleSpinBox
 
-from saccrec import settings as SETTINGS
-from saccrec.core import Settings
+from saccrec import settings
 from saccrec.engine.openbci import list_ports
-
-settings = QSettings()
 
 
 class _Language(Enum):
@@ -28,7 +25,7 @@ class _Language(Enum):
 
 class _GUISettingsPage(QWidget):
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, parent=None):
         super(_GUISettingsPage, self).__init__(parent)
 
         self._initial_lang = None
@@ -47,16 +44,14 @@ class _GUISettingsPage(QWidget):
         self.load()
 
     def load(self):
-        lang = settings.value(SETTINGS.GUI_LANG, 'en')
-
-        self._initial_lang = lang
-        self._languages_combo.setCurrentText(_Language(lang).label)
+        self._initial_lang = settings.gui.lang
+        self._languages_combo.setCurrentText(_Language(self._initial_lang).label)
 
     def save(self):
         lang = str(self._languages_combo.currentData())
 
         if lang != self._initial_lang:
-            settings.setValue(SETTINGS.GUI_LANG, lang)
+            settings.gui.lang = lang
 
             answer = QMessageBox.question(
                 self,
@@ -72,58 +67,11 @@ class _GUISettingsPage(QWidget):
         return _('Interfaz de Usuario')
 
 
-class _OpenBCISettingsPage(QWidget):
-
-    def __init__(self, settings: Settings, parent=None):
-        super(_OpenBCISettingsPage, self).__init__(parent)
-        self._settings = settings
-
-        layout = QFormLayout()
-
-        self._openbci_ports_combo = QComboBox()
-        self._openbci_ports_combo.setDuplicatesEnabled(False)
-        for port in list_ports():
-            self._openbci_ports_combo.addItem(port, port)
-        layout.addRow(_('Puerto'), self._openbci_ports_combo)
-
-        self._openbci_sample_rate_combo = QComboBox()
-        self._openbci_sample_rate_combo.setDuplicatesEnabled(False)
-        for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
-            self._openbci_sample_rate_combo.addItem(f'{sr} Hz', sr)
-        layout.addRow(_('Frecuencia de muestreo'), self._openbci_sample_rate_combo)
-
-        self.load()
-        self.setLayout(layout)
-
-    def load(self):
-        openbci_port = settings.value(SETTINGS.OPENBCI_PORT)
-        openbci_sampling_rate = settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250)
-
-        if openbci_port is not None:
-            self._openbci_ports_combo.setCurrentText(str(openbci_port))
-        else:
-            self._openbci_ports_combo.setCurrentIndex(0)
-
-        self._openbci_sample_rate_combo.setCurrentText(f'{openbci_sampling_rate} Hz')
-
-    def save(self):
-        openbci_port = str(self._openbci_ports_combo.currentData())
-        openbci_sampling_rate = int(self._openbci_sample_rate_combo.currentData())
-
-        settings.setValue(SETTINGS.OPENBCI_PORT, openbci_port)
-        settings.setValue(SETTINGS.OPENBCI_SAMPLING_RATE, openbci_sampling_rate)
-
-    @property
-    def title(self) -> str:
-        return _('Configuración del OpenBCI')
-
-
 class _OpenBCIChannelWidget(QWidget):
 
-    def __init__(self, channel_number: int, settings: Settings, parent=None):
+    def __init__(self, channel_number: int, parent=None):
         super(_OpenBCIChannelWidget, self).__init__(parent)
         self._channel_number = channel_number
-        self._settings = settings
         self.setFixedHeight(100)
         self.setFixedWidth(120)
 
@@ -155,98 +103,83 @@ class _OpenBCIChannelWidget(QWidget):
         self._gain_label.setVisible(self._openbci_channel_activated_check.checkState())
 
     def load(self):
-        self._openbci_channel_activated_check.setChecked(self._settings.openbci_channels[self._channel_number][0])
-        self._gain_label.setVisible(self._openbci_channel_activated_check.isChecked())
-        self._openbci_channel_gain_edit.setVisible(self._openbci_channel_activated_check.isChecked())
-        self._openbci_channel_gain_edit.setValue(self._settings.openbci_channels[self._channel_number][1])
+        active = settings.hardware.channels[self._channel_number].active
+
+        self._openbci_channel_activated_check.setChecked(active)
+        self._gain_label.setVisible(active)
+        self._openbci_channel_gain_edit.setVisible(active)
+        self._openbci_channel_gain_edit.setValue(settings.hardware.channels[self._channel_number].gain)
 
     def save(self):
-        self._settings.openbci_channels[self._channel_number] = self._openbci_channel_activated_check.isChecked()
-        self._settings.openbci_channels[self._channel_number] = self._openbci_channel_gain_edit.value()
+        settings.hardware.channels[self._channel_number].active = self._openbci_channel_activated_check.isChecked()
+        settings.hardware.channels[self._channel_number].gain = self._openbci_channel_gain_edit.value()
 
 
-class _OpenBCIChannelsSettingsPage(QWidget):
+class _HardwarePage(QWidget):
 
-    def __init__(self, settings: Settings, parent=None):
-        super(_OpenBCIChannelsSettingsPage, self).__init__(parent)
-        self.channel_list = list()
-        self._settings = settings
+    def __init__(self, parent=None):
+        super(_HardwarePage, self).__init__(parent)
 
-        layout = QVBoxLayout()
+        form_layout = QFormLayout()
+        self._openbci_ports_combo = QComboBox()
+        self._openbci_ports_combo.setDuplicatesEnabled(False)
+        for port in list_ports():
+            self._openbci_ports_combo.addItem(port, port)
+        form_layout.addRow(_('Puerto'), self._openbci_ports_combo)
+
+        self._openbci_sample_rate_combo = QComboBox()
+        self._openbci_sample_rate_combo.setDuplicatesEnabled(False)
+        for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
+            self._openbci_sample_rate_combo.addItem(f'{sr} Hz', sr)
+        form_layout.addRow(_('Frecuencia de muestreo'), self._openbci_sample_rate_combo)
+
+        channels_group = QGroupBox(_('Canales'))
+        self._channel_list = []
+        channels_layout = QVBoxLayout()
         top_layout = QHBoxLayout()
         bottom_layout = QHBoxLayout()
         for i in range(8):
-            channel = _OpenBCIChannelWidget(i, self._settings)
-            self.channel_list.append(channel)
+            channel = _OpenBCIChannelWidget(i)
+            self._channel_list.append(channel)
             if i < 4:
                 top_layout.addWidget(channel)
             else:
                 bottom_layout.addWidget(channel)
 
-        layout.addLayout(top_layout)
-        layout.addLayout(bottom_layout)
+        channels_layout.addLayout(top_layout)
+        channels_layout.addLayout(bottom_layout)
+        channels_group.setLayout(channels_layout)
+
+        layout = QVBoxLayout()
+        layout.addLayout(form_layout)
+        layout.addWidget(channels_group)
+
+        layout.addStretch()
+
+        self.load()
         self.setLayout(layout)
 
     def load(self):
-        # channels = []
-        # for index in range(8):
-        #     channels.append({
-        #         'active': str(settings.value(SETTINGS.OPENBCI_CHANNEL_ACTIVE.format(index=index), '1')) == '1',
-        #         'gain': int(settings.value(SETTINGS.OPENBCI_CHANNEL_GAIN.format(index=index), 24)),
-        #     })
+        if (port := settings.hardware.port) != '':
+            self._openbci_ports_combo.setCurrentText(port)
+        else:
+            self._openbci_ports_combo.setCurrentIndex(0)
 
-        for channel in self.channel_list:
+        self._openbci_sample_rate_combo.setCurrentText(f'{settings.hardware.sampling_rate} Hz')
+
+        for channel in self._channel_list:
             channel.load()
 
     def save(self):
-        for channel in self.channel_list:
+        settings.hardware.port = str(self._openbci_ports_combo.currentData())
+        settings.hardware.sampling_rate = int(self._openbci_sample_rate_combo.currentData())
+
+        for channel in self._channel_list:
             channel.save()
 
     @property
     def title(self) -> str:
-        return _('Configuración de los canales del OpenBCI')
-
-
-class _ScreenSettingsPage(QWidget):
-
-    def __init__(self, settings: Settings = Settings, parent=None):
-        super(_ScreenSettingsPage, self).__init__(parent)
-
-        layout = QFormLayout()
-        self.setWindowTitle(_('Pantalla de estímulo'))
-        self._stimulus_screen_width_edit = QDoubleSpinBox()
-        self._stimulus_screen_width_edit.setMinimum(10.0)
-        self._stimulus_screen_width_edit.setMaximum(200.0)
-        self._stimulus_screen_width_edit.setFixedWidth(85)
-        self._stimulus_screen_width_edit.setSuffix(' cm')
-        layout.addRow(_('Ancho'), self._stimulus_screen_width_edit)
-
-        self._stimulus_screen_height_edit = QDoubleSpinBox()
-        self._stimulus_screen_height_edit.setMinimum(10.0)
-        self._stimulus_screen_height_edit.setMaximum(200.0)
-        self._stimulus_screen_height_edit.setFixedWidth(85)
-        self._stimulus_screen_height_edit.setSuffix(' cm')
-        layout.addRow(_('Alto'), self._stimulus_screen_height_edit)
-
-        self.setLayout(layout)
-
-    def load(self):
-        screen_width = float(settings.value(SETTINGS.STIMULUS_SCREEN_WIDTH, 47.5))
-        screen_height = float(settings.value(SETTINGS.STIMULUS_SCREEN_HEIGHT, 30.0))
-
-        self._stimulus_screen_width_edit.setValue(screen_width)
-        self._stimulus_screen_height_edit.setValue(screen_height)
-
-    def save(self):
-        screen_width = self._stimulus_screen_width_edit.value()
-        screen_height = self._stimulus_screen_height_edit.value()
-
-        settings.setValue(SETTINGS.STIMULUS_SCREEN_WIDTH, screen_width)
-        settings.setValue(SETTINGS.STIMULUS_SCREEN_HEIGHT, screen_height)
-
-    @property
-    def title(self):
-        return _('Configuración de pantalla')
+        return _('Configuración del Hardware')
 
 
 class ColorButton(QPushButton):
@@ -277,9 +210,35 @@ class ColorButton(QPushButton):
 
 class _StimulusSettingsPage(QWidget):
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, parent=None):
         super(_StimulusSettingsPage, self).__init__(parent)
-        layout = QFormLayout()
+
+        screen_size_group = QGroupBox(_('Tamaño Pantalla'))
+        screen_size_layout = QHBoxLayout()
+
+        screen_size_layout.addWidget(QLabel(_('Ancho')))
+
+        self._stimulus_screen_width_edit = QDoubleSpinBox()
+        self._stimulus_screen_width_edit.setMinimum(10.0)
+        self._stimulus_screen_width_edit.setMaximum(200.0)
+        self._stimulus_screen_width_edit.setFixedWidth(85)
+        self._stimulus_screen_width_edit.setSuffix(' cm')
+        screen_size_layout.addWidget(self._stimulus_screen_width_edit)
+
+        screen_size_layout.addWidget(QLabel(_('Alto')))
+
+        self._stimulus_screen_height_edit = QDoubleSpinBox()
+        self._stimulus_screen_height_edit.setMinimum(10.0)
+        self._stimulus_screen_height_edit.setMaximum(200.0)
+        self._stimulus_screen_height_edit.setFixedWidth(85)
+        self._stimulus_screen_height_edit.setSuffix(' cm')
+        screen_size_layout.addWidget(self._stimulus_screen_height_edit)
+
+        screen_size_layout.addStretch()
+
+        screen_size_group.setLayout(screen_size_layout)
+
+        form_layout = QFormLayout()
 
         self._stimulus_saccadic_distance_edit = QDoubleSpinBox()
         self._stimulus_saccadic_distance_edit.setFixedWidth(85)
@@ -287,48 +246,47 @@ class _StimulusSettingsPage(QWidget):
         self._stimulus_saccadic_distance_edit.setMaximum(198.0)
         self._stimulus_saccadic_distance_edit.setSuffix(' cm')
 
-        layout.addRow(_('Distancia máxima de estímulo sacádico *'), self._stimulus_saccadic_distance_edit)
+        form_layout.addRow(_('Distancia máxima de estímulo sacádico *'), self._stimulus_saccadic_distance_edit)
 
         self._stimulus_saccadic_ball_radius_edit = QDoubleSpinBox()
         self._stimulus_saccadic_ball_radius_edit.setFixedWidth(85)
         self._stimulus_saccadic_ball_radius_edit.setMinimum(0.1)
         self._stimulus_saccadic_ball_radius_edit.setMaximum(1.0)
         self._stimulus_saccadic_ball_radius_edit.setSuffix(' cm')
-        layout.addRow(_('Radio del estímulo sacádico'), self._stimulus_saccadic_ball_radius_edit)
+        form_layout.addRow(_('Radio del estímulo sacádico'), self._stimulus_saccadic_ball_radius_edit)
 
         self._stimulus_saccadic_ball_color_select = ColorButton()
-        layout.addRow(_('Color del estímulo'), self._stimulus_saccadic_ball_color_select)
+        form_layout.addRow(_('Color del estímulo'), self._stimulus_saccadic_ball_color_select)
 
         self._stimulus_saccadic_background_color_select = ColorButton()
-        layout.addRow(_('Color de fondo'), self._stimulus_saccadic_background_color_select)
+        form_layout.addRow(_('Color de fondo'), self._stimulus_saccadic_background_color_select)
 
-        layout.addRow('', QLabel())
-        layout.addRow('', QLabel())
-        layout.addRow(QLabel(_('* Define la distancia entre los puntos de estímulo para la prueba con mayor ángulo de estimulación')))
+        form_layout.addRow('', QLabel())
+        form_layout.addRow('', QLabel())
+        form_layout.addRow(QLabel(_('* Define la distancia entre los puntos de estímulo para la prueba con mayor ángulo de estimulación')))
+
+        layout = QVBoxLayout()
+        layout.addWidget(screen_size_group)
+        layout.addLayout(form_layout)
+        layout.addStretch()
 
         self.setLayout(layout)
 
     def load(self):
-        distance = float(settings.value(SETTINGS.STIMULUS_SACCADIC_DISTANCE, 40.0))
-        ball_radius = float(settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, 0.5))
-        ball_color = settings.value(SETTINGS.STIMULUS_SACCADIC_BALL_COLOR, QColor(255, 255, 255))
-        back_color = settings.value(SETTINGS.STIMULUS_BACKGROUND_COLOR, QColor(0, 0, 0))
-
-        self._stimulus_saccadic_distance_edit.setValue(distance)
-        self._stimulus_saccadic_ball_radius_edit.setValue(ball_radius)
-        self._stimulus_saccadic_ball_color_select.setColor(ball_color)
-        self._stimulus_saccadic_background_color_select.setColor(back_color)
+        self._stimulus_screen_width_edit.setValue(settings.stimuli.screen_width)
+        self._stimulus_screen_height_edit.setValue(settings.stimuli.screen_height)
+        self._stimulus_saccadic_distance_edit.setValue(settings.stimuli.saccadic_distance)
+        self._stimulus_saccadic_ball_radius_edit.setValue(settings.stimuli.ball_radius)
+        self._stimulus_saccadic_ball_color_select.setColor(settings.stimuli.ball_color)
+        self._stimulus_saccadic_background_color_select.setColor(settings.stimuli.back_color)
 
     def save(self):
-        distance = self._stimulus_saccadic_distance_edit.value()
-        ball_radius = self._stimulus_saccadic_ball_radius_edit.value()
-        ball_color = self._stimulus_saccadic_ball_color_select.value()
-        back_color = self._stimulus_saccadic_background_color_select.value()
-
-        settings.setValue(SETTINGS.STIMULUS_SACCADIC_DISTANCE, distance)
-        settings.setValue(SETTINGS.STIMULUS_SACCADIC_BALL_RADIUS, ball_radius)
-        settings.setValue(SETTINGS.STIMULUS_SACCADIC_BALL_COLOR, ball_color)
-        settings.setValue(SETTINGS.STIMULUS_BACKGROUND_COLOR, back_color)
+        settings.stimuli.screen_width = self._stimulus_screen_width_edit.value()
+        settings.stimuli.screen_height = self._stimulus_screen_height_edit.value()
+        settings.stimuli.saccadic_distance = self._stimulus_saccadic_distance_edit.value()
+        settings.stimuli.ball_radius = self._stimulus_saccadic_ball_radius_edit.value()
+        settings.stimuli.ball_color = self._stimulus_saccadic_ball_color_select.value()
+        settings.stimuli.back_color = self._stimulus_saccadic_background_color_select.value()
 
     @property
     def title(self):
@@ -337,9 +295,8 @@ class _StimulusSettingsPage(QWidget):
 
 class SettingsDialog(QDialog):
 
-    def __init__(self, settings: Settings, parent=None):
+    def __init__(self, parent=None):
         super(SettingsDialog, self).__init__(parent=parent)
-        self._settings = settings
 
         self.contentsWidget = QListWidget()
         self.contentsWidget.setFlow(QListView.TopToBottom)
@@ -352,11 +309,9 @@ class SettingsDialog(QDialog):
         self.adjustSize()
 
         self.pagesWidget = QStackedWidget()
-        self.pagesWidget.addWidget(_GUISettingsPage(self._settings))
-        self.pagesWidget.addWidget(_OpenBCISettingsPage(self._settings))
-        self.pagesWidget.addWidget(_OpenBCIChannelsSettingsPage(self._settings))
-        self.pagesWidget.addWidget(_ScreenSettingsPage(self._settings))
-        self.pagesWidget.addWidget(_StimulusSettingsPage(self._settings))
+        self.pagesWidget.addWidget(_GUISettingsPage())
+        self.pagesWidget.addWidget(_HardwarePage())
+        self.pagesWidget.addWidget(_StimulusSettingsPage())
         self.contentsWidget.setCurrentRow(0)
 
         # MENUS
@@ -369,16 +324,6 @@ class SettingsDialog(QDialog):
         self.contentsWidget.addItem(openbci_button)
         openbci_button.setTextAlignment(Qt.AlignHCenter)
         openbci_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-
-        channel_button = QListWidgetItem(QIcon(':channels.svg'), _('Canales'))
-        self.contentsWidget.addItem(channel_button)
-        channel_button.setTextAlignment(Qt.AlignHCenter)
-        channel_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-
-        screen_button = QListWidgetItem(QIcon(':screen.svg'), _('Pantalla'))
-        self.contentsWidget.addItem(screen_button)
-        screen_button.setTextAlignment(Qt.AlignHCenter)
-        screen_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
         stimulus_button = QListWidgetItem(QIcon(':stimuli.svg'), _('Estímulo'))
         self.contentsWidget.addItem(stimulus_button)

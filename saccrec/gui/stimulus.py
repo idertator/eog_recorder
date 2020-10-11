@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QGroupBox, QLabel
 from PyQt5.QtWidgets import QSpinBox, QDoubleSpinBox
 
-from saccrec.consts import DEFAULT_TEST
+from saccrec.settings import DEFAULT_TEST
 
 
 class StimulusWidget(QGroupBox):
@@ -177,7 +177,14 @@ class InitialStimulusWidget(StimulusWidget):
 
 class TestStimulusWidget(StimulusWidget):
 
-    def __init__(self, wizard_list: list, wizard_layout: QVBoxLayout, position=0, data: dict = DEFAULT_TEST,parent=None):
+    def __init__(
+        self,
+        wizard_list: list,
+        wizard_layout: QVBoxLayout,
+        position: int = 0,
+        data: dict = DEFAULT_TEST,
+        parent=None
+    ):
         super(TestStimulusWidget, self).__init__(data, wizard_list, wizard_layout, parent)
         self.setTitle('{test_name} {angle} \u00B0'.format(
             test_name=_('Prueba sacádica a'),

@@ -3,5 +3,21 @@ from .enums import Channel, StimulusPosition, BoardTypes, BoardModes, SampleRate
 from .formats import Record
 
 from .screen import Screen
-from .settings import Settings
 from .study import Study, Subject, Test, SaccadicTest, Saccade
+
+__all__ = [
+    'Gender',
+    'SubjectStatus',
+    'Channel',
+    'StimulusPosition',
+    'BoardTypes',
+    'BoardModes',
+    'SampleRates',
+    'Record',
+    'Screen',
+    'Study',
+    'Subject',
+    'Test',
+    'SaccadicTest',
+    'Saccade',
+]

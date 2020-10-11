@@ -3,13 +3,11 @@ from random import randint
 
 from numpy import array, int8, zeros, ones, hstack
 
-from PyQt5.QtCore import QPoint, QSettings
+from PyQt5.QtCore import QPoint
 
-from saccrec.core import Settings, Screen, StimulusPosition
+from saccrec.core import Screen, StimulusPosition
 from saccrec.core.math import points_distance
-from saccrec import settings as SETTINGS
-
-settings = QSettings()
+from saccrec import settings
 
 
 class SaccadicStimuli(object):
@@ -49,9 +47,7 @@ class SaccadicStimuli(object):
         self._right_ball = None
         self._cm_to_pixels_x = 1.0
 
-        sampling_rate = int(settings.value(SETTINGS.OPENBCI_SAMPLING_RATE, 250))
-
-        samples = floor(fixation_duration * sampling_rate)
+        samples = floor(fixation_duration * settings.hardware.sampling_rate)
         delta = floor(((fixation_variability / 100.0) * samples) / 2)
 
         durations = [randint(samples - delta, samples + delta) for _ in range(saccades_count + 2)]
@@ -75,7 +71,7 @@ class SaccadicStimuli(object):
     def _update_positions(self):
         distance = points_distance(self._distance_to_subject, self._angle)
 
-        cm_width = float(settings.value(SETTINGS.STIMULUS_SCREEN_WIDTH, 47.5))
+        cm_width = settings.stimuli.screen_width
         cm_center = cm_width / 2
         cm_delta = distance / 2
         self._cm_to_pixels_x = self._screen.secondary_screen_rect.width() / cm_width

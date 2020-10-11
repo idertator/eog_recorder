@@ -1,5 +1,4 @@
 from PyQt5.QtCore import QObject, QRect
-from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import qApp
 
 
@@ -7,7 +6,7 @@ class Screen(QObject):
 
     def __init__(self, parent=None):
         super(Screen, self).__init__(parent=parent)
-        
+
         self._screen_count = None
         self._primary_screen_rect = None
         self._secondary_screen_rect = None
@@ -22,7 +21,7 @@ class Screen(QObject):
         self._primary_screen_rect = qApp.desktop().screenGeometry(0)
         if self._screen_count > 1:
             self._secondary_screen_rect = qApp.desktop().screenGeometry(1)
-        else: 
+        else:
             self._secondary_screen_rect = qApp.desktop().screenGeometry(0)
 
     @property

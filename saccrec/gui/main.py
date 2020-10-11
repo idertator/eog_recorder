@@ -1,7 +1,10 @@
+from os.path import join
+
 from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
 
-from saccrec.core import Settings, Screen
+from saccrec.core import Screen
+from saccrec import settings
 
 import saccrec.gui.icons  # noqa: F401
 
@@ -18,26 +21,22 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self._settings = Settings(self)
         self._screen = Screen(self)
 
         self._signals_widget = SignalsWidget(self)
         self._signals_widget.setVisible(False)
 
         self._new_record_wizard = RecordSetupWizard(
-            settings=self._settings,
             screen=self._screen,
             parent=self
         )
         self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
 
-        self._settings_dialog = SettingsDialog(self._settings, self)
+        self._settings_dialog = SettingsDialog(self)
         self._about_dialog = None
         self._stimulus_player = StimulusPlayerWidget(None)
 
         self._runner = Runner(
-            settings=self._settings,
-            screen=self._screen,
             player=self._stimulus_player,
             signals=self._signals_widget,
             parent=self
@@ -108,7 +107,17 @@ class MainWindow(QMainWindow):
         self._new_action.setEnabled(False)
         self._settings_action.setEnabled(False)
 
-        self._runner.run(**self._new_record_wizard.json)
+        wizard = self._new_record_wizard
+
+        self._runner.run(
+            subject=wizard.subject,
+            stimulus=wizard.stimulus,
+            output=wizard.output_path,
+            distance_to_subject=wizard.fixed_distance_to_subject,
+            tests=wizard.tests
+        )
+
+        # self._runner.run(**self._new_record_wizard.json)
 
     def open_settings_dialog(self):
         self._settings_dialog.open()
@@ -129,7 +138,7 @@ class MainWindow(QMainWindow):
             output = QFileDialog.getSaveFileName(
                 self,
                 _('Seleccione fichero de salida'),
-                self._settings.output_dir + '/' + self._new_record_wizard.subject_page.subject_code,
+                join(settings.gui.records_path, self._new_record_wizard.subject_page.subject_code),
                 filter='Microsoft Excel (*.xls)'
             )
             filepath = output[0]

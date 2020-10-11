@@ -2,8 +2,8 @@ from typing import Optional, Union
 
 from datetime import date, datetime
 
-from saccrec.consts import DATE_FORMAT
 from saccrec.core import Gender, SubjectStatus
+from saccrec.settings import DATE_FORMAT
 
 
 _FULL_NAME_FIELD = 'full_name'

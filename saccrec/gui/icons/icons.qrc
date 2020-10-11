@@ -9,9 +9,7 @@
         <file>help.svg</file>
         <file>settings.svg</file>
         <file>openbci.png</file>
-        <file>screen.svg</file>
         <file>stimuli.svg</file>
-        <file>channels.svg</file>
         <file>gui.svg</file>
     </qresource>
 </RCC>

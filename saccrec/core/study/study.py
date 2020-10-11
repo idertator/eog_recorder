@@ -6,12 +6,12 @@ from zipfile import ZipFile
 
 from numpy import load as array_load, savez_compressed
 
-from saccrec.consts import DATETIME_FORMAT
 from saccrec.core.enums import Channel
+from saccrec.settings import DATETIME_FORMAT
 
 from .hardware import Hardware
 from .subject import Subject
-from .tests import Test, SaccadicTest
+from .tests import Test
 
 
 class Study:

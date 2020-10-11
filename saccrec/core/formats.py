@@ -1,14 +1,12 @@
 from datetime import datetime
+from io import BytesIO
 from json import dumps
-from os import makedirs
-from os.path import join, exists, dirname
-from shutil import rmtree
-from tempfile import mkdtemp
+from os.path import join
 from zipfile import ZipFile
 
-from numpy import array, savez_compressed
+from numpy import array, int32, mean, savez_compressed
 
-from saccrec.consts import DATETIME_FORMAT
+from saccrec.settings import DATETIME_FORMAT
 from saccrec.core.models import Subject, Hardware
 
 
@@ -28,48 +26,15 @@ class Record:
 
         self._tests = []
 
-        self._folder = mkdtemp(prefix='saccrec-')
-
     def add_test(
         self,
-        stimulus: array,
+        filename: str,
         **properties
     ):
-        current_index = len(self._tests)
-
-        data = {
+        self._tests.append({
+            'filename': filename,
             'properties': properties,
-        }
-
-        if stimulus is not None:
-            path = f'{current_index:02}/stimulus.npz'
-            full_path = join(self._folder, path)
-            if not exists(dirname(full_path)):
-                makedirs(dirname(full_path))
-            savez_compressed(full_path, stimulus=stimulus)
-            data['stimulus'] = path
-
-        path = f'{current_index:02}/timestamps.npz'
-        full_path = join(self._folder, path)
-        if exists(full_path):
-            data['timestamps'] = path
-
-        path = f'{current_index:02}/time.npz'
-        full_path = join(self._folder, path)
-        if exists(full_path):
-            data['time'] = path
-
-        path = f'{current_index:02}/horizontal.npz'
-        full_path = join(self._folder, path)
-        if exists(full_path):
-            data['horizontal'] = path
-
-        path = f'{current_index:02}/vertical.npz'
-        full_path = join(self._folder, path)
-        if exists(full_path):
-            data['vertical'] = path
-
-        self._tests.append(data)
+        })
 
     @property
     def manifest_json(self) -> dict:
@@ -83,29 +48,67 @@ class Record:
             'tests': self._tests,
         }
 
-    def folder_for_test(self, test_index: int) -> str:
-        path = join(self._folder, f'{test_index:02}')
-        if not exists(path):
-            makedirs(path)
-        return path
+    def _read_openbci_sd_file(path: str) -> tuple[array, array, array]:
+        def mV(sample: str) -> int:
+            return int(f'0x{sample}', 0)
 
-    def save(self, filepath: str):
+        current_stimulus = 2
+
+        horizontal, vertical, stimulus = [], [], []
+        with open(path, 'rt') as f:
+            for line in f:
+                components = line.strip().split(',')
+                if len(components) == 12:
+                    horizontal.append(mV(components[1]))
+                    vertical.append(mV(components[2]))
+
+                    sample_stimulus = components[-3]
+                    if sample_stimulus[-1] != '0':
+                        current_stimulus = int(sample_stimulus[-1])
+
+                    stimulus.append({
+                        1: 1,
+                        2: 0,
+                        3: -1,
+                    }[current_stimulus])
+
+        horizontal = array(horizontal, dtype=int32)[1:]
+        horizontal -= int(mean(horizontal))
+
+        vertical = array(vertical, dtype=int32)[1:]
+        vertical -= int(mean(vertical))
+
+        stimulus = array(stimulus, dtype=int32)[1:]
+        stimulus *= max((horizontal.max(), abs(horizontal.min())))
+
+        return horizontal, vertical, stimulus
+
+    def save(self, filepath: str, sd_path: str = None):
+        if sd_path is not None:
+            channels = []
+            for index, test in enumerate(self._tests):
+                sd_file_path = join(sd_path, test['filename'])
+                horizontal, vertical, stimulus = self._read_openbci_sd_file(sd_file_path)
+
+                channels.append({
+                    'horizontal': horizontal,
+                    'vertical': vertical,
+                    'stimulus': stimulus,
+                })
+
+                test['channels'] = {
+                    'horizontal': f'{index:02}/horizontal.npz',
+                    'vertical': f'{index:02}/vertical.npz',
+                    'stimulus': f'{index:02}/stimulus.npz',
+                }
+
         with ZipFile(filepath, mode='w') as out:
             manifest = dumps(self.manifest_json, indent=4)
             out.writestr('manifest.json', manifest)
 
-            for test in self._tests:
-                for channel in (
-                    'timestamps',
-                    'stimulus',
-                    'time',
-                    'horizontal',
-                    'vertical',
-                    'annotations',
-                ):
-                    if channel in test:
-                        full_path = join(self._folder, test[channel])
-                        out.write(full_path, test[channel])
-
-    def close(self):
-        rmtree(self._folder, ignore_errors=True)
+            if sd_path is not None:
+                for test, test_channels in zip(self._tests, channels):
+                    for channel, channel_path in test['channels'].items():
+                        channel_buffer = BytesIO()
+                        savez_compressed(channel_buffer, data=test_channels[channel])
+                        out.writestr(channel_path, channel_buffer.read())

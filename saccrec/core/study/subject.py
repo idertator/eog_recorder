@@ -1,8 +1,8 @@
 from datetime import datetime, date
 from typing import Union, Optional
 
-from saccrec.consts import DATE_FORMAT
 from saccrec.core.enums import Gender, SubjectStatus
+from saccrec.settings import DATE_FORMAT
 
 
 class Subject:
