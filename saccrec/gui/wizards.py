@@ -225,7 +225,7 @@ class StimulusWizardPage(QWizardPage):
         )
         scroll_area_layout.addWidget(self.initial_calibration_test)
 
-        test_list = settings.tests.tests
+        test_list = settings.tests.tests['tests']
         cont = 0
         for test in test_list:
             stimulus_widget = TestStimulusWidget(self.test_widget_list, test_layout, cont, test)

@@ -1,4 +1,5 @@
 from typing import List
+from json import loads
 from os.path import expanduser, join
 
 from PyQt5.QtCore import QSettings
@@ -196,7 +197,9 @@ class _TestsSettings:
 
     @property
     def initial_calibration(self) -> dict:
-        return dict(_settings.value('Test/InitialCalibration', DEFAULT_TEST))
+        if (json := _settings.value('Test/InitialCalibration', None)) is not None:
+            return loads(json)
+        return DEFAULT_TEST
 
     @initial_calibration.setter
     def initial_calibration(self, value: dict):
@@ -204,7 +207,9 @@ class _TestsSettings:
 
     @property
     def test_stimulus(self) -> List[dict]:
-        return list(_settings.value('Test/TestStimulus', [DEFAULT_TEST]))
+        if (json := _settings.value('Test/TestStimulus', None)) is not None:
+            return loads(json)
+        return [DEFAULT_TEST]
 
     @test_stimulus.setter
     def test_stimulus(self, value: List[dict]):
@@ -212,7 +217,9 @@ class _TestsSettings:
 
     @property
     def final_calibration(self) -> dict:
-        return dict(_settings.value('Test/FinalCalibration', DEFAULT_TEST))
+        if (json := _settings.value('Test/FinalCalibration', None)) is not None:
+            return loads(json)
+        return DEFAULT_TEST
 
     @final_calibration.setter
     def final_calibration(self, value: dict):
