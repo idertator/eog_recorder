@@ -1,8 +1,8 @@
 from datetime import datetime, date
 from typing import Union, Optional
 
+from saccrec import settings
 from saccrec.core.enums import Gender, SubjectStatus
-from saccrec.settings import DATE_FORMAT
 
 
 class Subject:
@@ -34,7 +34,7 @@ class Subject:
             self._status = SubjectStatus.Unknown
 
         if isinstance(borndate, str):
-            self._borndate = datetime.strptime(borndate, DATE_FORMAT).date()
+            self._borndate = datetime.strptime(borndate, settings.DATE_FORMAT).date()
         elif isinstance(borndate, datetime):
             self._borndate = borndate.date()
         elif isinstance(borndate, date):
@@ -50,7 +50,7 @@ class Subject:
             'full_name': self._name,
             'gender': self._gender.value,
             'status': self._status.value,
-            'borndate': self._borndate.strftime(DATE_FORMAT) if self._borndate is not None else None,
+            'borndate': self._borndate.strftime(settings.DATE_FORMAT) if self._borndate is not None else None,
         }
 
     @property
@@ -97,7 +97,7 @@ class Subject:
     @borndate.setter
     def borndate(self, value: Optional[Union[str, date, datetime]]):
         if isinstance(value, str):
-            self._borndate = datetime.strptime(value, DATE_FORMAT).date()
+            self._borndate = datetime.strptime(value, settings.DATE_FORMAT).date()
         elif isinstance(value, datetime):
             self._borndate = value.date()
         elif isinstance(value, date):

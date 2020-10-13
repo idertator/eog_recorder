@@ -1,6 +1,6 @@
 from typing import Optional, Union, List
 
-from saccrec.core import BoardTypes, BoardModes, SampleRates
+from saccrec.core import SampleRates
 
 
 _BOARD_FIELD = 'board'
@@ -9,9 +9,9 @@ _CHANNELS_FIELDS = 'channels'
 
 
 class Hardware:
-    
+
     def __init__(
-        self, 
+        self,
         sample_rate: Optional[Union[SampleRates, str]] = None,
         channels: List[dict] = list()
     ):

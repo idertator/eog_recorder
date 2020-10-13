@@ -2,8 +2,8 @@ from typing import Optional, Union
 
 from datetime import date, datetime
 
+from saccrec import settings
 from saccrec.core import Gender, SubjectStatus
-from saccrec.settings import DATE_FORMAT
 
 
 _FULL_NAME_FIELD = 'full_name'
@@ -29,7 +29,7 @@ class Subject:
             self._gender = gender
 
         if isinstance(borndate, str):
-            self._gender = datetime.strptime(borndate, DATE_FORMAT)
+            self._gender = datetime.strptime(borndate, settings.DATE_FORMAT)
         else:
             self._borndate = borndate
 
@@ -81,7 +81,7 @@ class Subject:
         return {
             _FULL_NAME_FIELD: self.full_name,
             _GENDER_FIELD: self._gender.value if self._gender is not None else None,
-            _BORNDATE_FIELD: self.borndate.strftime(DATE_FORMAT),
+            _BORNDATE_FIELD: self.borndate.strftime(settings.DATE_FORMAT),
             _STATUS_FIELD: self.status.value if self._status is not None else None,
         }
 

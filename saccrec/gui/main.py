@@ -3,7 +3,6 @@ from os.path import join
 from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
 
-from saccrec.core import Screen
 from saccrec import settings
 
 import saccrec.gui.icons  # noqa: F401
@@ -21,15 +20,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self._screen = Screen(self)
-
         self._signals_widget = SignalsWidget(self)
         self._signals_widget.setVisible(False)
 
-        self._new_record_wizard = RecordSetupWizard(
-            screen=self._screen,
-            parent=self
-        )
+        self._new_record_wizard = RecordSetupWizard(parent=self)
         self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
 
         self._settings_dialog = SettingsDialog(self)

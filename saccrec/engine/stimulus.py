@@ -5,7 +5,7 @@ from numpy import array, int8, zeros, ones, hstack
 
 from PyQt5.QtCore import QPoint
 
-from saccrec.core import Screen, StimulusPosition
+from saccrec.core import StimulusPosition
 from saccrec.core.math import points_distance
 from saccrec import settings
 
@@ -14,7 +14,6 @@ class SaccadicStimuli(object):
 
     def __init__(
         self,
-        screen: Screen,
         distance_to_subject: float,
         angle: int,
         fixation_duration: float,
@@ -25,7 +24,6 @@ class SaccadicStimuli(object):
         """Constructor
 
         Args:
-            screen: (saccrec.core.Screen): Screen object
             distance_to_subject (float): Distance to the subject in cm
             angle (int): Stimuli angle
             fixation_duration (float): Mean fixation duration in seconds
@@ -33,7 +31,6 @@ class SaccadicStimuli(object):
             saccades_count (int): Amounts of saccades to generate
             test_name (str): Name of the stimulation pattern
         """
-        self._screen = screen
         self._distance_to_subject = distance_to_subject
 
         self._angle = angle
@@ -74,13 +71,13 @@ class SaccadicStimuli(object):
         cm_width = settings.stimuli.screen_width
         cm_center = cm_width / 2
         cm_delta = distance / 2
-        self._cm_to_pixels_x = self._screen.secondary_screen_rect.width() / cm_width
+        self._cm_to_pixels_x = settings.screen.secondary_screen_rect.width() / cm_width
 
         left_x = (cm_center - cm_delta) * self._cm_to_pixels_x
         right_x = (cm_center + cm_delta) * self._cm_to_pixels_x
         center_x = (left_x + right_x) / 2
 
-        y = self._screen.secondary_screen_rect.center().y()
+        y = settings.screen.secondary_screen_rect.center().y()
 
         self._left_ball = QPoint(left_x, y)
         self._center_ball = QPoint(center_x, y)

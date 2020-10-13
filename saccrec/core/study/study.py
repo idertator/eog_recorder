@@ -6,8 +6,8 @@ from zipfile import ZipFile
 
 from numpy import load as array_load, savez_compressed
 
+from saccrec import settings
 from saccrec.core.enums import Channel
-from saccrec.settings import DATETIME_FORMAT
 
 from .hardware import Hardware
 from .subject import Subject
@@ -35,7 +35,7 @@ class Study:
             raise AttributeError('version must be of type int')
 
         if isinstance(recorded_at, str):
-            self._recorded_at = datetime.strptime(recorded_at, DATETIME_FORMAT)
+            self._recorded_at = datetime.strptime(recorded_at, settings.DATETIME_FORMAT)
         elif isinstance(recorded_at, datetime):
             self._recorded_at = recorded_at
         else:
@@ -58,7 +58,7 @@ class Study:
         return {
             'version': self._version,
             'record': {
-                'datetime': self._recorded_at.strftime(DATETIME_FORMAT)
+                'datetime': self._recorded_at.strftime(settings.DATETIME_FORMAT)
             },
             'hardware': self._hardware.__json__(),
             'processing': {

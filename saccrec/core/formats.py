@@ -6,7 +6,7 @@ from zipfile import ZipFile
 
 from numpy import array, int32, mean, savez_compressed
 
-from saccrec.settings import DATETIME_FORMAT
+from saccrec import settings
 from saccrec.core.models import Subject, Hardware
 
 
@@ -41,7 +41,7 @@ class Record:
         return {
             'version': _CURRENT_VERSION,
             'record': {
-                'datetime': self._datetime.strftime(DATETIME_FORMAT)
+                'datetime': self._datetime.strftime(settings.DATETIME_FORMAT)
             },
             'subject': self._subject.json,
             'hardware': self._hardware.json,
