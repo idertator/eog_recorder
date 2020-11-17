@@ -1,7 +1,8 @@
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from saccrec.core import Record
-from saccrec.core.models import Subject, Hardware
+from saccrec.core.study import Subject
+from saccrec.core.models import Hardware
 from saccrec.engine.recording import OpenBCIRecorder
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec import settings
@@ -46,7 +47,6 @@ class Runner(QObject):
 
     def run(
         self,
-        subject: Subject,
         stimulus: dict,
         output: str,
         distance_to_subject: float,
@@ -58,8 +58,9 @@ class Runner(QObject):
         self._distance_to_subject = distance_to_subject
         self._tests_stimuli = tests_stimuli
 
+        from saccrec.core import workspace
         self._record = Record(
-            subject=subject,
+            subject=workspace.subject,
             hardware=Hardware(
                 sample_rate=settings.hardware.sampling_rate,
                 channels=settings.hardware.channels.json

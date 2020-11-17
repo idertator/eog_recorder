@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
 
 from saccrec import settings
+from saccrec.core import initialize_workspace
 
 import saccrec.gui.icons  # noqa: F401
 
@@ -12,7 +13,6 @@ from .player import StimulusPlayerWidget
 from .runner import Runner
 from .settings import SettingsDialog
 from .signals import SignalsWidget
-from .wizards import RecordSetupWizard
 
 
 class MainWindow(QMainWindow):
@@ -20,11 +20,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
+        self._workspace = initialize_workspace(self)
+
         self._signals_widget = SignalsWidget(self)
         self._signals_widget.setVisible(False)
 
-        self._new_record_wizard = RecordSetupWizard(parent=self)
-        self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
+        self._new_record_wizard = None
 
         self._settings_dialog = SettingsDialog(self)
         self._about_dialog = None
@@ -95,6 +96,12 @@ class MainWindow(QMainWindow):
         self.show()
 
     def on_new_test_wizard_clicked(self):
+        if self._new_record_wizard is None:
+            from .wizards import RecordSetupWizard
+
+            self._new_record_wizard = RecordSetupWizard(parent=self)
+            self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
+
         self._new_record_wizard.show()
 
     def on_new_test_wizard_finished(self):
@@ -104,14 +111,11 @@ class MainWindow(QMainWindow):
         wizard = self._new_record_wizard
 
         self._runner.run(
-            subject=wizard.subject,
             stimulus=wizard.stimulus,
             output=wizard.output_path,
             distance_to_subject=wizard.fixed_distance_to_subject,
             tests=wizard.tests
         )
-
-        # self._runner.run(**self._new_record_wizard.json)
 
     def open_settings_dialog(self):
         self._settings_dialog.open()
@@ -129,10 +133,11 @@ class MainWindow(QMainWindow):
         )
 
         if report == QMessageBox.Yes:
+            subject = self._workspace.subject
             output = QFileDialog.getSaveFileName(
                 self,
                 _('Seleccione fichero de salida'),
-                join(settings.gui.records_path, self._new_record_wizard.subject_page.subject_code),
+                join(settings.gui.records_path, subject.code),
                 filter='Microsoft Excel (*.xls)'
             )
             filepath = output[0]

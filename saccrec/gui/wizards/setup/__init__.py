@@ -3,7 +3,7 @@ from typing import List
 from PyQt5 import QtCore, QtWidgets
 
 from saccrec import settings
-from saccrec.core import Subject
+from saccrec.core import workspace
 from saccrec.core.math import distance_to_subject
 from saccrec.engine.stimulus import SaccadicStimuli
 
@@ -50,14 +50,6 @@ class RecordSetupWizard(QtWidgets.QWizard):
         self.resize(640, 480)
 
         self.button(QtWidgets.QWizard.FinishButton).clicked.connect(self.finish_wizard)
-
-    @property
-    def subject_code(self) -> str:
-        return self._subject_page.subject_code
-
-    @property
-    def subject(self) -> Subject:
-        return self._subject_page.subject
 
     @property
     def stimulus(self) -> dict:

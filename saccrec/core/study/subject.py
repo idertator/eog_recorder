@@ -1,120 +1,160 @@
-from datetime import datetime, date
+from datetime import date
 from typing import Union, Optional
 
+from PyQt5 import QtCore, QtWidgets
+
 from saccrec import settings
-from saccrec.core.enums import Gender, SubjectStatus
+from saccrec.core import Gender, SubjectStatus
 
 
-class Subject:
+class Subject(QtWidgets.QWidget):
+    nameChanged = QtCore.pyqtSignal(str)
 
     def __init__(
         self,
-        name: str = 'Unknown',
-        gender: Union[str, Gender] = Gender.Unknown,
-        status: Union[str, SubjectStatus] = SubjectStatus.Unknown,
-        borndate: Optional[Union[str, date, datetime]] = None
+        name: str = '',
+        gender: Union[int, Gender] = Gender.Unknown,
+        status: Union[int, SubjectStatus] = SubjectStatus.Unknown,
+        borndate: Optional[Union[str, date]] = None,
+        parent=None
     ):
-        if isinstance(name, str):
-            self._name = name
-        else:
-            self._name = 'Unknown'
+        super(Subject, self).__init__(parent=parent)
 
-        if isinstance(gender, str):
-            self._gender = Gender(gender)
-        elif isinstance(gender, Gender):
-            self._gender = gender
-        else:
-            self._gender = Gender.Unknown
+        self._setup_ui()
 
-        if isinstance(status, str):
-            self._status = SubjectStatus(status)
-        elif isinstance(status, SubjectStatus):
-            self._status = status
-        else:
-            self._status = SubjectStatus.Unknown
+        self.name = name
+        self.gender = gender
+        self.status = status
 
-        if isinstance(borndate, str):
-            self._borndate = datetime.strptime(borndate, settings.DATE_FORMAT).date()
-        elif isinstance(borndate, datetime):
-            self._borndate = borndate.date()
-        elif isinstance(borndate, date):
-            self._borndate = borndate
-        else:
-            self._borndate = None
+    def _setup_ui(self):
+        layout = QtWidgets.QFormLayout(self)
 
-    def __str__(self) -> str:
-        return self._name
+        self._name_edit = QtWidgets.QLineEdit()
+        self._name_edit.textChanged.connect(self.on_name_changed)
+        layout.addRow(_('Nombre(s)'), self._name_edit)
 
-    def __json__(self) -> dict:
-        return {
-            'full_name': self._name,
-            'gender': self._gender.value,
-            'status': self._status.value,
-            'borndate': self._borndate.strftime(settings.DATE_FORMAT) if self._borndate is not None else None,
-        }
+        self._gender_combo = QtWidgets.QComboBox()
+        for gender in Gender:
+            self._gender_combo.addItem(gender.label, gender.value)
+        layout.addRow(_('Género'), self._gender_combo)
+
+        self._borndate_edit = QtWidgets.QDateEdit()
+        self._borndate_edit.setCalendarPopup(True)
+        self._borndate_edit.setDisplayFormat('dd/MM/yyyy')
+        layout.addRow(_('Fecha de nacimiento'), self._borndate_edit)
+
+        self._status_combo = QtWidgets.QComboBox()
+        for status in SubjectStatus:
+            self._status_combo.addItem(status.label, status.value)
+        layout.addRow(_('Estado'), self._status_combo)
+
+        self.setLayout(layout)
+
+    def reset(self):
+        self._name_edit.setText('')
+        self._gender_combo.setCurrentIndex(0)
+        self._borndate_edit.setDate(QtCore.QDate(2000, 1, 1))
+        self._status_combo.setCurrentIndex(0)
 
     @property
     def name(self) -> str:
-        return self._name
+        return self._name_edit.text()
 
     @name.setter
     def name(self, value: str):
-        if isinstance(value, str):
-            self._name = value
-        else:
-            raise AttributeError('name must be of type str')
+        initial_value = self._name_edit.text()
+        if value != initial_value:
+            self._name_edit.setText(value)
+            self.nameChanged.emit(value)
 
     @property
     def gender(self) -> Gender:
-        return self._gender
+        return Gender(self._gender_combo.currentData())
 
     @gender.setter
     def gender(self, value: Union[int, Gender]):
         if isinstance(value, int):
-            self._gender = Gender(value)
-        elif isinstance(value, Gender):
-            self._gender = value
-        else:
-            raise AttributeError('gender must be of type str or type Gender')
+            self._gender_combo.setCurrentText(Gender(value).label)
+        elif isinstance(value, SubjectStatus):
+            self._gender_combo.setCurrentText(value.label)
 
     @property
     def status(self) -> SubjectStatus:
-        return self._status
+        return SubjectStatus(self._status_combo.currentData())
 
     @status.setter
-    def status(self, value: Union[str, SubjectStatus]):
-        if isinstance(value, str):
-            self._status = SubjectStatus(value)
+    def status(self, value: Union[int, SubjectStatus]):
+        if isinstance(value, int):
+            self._status_combo.setCurrentText(SubjectStatus(value).label)
         elif isinstance(value, SubjectStatus):
-            self._status = value
-        else:
-            raise AttributeError('status must be of type str or type SubjectStatus')
+            self._status_combo.setCurrentText(value.label)
 
     @property
     def borndate(self) -> date:
-        return self._borndate
+        return self._borndate_edit.date().toPyDate()
 
     @borndate.setter
-    def borndate(self, value: Optional[Union[str, date, datetime]]):
-        if isinstance(value, str):
-            self._borndate = datetime.strptime(value, settings.DATE_FORMAT).date()
-        elif isinstance(value, datetime):
-            self._borndate = value.date()
-        elif isinstance(value, date):
-            self._borndate = value
+    def borndate(self, value: Union[str, date]):
+        if isinstance(borndate, str):
+            value = datetime.strptime(borndate, settings.DATE_FORMAT).date()
+
+        if value is not None:
+            qdate = QtCore.QDate(value.year, value.month, value.day)
         else:
-            raise AttributeError('borndate must be of type str, type datetime or type date')
+            qdate = QtCore.QDate(2000, 1, 1)
+
+        self._borndate_edit.setDate(qdate)
+
+    @property
+    def json(self) -> dict:
+        return {
+            'name': self.name,
+            'gender': self.gender.value,
+            'status': self.status.value,
+            'borndate': self.borndate.strftime(settings.DATE_FORMAT),
+        }
 
     @property
     def age(self) -> int:
         today = date.today()
-        if self._borndate is not None:
-            years = today.year - self._borndate.year
-            if today.month > self._borndate.month:
+        if self.borndate is not None:
+            years = today.year - self.borndate.year
+            if today.month > self.borndate.month:
                 return years + 1
-            if today.month < self._borndate.year:
+            if today.month < self.borndate.year:
                 return years
-            if today.day >= self._borndate.day:
+            if today.day >= self.borndate.day:
                 return years + 1
             return years
         return 0
+
+    @property
+    def code(self) -> str:
+        def int_to_str(data: int) -> str:
+            if int(data) < 10:
+                return '0' + str(data)
+            if len(str(data)) > 2:
+                return str(data)[2:4]
+            return str(data)
+
+        name = self.name.upper().strip().split(' ')
+        while len(name) > 3:
+            name.remove(name[1])
+        initials = ''
+        if len(name) == 1:
+            initials = name[0][0:3]
+        else:
+            for text in name:
+                initials += text[0]
+
+        borndate = self.borndate
+
+        day = int_to_str(borndate.day)
+        month = int_to_str(borndate.month)
+        year = int_to_str(borndate.year)
+        return initials + day + month + year
+
+    def on_name_changed(self):
+        value = self._name_edit.text()
+        self.nameChanged.emit(value)
+

@@ -3,6 +3,7 @@ from os.path import dirname, exists, join
 from PyQt5 import QtCore, QtWidgets
 
 from saccrec import settings
+from saccrec.core import workspace
 
 
 class OutputWizardPage(QtWidgets.QWizardPage):
@@ -48,10 +49,11 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         self.completeChanged.emit()
 
     def on_output_select_clicked(self):
+        subject = workspace.subject
         output = QtWidgets.QFileDialog.getSaveFileName(
             self,
             _('Seleccione fichero de salida'),
-            join(settings.gui.records_path, self.parent().subject_code),
+            join(settings.gui.records_path, subject.code),
             filter=_('Archivo de SaccRec (*.rec)')
         )
         filepath = output[0]

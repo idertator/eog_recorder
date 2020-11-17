@@ -7,7 +7,8 @@ from zipfile import ZipFile
 from numpy import array, int32, mean, savez_compressed
 
 from saccrec import settings
-from saccrec.core.models import Subject, Hardware
+from saccrec.core.study import Subject
+from saccrec.core.models import Hardware
 
 
 _CURRENT_VERSION = 1
