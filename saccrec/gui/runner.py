@@ -1,8 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from saccrec.core import Record
-from saccrec.core.study import Subject
-from saccrec.core.models import Hardware
+from saccrec.core.study import Hardware, Subject
 from saccrec.engine.recording import OpenBCIRecorder
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec import settings

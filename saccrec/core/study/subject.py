@@ -30,7 +30,7 @@ class Subject(QtWidgets.QWidget):
         layout = QtWidgets.QFormLayout(self)
 
         self._name_edit = QtWidgets.QLineEdit()
-        self._name_edit.textChanged.connect(self.on_name_changed)
+        self._name_edit.textChanged.connect(self._on_name_changed)
         layout.addRow(_('Nombre(s)'), self._name_edit)
 
         self._gender_combo = QtWidgets.QComboBox()
@@ -154,7 +154,7 @@ class Subject(QtWidgets.QWidget):
         year = int_to_str(borndate.year)
         return initials + day + month + year
 
-    def on_name_changed(self):
+    def _on_name_changed(self):
         value = self._name_edit.text()
         self.nameChanged.emit(value)
 

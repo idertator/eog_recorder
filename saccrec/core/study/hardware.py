@@ -4,7 +4,7 @@ from saccrec.core.enums import SampleRates
 
 
 class _Channel:
-    
+
     def __init__(self, index: int, active: bool, gain: int = 24):
         if isinstance(index, int):
             self._index = index
@@ -27,7 +27,7 @@ class _Channel:
             'active': self._active,
             'gain': self._gain,
         }
-    
+
     @property
     def index(self) -> int:
         return self._index
@@ -82,5 +82,5 @@ class Hardware:
     def channels(self) -> Channels:
         return self._channels
 
-    
+
 

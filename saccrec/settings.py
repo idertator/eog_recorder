@@ -1,6 +1,7 @@
 from typing import List
 from json import loads
 from os.path import expanduser, join
+from typing import Optional
 
 from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QColor
@@ -42,6 +43,14 @@ class _GUISettings:
     @records_path.setter
     def records_path(self, value: str):
         _settings.setValue('GUI/RecordsPath', value)
+
+    @property
+    def current_protocol(self) -> Optional[str]:
+        return _settings.value('GUI/CurrentProtocol', None)
+
+    @current_protocol.setter
+    def current_protocol(self, value: str):
+        _settings.setValue('GUI/CurrentProtocol', value)
 
 
 gui = _GUISettings()
