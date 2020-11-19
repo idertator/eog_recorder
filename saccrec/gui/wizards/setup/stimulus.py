@@ -26,9 +26,6 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
 
         self.setLayout(layout)
 
-        self.setButtonText(QtWidgets.QWizard.CustomButton1, 'Load')
-        self.setButtonText(QtWidgets.QWizard.CustomButton2, 'Save')
-
     @property
     def html(self) -> str:
         text = '<h4>{title}</h4>'.format(
