@@ -59,7 +59,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
     def fixed_distance_to_subject(self) -> float:
         return distance_to_subject(
             settings.stimuli.saccadic_distance,
-            self._stimulus_page.max_angle
+            workspace.protocol.max_angle
         )
 
     @property

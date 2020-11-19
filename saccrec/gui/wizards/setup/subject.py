@@ -7,14 +7,16 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
 
     def __init__(self, parent):
         super(SubjectWizardPage, self).__init__(parent)
+        self.setup_ui()
 
+    def setup_ui(self):
         self.setTitle(_('Datos del sujeto'))
-
-        layout = QtWidgets.QVBoxLayout()
 
         self._subject = workspace.subject
         self._subject.setParent(self)
         self._subject.nameChanged.connect(self.on_name_changed)
+
+        layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self._subject)
 
         self.setLayout(layout)

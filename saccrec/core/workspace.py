@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtWidgets
 
-from saccrec.core.study import Subject
+from saccrec.core.study import Subject, Protocol
 
 
 class Workspace(QtCore.QObject):
@@ -11,7 +11,12 @@ class Workspace(QtCore.QObject):
         self._main_window = main_window
 
         self._subject = Subject()
+        self._protocol = Protocol()
 
     @property
     def subject(self) -> Subject:
         return self._subject
+
+    @property
+    def protocol(self) -> Protocol:
+        return self._protocol

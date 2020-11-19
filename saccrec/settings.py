@@ -45,6 +45,16 @@ class _GUISettings:
         _settings.setValue('GUI/RecordsPath', value)
 
     @property
+    def protocols_path(self) -> str:
+        homedir = expanduser('~')
+        default_path = join(self.records_path, 'protocols')
+        return _settings.value('GUI/ProtocolsPath', default_path)
+
+    @protocols_path.setter
+    def protocols_path(self, value: str):
+        _settings.setValue('GUI/ProtocolsPath', value)
+
+    @property
     def current_protocol(self) -> Optional[str]:
         return _settings.value('GUI/CurrentProtocol', None)
 

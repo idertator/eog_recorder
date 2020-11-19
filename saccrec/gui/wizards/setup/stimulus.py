@@ -1,7 +1,8 @@
 from PyQt5 import QtWidgets
 
 from saccrec import settings
-from saccrec.gui.stimulus import StimulusWidget, TestStimulusWidget, InitialStimulusWidget, FinalStimulusWidget
+from saccrec.core import workspace
+from saccrec.core.study import Stimulus
 
 
 _TEST_HTML = '''<p>{name} {of_str} <b>{angle}&#176;</b> {with_str} <b>{saccades_count}</b> {saccades_str}.
@@ -12,64 +13,35 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
 
     def __init__(self, parent):
         super(StimulusWizardPage, self).__init__(parent)
+        self.setup_ui()
 
+    def setup_ui(self):
         self.setTitle(_('Configuración del estímulo'))
 
-        scroll_area = QtWidgets.QScrollArea()
-        scroll_area_widget = QtWidgets.QWidget()
-        scroll_area_layout = QtWidgets.QVBoxLayout()
+        self._protocol = workspace.protocol
+        self._protocol.setParent(self)
 
         layout = QtWidgets.QVBoxLayout()
-        self.test_widget_list = list()
-        test_layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self._protocol)
 
-        self.initial_calibration_test = InitialStimulusWidget(
-            settings.tests.initial_calibration,
-            self.test_widget_list,
-            test_layout
-        )
-        scroll_area_layout.addWidget(self.initial_calibration_test)
-
-        test_list = settings.tests.tests['tests']
-        cont = 0
-        for test in test_list:
-            stimulus_widget = TestStimulusWidget(self.test_widget_list, test_layout, cont, test)
-            test_layout.addWidget(stimulus_widget)
-            self.test_widget_list.append(stimulus_widget)
-            cont += 1
-
-        scroll_area_layout.addLayout(test_layout)
-
-        self.final_calibration_test = FinalStimulusWidget(
-            settings.tests.final_calibration
-        )
-        scroll_area_layout.addWidget(self.final_calibration_test)
-
-        scroll_area.setWidgetResizable(True)
-        scroll_area_widget.setLayout(scroll_area_layout)
-        scroll_area.setWidget(scroll_area_widget)
-        layout.addWidget(scroll_area)
         self.setLayout(layout)
+
+        self.setButtonText(QtWidgets.QWizard.CustomButton1, 'Load')
+        self.setButtonText(QtWidgets.QWizard.CustomButton2, 'Save')
 
     @property
     def html(self) -> str:
         text = '<h4>{title}</h4>'.format(
             title=_('Estímulos')
         )
-        text += self._test_to_html(self.initial_calibration_test)
-        for test in self.test_widget_list:
+        for test in self._protocol:
             text += self._test_to_html(test)
-        text += self._test_to_html(self.final_calibration_test)
         return text
 
     @staticmethod
-    def _test_to_html(test: StimulusWidget) -> str:
-        name = test.test_name
-        if type(test) is TestStimulusWidget:
-            name = _('Prueba sacádica')
-
+    def _test_to_html(test: Stimulus) -> str:
         return _TEST_HTML.format(
-            name=name,
+            name=test.name,
             of_str=_('a'),
             angle=test.angle,
             with_str=_('con'),
@@ -84,20 +56,4 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
 
     @property
     def json(self) -> dict:
-        json = {
-            'initial_calibration': self.initial_calibration_test.json,
-            'final_calibration': self.final_calibration_test.json,
-        }
-        test_list = list()
-        for test in self.test_widget_list:
-            test_list.append(test.json)
-        json.setdefault('tests', test_list)
-        return json
-
-    @property
-    def max_angle(self) -> float:
-        return float(max(max(test.angle for test in self.test_widget_list), self.initial_calibration_test.angle,
-                         self.final_calibration_test.angle))
-
-    def save(self):
-        settings.tests.tests = self.json
+        return self._protocol.json

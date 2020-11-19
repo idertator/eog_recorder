@@ -18,7 +18,7 @@ class Stimulus(QtWidgets.QGroupBox):
         enabled: bool = True,
         parent=None
     ):
-        super(StimulusWidget, self).__init__(parent=parent)
+        super(Stimulus, self).__init__(parent=parent)
 
         self._index = index
         self._name = name
@@ -26,12 +26,12 @@ class Stimulus(QtWidgets.QGroupBox):
         self._can_remove = can_remove
         self._enabled = enabled
 
+        self.setup_ui()
+
         self.angle = angle
         self.fixation_duration = fixation_duration
         self.fixation_variability = fixation_variability
         self.saccades_count = saccades_count
-
-        self.setup_ui()
 
     def setup_ui(self):
         self.setTitle(self._name)
@@ -49,6 +49,7 @@ class Stimulus(QtWidgets.QGroupBox):
         self._angle_edit.setFixedWidth(60)
         self._angle_edit.setToolTip(_('Ángulo'))
         self._angle_edit.setEnabled(self._enabled)
+        self._angle_edit.valueChanged.connect(self._on_angle_value_changed)
         element_layout = QtWidgets.QVBoxLayout()
         element_layout.addWidget(QtWidgets.QLabel(_('Ángulo')))
         element_layout.addWidget(self._angle_edit)
@@ -95,24 +96,27 @@ class Stimulus(QtWidgets.QGroupBox):
             self.cancel_widget_button = QtWidgets.QPushButton('-')
             self.cancel_widget_button.setFixedWidth(20)
             self.cancel_widget_button.setFixedHeight(20)
-            self.cancel_widget_button.pressed.connect(self.on_remove_pressed)
+            self.cancel_widget_button.pressed.connect(self._on_remove_pressed)
             layout.addWidget(self.cancel_widget_button)
 
-        if sel._can_add:
+        if self._can_add:
             self._add_widget_button = QtWidgets.QPushButton('+')
             self._add_widget_button.setFixedWidth(20)
             self._add_widget_button.setFixedHeight(20)
-            self._add_widget_button.pressed.connect(self.on_add_pressed)
+            self._add_widget_button.pressed.connect(self._on_add_pressed)
             layout.addWidget(self._add_widget_button)
 
         self.setAlignment(QtCore.Qt.AlignBottom)
         self.setLayout(layout)
 
-    def on_remove_pressed(self):
+    def _on_remove_pressed(self):
         self.removePressed.emit(self._index)
 
-    def on_add_pressed(self):
+    def _on_add_pressed(self):
         self.addPressed.emit(self._index)
+
+    def _on_angle_value_changed(self, value: int):
+        self.angle = value
 
     @property
     def index(self) -> int:
@@ -136,7 +140,8 @@ class Stimulus(QtWidgets.QGroupBox):
 
     @angle.setter
     def angle(self, value: int):
-        self._name = _('Prueba sacádica a {angle}\u00B0').format(angle=value)
+        if self._enabled:
+            self._name = _('Prueba sacádica a {angle}\u00B0').format(angle=value)
         self.setTitle(self._name)
         self._angle_edit.setValue(value)
 
