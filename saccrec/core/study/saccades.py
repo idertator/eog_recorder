@@ -26,7 +26,7 @@ class Saccade:
         self._sampling_interval = test.study.sampling_interval
 
     def __str__(self) -> str:
-        return _('Saccade: {onset} -> {offset}').format(
+        return _('Sácada: {onset} -> {offset}').format(
             onset=self.onset,
             offset=self.offset
         )
@@ -63,4 +63,3 @@ class Saccade:
         max_velocity = abs_velocities[self._onset:self._offset].max()
         scale = self._test.study.channel_calibration(self._channel) * 1000.0
         return max_velocity * scale
-

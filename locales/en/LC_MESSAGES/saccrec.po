@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: saccrec\n"
-"POT-Creation-Date: 2020-11-19 23:57+0100\n"
-"PO-Revision-Date: 2020-11-20 00:09+0100\n"
+"POT-Creation-Date: 2020-11-21 18:44+0100\n"
+"PO-Revision-Date: 2020-11-21 18:45+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -43,79 +43,83 @@ msgstr "Presymptomatic"
 msgid "SCA2"
 msgstr "SCA2"
 
-#: saccrec/core/study/protocol.py:35
+#: saccrec/core/study/protocol.py:36
 msgid "Prueba de calibración horizontal inicial"
 msgstr "Initial Horizontal Calibration Test"
 
-#: saccrec/core/study/protocol.py:47
+#: saccrec/core/study/protocol.py:48
 msgid "Prueba sacádica a 30\\u00B0"
 msgstr "30\\u00B0 saccadic test"
 
-#: saccrec/core/study/protocol.py:59
+#: saccrec/core/study/protocol.py:60
 msgid "Prueba de calibración horizontal final"
 msgstr "Final Horizontal Calibration Test"
 
-#: saccrec/core/study/protocol.py:130
+#: saccrec/core/study/protocol.py:135
 msgid "Abrir"
 msgstr "Open"
 
-#: saccrec/core/study/protocol.py:134
+#: saccrec/core/study/protocol.py:139
 msgid "Guardar"
 msgstr "Save"
 
-#: saccrec/core/study/protocol.py:164
+#: saccrec/core/study/protocol.py:169
 msgid "Abrir fichero de protocolo"
 msgstr "Open protocol file"
 
-#: saccrec/core/study/protocol.py:166 saccrec/core/study/protocol.py:186
+#: saccrec/core/study/protocol.py:171 saccrec/core/study/protocol.py:191
 msgid "Archivo de Protocolo (*.json)"
 msgstr "Protocol File (*.json)"
 
-#: saccrec/core/study/protocol.py:180
+#: saccrec/core/study/protocol.py:185
 msgid "SinNombre.json"
 msgstr "Unnamed.json"
 
-#: saccrec/core/study/protocol.py:184
+#: saccrec/core/study/protocol.py:189
 msgid "Guardar fichero de protocolo"
 msgstr "Save protocol file"
 
+#: saccrec/core/study/saccades.py:29
+#, python-brace-format
+msgid "Sácada: {onset} -> {offset}"
+msgstr "Saccade: {onset} -> {offset}"
+
 #: saccrec/core/study/stimulus.py:50 saccrec/core/study/stimulus.py:54
-#: saccrec/gui/stimulus.py:30 saccrec/gui/stimulus.py:32
 msgid "Ángulo"
 msgstr "Angle"
 
-#: saccrec/core/study/stimulus.py:60 saccrec/gui/stimulus.py:38
+#: saccrec/core/study/stimulus.py:60
 msgid " seg"
 msgstr " sec"
 
-#: saccrec/core/study/stimulus.py:62 saccrec/gui/stimulus.py:40
+#: saccrec/core/study/stimulus.py:62
 msgid "Duración de fijaciones"
 msgstr "Fixation duration"
 
-#: saccrec/core/study/stimulus.py:65 saccrec/gui/stimulus.py:42
+#: saccrec/core/study/stimulus.py:65
 msgid "T. Fijación"
 msgstr "Fixation time"
 
-#: saccrec/core/study/stimulus.py:74 saccrec/gui/stimulus.py:51
+#: saccrec/core/study/stimulus.py:74
 msgid "Variabilidad de fijaciones"
 msgstr "Fixation variability"
 
-#: saccrec/core/study/stimulus.py:77 saccrec/gui/stimulus.py:53
+#: saccrec/core/study/stimulus.py:77
 msgid "Variabilidad"
 msgstr "Variability"
 
-#: saccrec/core/study/stimulus.py:86 saccrec/gui/stimulus.py:62
+#: saccrec/core/study/stimulus.py:86
 msgid "Cantidad de sácadas"
 msgstr "Saccades count"
 
-#: saccrec/core/study/stimulus.py:89 saccrec/gui/stimulus.py:64
+#: saccrec/core/study/stimulus.py:89
 msgid "Cantidad"
 msgstr "Amount"
 
 #: saccrec/core/study/stimulus.py:144
 #, python-brace-format
-msgid "Prueba sacádica a {angle}\\u00B0"
-msgstr "{angle}\\u00B0 saccadic test"
+msgid "Prueba sacádica a {angle}"
+msgstr "Saccadic test of {angle}"
 
 #: saccrec/core/study/subject.py:34
 msgid "Nombre(s)"
@@ -177,7 +181,7 @@ msgstr "Option"
 msgid "¿Desea generar un reporte sacádico?"
 msgstr "Do you wish to generate a saccadic report?"
 
-#: saccrec/gui/main.py:139 saccrec/gui/wizards/setup/output.py:55
+#: saccrec/gui/main.py:139 saccrec/gui/wizards.py:101
 msgid "Seleccione fichero de salida"
 msgstr "Select an output file"
 
@@ -305,97 +309,80 @@ msgstr "Horizontal Channel"
 msgid "Canal Vertical"
 msgstr "Vertical Channel"
 
-#: saccrec/gui/stimulus.py:167
-msgid "Prueba de Calibración Horizontal Inicial"
-msgstr "Initial Horizontal Calibration Test"
-
-#: saccrec/gui/stimulus.py:190 saccrec/gui/stimulus.py:205
-msgid "Prueba sacádica a"
-msgstr "Saccadic test of"
-
-#: saccrec/gui/stimulus.py:213
-msgid "Prueba de Calibración Horizontal Final"
-msgstr "Final Horizontal Calibration Test"
-
-#: saccrec/gui/wizards/setup/__init__.py:49
-msgid "Configuración de nuevo registro"
-msgstr "Setup new record"
-
-#: saccrec/gui/wizards/setup/__init__.py:100
-msgid "Resumen"
-msgstr "Summary"
-
-#: saccrec/gui/wizards/setup/__init__.py:103
-msgid "Notas importantes"
-msgstr "Important notes"
-
-#: saccrec/gui/wizards/setup/__init__.py:104
-msgid "Distancia del sujeto a la pantalla"
-msgstr "Distance of the subject to the screen"
-
-#: saccrec/gui/wizards/setup/output.py:14
-msgid "Configuración de la salida"
-msgstr "Output settings"
-
-#: saccrec/gui/wizards/setup/output.py:24
-msgid "Seleccionar"
-msgstr "Select"
-
-#: saccrec/gui/wizards/setup/output.py:57
-msgid "Archivo de SaccRec (*.rec)"
-msgstr "SaccRec File (*.rec)"
-
-#: saccrec/gui/wizards/setup/stimulus.py:19
-msgid "Configuración del estímulo"
-msgstr "Stimuli settings"
-
-#: saccrec/gui/wizards/setup/stimulus.py:35
-msgid "Estímulos"
-msgstr "Stimuli"
-
-#: saccrec/gui/wizards/setup/stimulus.py:45
-msgid "a"
-msgstr "of"
-
-#: saccrec/gui/wizards/setup/stimulus.py:47
-msgid "con"
-msgstr "with"
-
-#: saccrec/gui/wizards/setup/stimulus.py:49
-msgid "sácadas"
-msgstr "saccades"
-
-#: saccrec/gui/wizards/setup/stimulus.py:50
-msgid "La duración media de las fijaciones es de"
-msgstr "The mean duration of fixations is"
-
-#: saccrec/gui/wizards/setup/stimulus.py:52
-msgid "segundos"
-msgstr "seconds"
-
-#: saccrec/gui/wizards/setup/stimulus.py:53
-msgid "con una variabilidad del"
-msgstr "with a variability of"
-
-#: saccrec/gui/wizards/setup/subject.py:13
+#: saccrec/gui/wizards.py:16
 msgid "Datos del sujeto"
 msgstr "Subject info"
 
-#: saccrec/gui/wizards/setup/subject.py:33
-msgid "persona nacida el"
-msgstr "person born at"
+#: saccrec/gui/wizards.py:41
+msgid "Configuración del estímulo"
+msgstr "Stimuli settings"
 
-#: saccrec/gui/wizards/setup/subject.py:34
-msgid "hombre nacido el"
-msgstr "male born at"
+#: saccrec/gui/wizards.py:61
+msgid "Configuración de la salida"
+msgstr "Output settings"
 
-#: saccrec/gui/wizards/setup/subject.py:35
-msgid "mujer nacida el"
-msgstr "female born at"
+#: saccrec/gui/wizards.py:71
+msgid "Seleccionar"
+msgstr "Select"
 
-#: saccrec/gui/wizards/setup/subject.py:43
-msgid "Sujeto"
-msgstr "Subject"
+#: saccrec/gui/wizards.py:103
+msgid "Archivo de SaccRec (*.rec)"
+msgstr "SaccRec File (*.rec)"
+
+#: saccrec/gui/wizards.py:122
+msgid "Configuración de nuevo registro"
+msgstr "Setup new record"
+
+#~ msgid "Prueba de Calibración Horizontal Inicial"
+#~ msgstr "Initial Horizontal Calibration Test"
+
+#~ msgid "Prueba sacádica a"
+#~ msgstr "Saccadic test of"
+
+#~ msgid "Prueba de Calibración Horizontal Final"
+#~ msgstr "Final Horizontal Calibration Test"
+
+#~ msgid "Resumen"
+#~ msgstr "Summary"
+
+#~ msgid "Notas importantes"
+#~ msgstr "Important notes"
+
+#~ msgid "Distancia del sujeto a la pantalla"
+#~ msgstr "Distance of the subject to the screen"
+
+#~ msgid "Estímulos"
+#~ msgstr "Stimuli"
+
+#~ msgid "a"
+#~ msgstr "of"
+
+#~ msgid "con"
+#~ msgstr "with"
+
+#~ msgid "sácadas"
+#~ msgstr "saccades"
+
+#~ msgid "La duración media de las fijaciones es de"
+#~ msgstr "The mean duration of fixations is"
+
+#~ msgid "segundos"
+#~ msgstr "seconds"
+
+#~ msgid "con una variabilidad del"
+#~ msgstr "with a variability of"
+
+#~ msgid "persona nacida el"
+#~ msgstr "person born at"
+
+#~ msgid "hombre nacido el"
+#~ msgstr "male born at"
+
+#~ msgid "mujer nacida el"
+#~ msgstr "female born at"
+
+#~ msgid "Sujeto"
+#~ msgstr "Subject"
 
 #~ msgid "Error"
 #~ msgstr "Error"

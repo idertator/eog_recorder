@@ -141,7 +141,7 @@ class Stimulus(QtWidgets.QGroupBox):
     @angle.setter
     def angle(self, value: int):
         if self._enabled:
-            self._name = _('Prueba sacádica a {angle}\u00B0').format(angle=value)
+            self._name = _('Prueba sacádica a {angle}').format(angle=f'{value}\u00B0')
         self.setTitle(self._name)
         self._angle_edit.setValue(value)
 
