@@ -1,4 +1,5 @@
 from json import load, dump
+from math import radians, tan
 from os import makedirs
 from os.path import join, exists
 
@@ -252,3 +253,9 @@ class Protocol(QtWidgets.QWidget):
                 for test in self._stimuli
             )
         )
+
+    @property
+    def distance_to_subject(self) -> float:
+        distance = settings.stimuli.saccadic_distance
+        angle = self.max_angle
+        return (distance / 2.0) / tan(radians(angle / 2.0))

@@ -1,6 +1,6 @@
 from os.path import dirname, exists, join
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
 
 from saccrec import settings
 from saccrec.core import workspace
@@ -27,10 +27,9 @@ class OutputWizardPage(QtWidgets.QWizardPage):
 
         layout.addLayout(output_layout)
 
-        self._overview_edit = QtWidgets.QTextEdit(self)
-        self._overview_edit.setReadOnly(True)
-        self._overview_edit.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
-        layout.addWidget(self._overview_edit)
+        self._overview_webview = QtWebEngineWidgets.QWebEngineView(self)
+        self._overview_webview.page().setBackgroundColor(QtCore.Qt.transparent)
+        layout.addWidget(self._overview_webview)
 
         self.setLayout(layout)
 
@@ -43,7 +42,7 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         return self._output_path_edit.text()
 
     def initializePage(self):
-        self._overview_edit.setHtml(self.wizard().html)
+        self._overview_webview.setHtml(workspace.html_overview)
 
     def on_output_path_changed(self):
         self.completeChanged.emit()

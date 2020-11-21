@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block css %}
+.stimuli {
+    height: 5rem;
+    overflow: auto;
+}
+{% endblock %}
+
+{% block content %}
+<h1>Resumen</h1>
+
+<h2>Sujeto</h2>
+<p>
+<strong>{{ subject.name }}</strong>,
+{% if subject.gender == 0 %}
+persona nacida el
+{% elif subject.gender == 1 %}
+hombre nacido el
+{% elif subject.gender == 2 %}
+mujer nacida el
+{% endif  %}
+{{ subject.borndate.strftime('%d/%m/%Y')}}
+({{ subject.status.label }})
+</p>
+
+<h2>Estímulos</h2>
+<div class="stimuli">
+    <ol>
+    {% for stimulus in protocol %}
+        <li>
+            <strong>{{ stimulus.name }}</strong> con {{ stimulus.saccades_count }} sácadas. La duración media de las
+        </li>
+    {% endfor %}
+    </ol>
+</div>
+
+<div class="notes">
+<h2>Nota Importante</h2>
+
+<p>Distancia del sujeto a la pantalla: <strong>{{ "%.2f"|format(protocol.distance_to_subject) }} cm</strong></p>
+</div>
+{% endblock %}

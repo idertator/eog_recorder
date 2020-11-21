@@ -107,3 +107,7 @@ Por último para ejecutar el programa:
 ```shell
 $ ./SaccRec.py
 ```
+
+## Color Palette
+
+https://coolors.co/1d3461-1f487e-376996-6290c8-829cbc

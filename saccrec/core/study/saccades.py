@@ -8,9 +8,9 @@ from saccrec.core.enums import Channel
 class Saccade:
 
     def __init__(
-        self, 
-        onset: int, offset: int, 
-        test: 'Test', channel: Channel, 
+        self,
+        onset: int, offset: int,
+        test: 'Test', channel: Channel,
         ignore_calibration: bool = False
     ):
         self._onset = onset
@@ -26,7 +26,10 @@ class Saccade:
         self._sampling_interval = test.study.sampling_interval
 
     def __str__(self) -> str:
-        return f'Saccade: {self.onset} -> {self.offset}'
+        return _('Saccade: {onset} -> {offset}').format(
+            onset=self.onset,
+            offset=self.offset
+        )
 
     def __json__(self) -> dict:
         return (self._onset, self._offset)
@@ -57,7 +60,7 @@ class Saccade:
     @property
     def max_velocity(self) -> float:
         abs_velocities = self._test.channel_absolute_velocities(self._channel)
-        max_velocity = abs_velocities[self._onset:self._offset].max() 
+        max_velocity = abs_velocities[self._onset:self._offset].max()
         scale = self._test.study.channel_calibration(self._channel) * 1000.0
         return max_velocity * scale
 

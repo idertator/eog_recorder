@@ -1,3 +1,5 @@
+from typing import Optional
+
 from PyQt5 import QtCore, QtWidgets
 
 from saccrec.core.study import Subject, Protocol
@@ -12,6 +14,7 @@ class Workspace(QtCore.QObject):
 
         self._subject = Subject()
         self._protocol = Protocol()
+        self._filepath = None
 
     @property
     def subject(self) -> Subject:
@@ -20,3 +23,20 @@ class Workspace(QtCore.QObject):
     @property
     def protocol(self) -> Protocol:
         return self._protocol
+
+    @property
+    def filepath(self) -> Optional[str]:
+        return self._filepath
+
+    @filepath.setter
+    def filepath(self, value: str):
+        self._filepath = value
+
+    @property
+    def html_overview(self) -> str:
+        from saccrec.core.templating import render
+        return render(
+            'overview',
+            subject=self._subject,
+            protocol=self._protocol
+        )

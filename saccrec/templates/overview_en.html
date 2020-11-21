@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block css %}
+.stimuli {
+    max-height: 123px;
+    overflow: auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+}
+{% endblock %}
+
+{% block content %}
+<h1>Summary</h1>
+
+<h2>Subject</h2>
+<p>
+<strong>{{ subject.name }}</strong>,
+{% if subject.gender == 0 %}
+person born at
+{% elif subject.gender == 1 %}
+male born at
+{% elif subject.gender == 2 %}
+female born at
+{% endif  %}
+{{ subject.borndate.strftime('%d/%m/%Y')}}
+({{ subject.status.label }})
+</p>
+
+<h2>Stimuli</h2>
+<div class="stimuli">
+    <ol>
+    {% for stimulus in protocol %}
+        <li>
+            <strong>{{ stimulus.name }}</strong> with {{ stimulus.saccades_count }} saccades. The mean duration of fixations is <strong>{{
+                stimulus.fixation_duration }} seconds</strong> with a variability of <strong>{{ stimulus.fixation_variability }}%</strong>.
+        </li>
+    {% endfor %}
+    </ol>
+</div>
+
+<div class="notes">
+<h2>Important Note</h2>
+
+<p>Distance of the subject to the screen: <strong>{{ "%.2f"|format(protocol.distance_to_subject) }} cm</strong></p>
+</div>
+{% endblock %}

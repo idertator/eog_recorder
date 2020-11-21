@@ -12,23 +12,6 @@ from .stimulus import StimulusWizardPage
 from .subject import SubjectWizardPage
 
 
-_SUMMARY_HTML = '''<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
-        <h2>{title}</h2>
-        {subject}
-        {stimulus}
-
-        <h2>{notes}</h2>
-        <p>{distance_title}: <strong>{distance} cm</strong></p>
-    </body>
-</html>
-'''
-
-
 class RecordSetupWizard(QtWidgets.QWizard):
     finished = QtCore.pyqtSignal()
 
@@ -93,17 +76,6 @@ class RecordSetupWizard(QtWidgets.QWizard):
     @property
     def subject_page(self):
         return self._subject_page
-
-    @property
-    def html(self) -> str:
-        return _SUMMARY_HTML.format(
-            title=_('Resumen'),
-            subject=self._subject_page.html,
-            stimulus=self._stimulus_page.html,
-            notes=_('Notas importantes'),
-            distance_title=_('Distancia del sujeto a la pantalla'),
-            distance=f'{self.fixed_distance_to_subject:.2f}'
-        )
 
     @property
     def json(self) -> dict:

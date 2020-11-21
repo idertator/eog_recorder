@@ -5,6 +5,7 @@ from os import kill, system
 from os.path import join, exists, abspath, dirname
 from tempfile import gettempdir
 
+import PyQt5.QtWebEngineWidgets
 from PyQt5.QtWidgets import QApplication
 
 from saccrec.gui.main import MainWindow

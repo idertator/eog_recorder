@@ -26,23 +26,3 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
 
     def on_name_changed(self, value: str):
         self.completeChanged.emit()
-
-    @property
-    def html(self) -> str:
-        gender = {
-            Gender.Unknown: _('persona nacida el'),
-            Gender.Male: _('hombre nacido el'),
-            Gender.Female: _('mujer nacida el'),
-        }[self._subject.gender]
-        borndate = self._subject.borndate.strftime('%d/%m/%Y')
-        status = self._subject.status.label
-
-        return '''<h4>{title}</h4>
-            <p>{name}, {gender} {borndate} ({status})</p>
-        '''.format(
-            title=_('Sujeto'),
-            name=self._subject.name,
-            gender=gender,
-            borndate=borndate,
-            status=status
-        )
