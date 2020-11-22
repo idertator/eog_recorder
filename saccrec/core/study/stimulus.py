@@ -1,4 +1,12 @@
+from math import floor, ceil
+from random import randint
+
+from numpy import array, int8, zeros, ones, hstack
+
 from PyQt5 import QtCore, QtWidgets
+
+from saccrec import settings
+from saccrec.core.enums import StimulusPosition
 
 
 class Stimulus(QtWidgets.QGroupBox):
@@ -13,6 +21,7 @@ class Stimulus(QtWidgets.QGroupBox):
         fixation_duration: float,
         fixation_variability: float,
         saccades_count: int,
+        channel: array = None,
         can_add: bool = False,
         can_remove: bool = False,
         enabled: bool = True,
@@ -26,12 +35,22 @@ class Stimulus(QtWidgets.QGroupBox):
         self._can_remove = can_remove
         self._enabled = enabled
 
+        self._channel = channel
+
         self.setup_ui()
 
         self.angle = angle
         self.fixation_duration = fixation_duration
         self.fixation_variability = fixation_variability
         self.saccades_count = saccades_count
+
+    def __len__(self):
+        if self._channel is not None:
+            return len(self._channel)
+        return 0
+
+    def __getitem__(self, index: int) -> float:
+        return self._channel[index]
 
     def setup_ui(self):
         self.setTitle(self._name)
@@ -176,6 +195,38 @@ class Stimulus(QtWidgets.QGroupBox):
     @property
     def can_remove(self) -> bool:
         return self._can_remove
+
+    @property
+    def channel(self) -> array:
+        if self._channel is None:
+            samples = floor(self._fixation_duration * settings.hardware.sampling_rate)
+            delta = floor(((self._fixation_variability / 100.0) * samples) / 2)
+
+            durations = [
+                randint(samples - delta, samples + delta)
+                for _ in range(self._saccades_count + 2)
+            ]
+
+            first, *main, last = durations
+
+            chunks = [zeros(first, dtype=int8)]
+            current_angle = -floor(angle / 2)
+            for duration in main:
+                chunks.append(ones(duration, dtype=int8) * current_angle)
+                current_angle *= -1
+            chunks.append(zeros(last, dtype=int8))
+
+            self._channel = hstack(chunks)
+        return self._channel
+
+    def position(self, sample: int) -> StimulusPosition:
+        if sample < len(self._channel):
+            if self._channel[sample] < 0:
+                return StimulusPosition.Left
+            if self._channel[sample] > 0:
+                return StimulusPosition.Right
+            return StimulusPosition.Center
+        return None
 
     @property
     def json(self) -> dict:

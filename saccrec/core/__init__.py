@@ -7,15 +7,6 @@ from .formats import Record
 from .screen import Screen
 from .study import Study, Test, SaccadicTest, Saccade
 
-from .workspace import Workspace
-
-
-workspace = None
-
-def initialize_workspace(main_window: QtWidgets.QMainWindow) -> Workspace:
-    global workspace
-    workspace = Workspace(main_window)
-    return workspace
 
 __all__ = [
     'Gender',
@@ -32,6 +23,4 @@ __all__ = [
     'Test',
     'SaccadicTest',
     'Saccade',
-
-    'workspace',
 ]

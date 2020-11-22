@@ -3,17 +3,18 @@ from os.path import join, exists, dirname
 from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
 
 from saccrec import settings
-from saccrec.core import workspace
 
 
 class SubjectWizardPage(QtWidgets.QWizardPage):
 
     def __init__(self, parent):
-        super(SubjectWizardPage, self).__init__(parent)
+        super(SubjectWizardPage, self).__init__(parent=parent)
         self.setup_ui()
 
     def setup_ui(self):
         self.setTitle(_('Datos del sujeto'))
+
+        workspace = self.parent().parent()
 
         self._subject = workspace.subject
         self._subject.setParent(self)
@@ -39,6 +40,8 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
 
     def setup_ui(self):
         self.setTitle(_('Configuración del estímulo'))
+
+        workspace = self.parent().parent()
 
         self._protocol = workspace.protocol
         self._protocol.setParent(self)
@@ -89,12 +92,14 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         return self._output_path_edit.text()
 
     def initializePage(self):
+        workspace = self.parent().parent().parent().parent()
         self._overview_webview.setHtml(workspace.html_overview)
 
     def on_output_path_changed(self):
         self.completeChanged.emit()
 
     def on_output_select_clicked(self):
+        workspace = self.parent().parent().parent().parent()
         subject = workspace.subject
         output = QtWidgets.QFileDialog.getSaveFileName(
             self,
@@ -136,3 +141,11 @@ class RecordSetupWizard(QtWidgets.QWizard):
     def finish_wizard(self):
         self._stimulus_page.save()
         self.finished.emit()
+
+    @property
+    def subject(self):
+        return self.parent().subject
+
+    @property
+    def protocol(self):
+        return self.parent().protocol

@@ -6,7 +6,7 @@ from saccrec.engine.recording import OpenBCIRecorder
 from saccrec.engine.stimulus import SaccadicStimuli
 from saccrec import settings
 
-from .player import StimulusPlayerWidget
+from .player import StimulusPlayer
 from .signals import SignalsWidget
 
 
@@ -17,7 +17,7 @@ class Runner(QObject):
 
     def __init__(
         self,
-        player: StimulusPlayerWidget,
+        player: StimulusPlayer,
         signals: SignalsWidget,
         parent=None
     ):
@@ -57,9 +57,8 @@ class Runner(QObject):
         self._distance_to_subject = distance_to_subject
         self._tests_stimuli = tests_stimuli
 
-        from saccrec.core import workspace
         self._record = Record(
-            subject=workspace.subject,
+            subject=self.parent().subject,
             hardware=Hardware(
                 sample_rate=settings.hardware.sampling_rate,
                 channels=settings.hardware.channels.json

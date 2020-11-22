@@ -9,7 +9,6 @@ class _TemplateLoader(BaseLoader):
 
     def __init__(self, *additional_paths):
         self._path = join(dirname(dirname(__file__)), 'templates')
-        print(self._path)
 
     def get_source(self, environment, template):
         if template.endswith('.html'):

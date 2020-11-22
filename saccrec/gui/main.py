@@ -4,23 +4,22 @@ from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
 
 from saccrec import settings
-from saccrec.core import initialize_workspace
 
 import saccrec.gui.icons  # noqa: F401
 
 from .about import AboutDialog
-from .player import StimulusPlayerWidget
+from .player import StimulusPlayer
 from .runner import Runner
 from .settings import SettingsDialog
 from .signals import SignalsWidget
+from .workspace import Workspace
 
 
-class MainWindow(QMainWindow):
+class MainWindow(Workspace, QMainWindow):
 
     def __init__(self):
-        super(MainWindow, self).__init__()
-
-        self._workspace = initialize_workspace(self)
+        Workspace.__init__(self)
+        QMainWindow.__init__(self)
 
         self._signals_widget = SignalsWidget(self)
         self._signals_widget.setVisible(False)
@@ -29,20 +28,20 @@ class MainWindow(QMainWindow):
 
         self._settings_dialog = SettingsDialog(self)
         self._about_dialog = None
-        self._stimulus_player = StimulusPlayerWidget(None)
+        self._stimulus_player = StimulusPlayer(self)
 
-        self._runner = Runner(
-            player=self._stimulus_player,
-            signals=self._signals_widget,
-            parent=self
-        )
+        # self._runner = Runner(
+        #     player=self._stimulus_player,
+        #     signals=self._signals_widget,
+        #     parent=self
+        # )
 
-        self._runner.stopped.connect(self.on_runner_stopped)
-        self._runner.finished.connect(self.on_runner_finished)
+        # self._runner.stopped.connect(self.on_runner_stopped)
+        # self._runner.finished.connect(self.on_runner_finished)
 
-        self.initUI()
+        self.setup_ui()
 
-    def initUI(self):
+    def setup_ui(self):
         # Setting up top level menus
         menubar = self.menuBar()
 
@@ -110,49 +109,48 @@ class MainWindow(QMainWindow):
 
         wizard = self._new_record_wizard
 
-        self._runner.run(
-            stimulus=wizard.stimulus,
-            output=wizard.output_path,
-            distance_to_subject=wizard.fixed_distance_to_subject,
-            tests=wizard.tests
-        )
+        # self._runner.run(
+        #     stimulus=wizard.stimulus,
+        #     output=wizard.output_path,
+        #     distance_to_subject=wizard.fixed_distance_to_subject,
+        #     tests=wizard.tests
+        # )
 
     def open_settings_dialog(self):
         self._settings_dialog.open()
 
-    def on_runner_stopped(self):
-        self._new_action.setEnabled(True)
-        self._settings_action.setEnabled(True)
+    # def on_runner_stopped(self):
+    #     self._new_action.setEnabled(True)
+    #     self._settings_action.setEnabled(True)
 
-    def on_runner_finished(self):
-        report = QMessageBox.question(
-            self,
-            _('Opción'),
-            _('¿Desea generar un reporte sacádico?'),
-            QMessageBox.Yes | QMessageBox.No
-        )
+    # def on_runner_finished(self):
+    #     report = QMessageBox.question(
+    #         self,
+    #         _('Opción'),
+    #         _('¿Desea generar un reporte sacádico?'),
+    #         QMessageBox.Yes | QMessageBox.No
+    #     )
 
-        if report == QMessageBox.Yes:
-            subject = self._workspace.subject
-            output = QFileDialog.getSaveFileName(
-                self,
-                _('Seleccione fichero de salida'),
-                join(settings.gui.records_path, subject.code),
-                filter='Microsoft Excel (*.xls)'
-            )
-            filepath = output[0]
-            if not filepath.lower().endswith('.xls'):
-                filepath += '.xls'
+    #     if report == QMessageBox.Yes:
+    #         output = QFileDialog.getSaveFileName(
+    #             self,
+    #             _('Seleccione fichero de salida'),
+    #             join(settings.gui.records_path, self.subject.code),
+    #             filter='Microsoft Excel (*.xls)'
+    #         )
+    #         filepath = output[0]
+    #         if not filepath.lower().endswith('.xls'):
+    #             filepath += '.xls'
 
-            if filepath:
-                from saccrec.core import Study
-                from saccrec.core.reports import excel_saccadic_report
+    #         if filepath:
+    #             from saccrec.core import Study
+    #             from saccrec.core.reports import excel_saccadic_report
 
-                study = Study.open(self._new_record_wizard.output_path)
-                excel_saccadic_report(study, filepath)
+    #             study = Study.open(self._new_record_wizard.output_path)
+    #             excel_saccadic_report(study, filepath)
 
-        self._new_action.setEnabled(True)
-        self._settings_action.setEnabled(True)
+    #     self._new_action.setEnabled(True)
+    #     self._settings_action.setEnabled(True)
 
     def on_about_dialog_clicked(self):
         if self._about_dialog is None:

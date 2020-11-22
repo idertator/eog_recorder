@@ -1,43 +1,49 @@
-from math import ceil
+from math import ceil, floor
 from time import time
 
-from PyQt5.QtCore import pyqtSignal, Qt, QTimer
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import qApp, QWidget
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
-from saccrec.engine.stimulus import SaccadicStimuli
+from saccrec.core.enums import StimulusPosition
+from saccrec.core.study import Stimulus
 
 
-STIMULUS_TIMEOUT = 7    # TODO: Calculate this from the refresh rate of the monitor
-
-
-class StimulusPlayerWidget(QWidget):
-    started = pyqtSignal(float)
-    stopped = pyqtSignal()
-    finished = pyqtSignal()
-    moved = pyqtSignal(int)
+class StimulusPlayer(QtWidgets.QWidget):
+    started = QtCore.pyqtSignal(float)
+    stopped = QtCore.pyqtSignal()
+    finished = QtCore.pyqtSignal()
+    moved = QtCore.pyqtSignal(int)
 
     def __init__(self, parent=None):
-        super(StimulusPlayerWidget, self).__init__(parent=parent)
+        super(StimulusPlayer, self).__init__()
 
-        self._sampling_step = 1000 / settings.hardware.sampling_rate
+        self._parent = parent
 
-        self._stimuli = None
+        self._timer = QtCore.QTimer()
+        self._timer.timeout.connect(self._on_timeout)
+
+        self._sampling_step = None
+
+        self._timeout = None
+        self._start_time = None
+        self._stimulus = None
+
+        self._message = None
+        self._left_ball = None
+        self._center_ball = None
+        self._right_ball = None
+
         self._ball_position = None
-        self._initial_message = None
-
-        self._timer = QTimer()
-        self._timer.setInterval(STIMULUS_TIMEOUT)
-        self._timer.timeout.connect(self.on_timeout)
-
-        self._start_time = 0
-
-        self._load_settings()
-
-        self._moved = None
 
     def _load_settings(self):
+        # Timer interval computing based on refresh rate
+        self._timeout = floor(1000.0 / screen.secondary_screen_refresh_rate / 2.0)
+        self._timer.setInterval(self._timeout)
+
+        # Sampling Step
+        self._sampling_step = 1000 / settings.hardware.sampling_rate
+
+        # Ball properties computing
         ball_radius = settings.stimuli.ball_radius
 
         if self._stimuli is None:
@@ -48,57 +54,89 @@ class StimulusPlayerWidget(QWidget):
         self._ball_color = settings.stimuli.ball_color
         self._background_color = settings.stimuli.back_color
 
-    def _start_stimulus(self):
-        self._ball_position = self._stimuli.screen_position(0)
+        # Points Distance Computing
+        distance = (tan(radians(self._stimulus.angle / 2.0)) * self._stimulus.distance_to_subject) * 2
+
+        cm_width = settings.stimuli.screen_width
+        cm_center, cm_delta = cm_width / 2, distance / 2
+        self._cm_to_pixels_x = settings.screen.secondary_screen_rect.width() / cm_width
+
+        left_x = (cm_center - cm_delta) * self._cm_to_pixels_x
+        right_x = (cm_center + cm_delta) * self._cm_to_pixels_x
+        center_x = (left_x + right_x) / 2
+
+        y = settings.screen.secondary_screen_rect.center().y()
+
+        self._left_ball = QtCore.QPoint(left_x, y)
+        self._center_ball = QtCore.QPoint(center_x, y)
+        self._right_ball = QtCore.QPoint(right_x, y)
+
+    def _screen_position(self, sample: int) -> QtCore.QPoint:
+        position = self._stimulus.position(sample)
+        return {
+            StimulusPosition.Left: self._left_ball,
+            StimulusPosition.Right: self._right_ball,
+            StimulusPosition.Center: self._center_ball,
+        }.get(position, None)
+
+    def start(self, stimulus: Stimulus):
+        self._stimulus = stimulus
+
+        self._load_settings()
+
+        self._message = '\n'.join(
+            self._stimulus.name,
+            _('Presione espacio para continuar')
+        )
         self.update()
 
-        self._start_time = time()
-        self._timer.start()
-        self.started.emit(self._start_time)
+    def stop(self):
+        self._timer.stop()
+        self.stopped.emit()
 
-    def run_stimulus(
-        self,
-        stimuli: SaccadicStimuli,
-        initial_message: str = None
-    ):
-        self._stimuli = stimuli
-        self._load_settings()
-        self._initial_message = initial_message
+        self._stimulus = None
 
-        if initial_message is None:
-            self._start_stimulus()
-        else:
-            self.update()
+    def finished(self):
+        self._timer.stop()
+        self.finished.emit()
 
-    def close_player(self):
-        self.setParent(qApp.topLevelWidgets()[0])
+        self._stimulus = None
+
+    def close(self):
+        self.setParent(QtWidgets.qApp.topLevelWidgets()[0])
         self.close()
         self.setParent(None)
 
-    def on_timeout(self):
+    def _start_test(self):
+        self._message = None
+        self._ball_position = self.screen_position(0)
+        self._start_time = time()
+        self.update()
+        self._timer.start()
+        self.started.emit(self._start_time)
+
+    def _on_timeout(self):
         elapsed = (time() - self._start_time) * 1000.0
         current_sample = ceil(elapsed / self._sampling_step)
+
         previous_position = self._ball_position
-        self._ball_position = self._stimuli.screen_position(current_sample)
+        self._ball_position = self.screen_position(current_sample)
 
         if previous_position != self._ball_position:
-            new_position = self._stimuli.position(current_sample)
             self.update()
-            if new_position is not None:
-                self._moved = new_position.value
+            self.moved.emit(self._ball_position.value)
 
         if self._ball_position is None:
-            self._timer.stop()
-            self.stopped.emit()
+            self.finished()
 
     def paintEvent(self, event):
-        painter = QPainter()
+        painter = QtGui.QPainter()
         painter.begin(self)
 
         painter.setBackground(self._background_color)
         painter.fillRect(self.rect(), self._background_color)
 
-        if self._initial_message is not None:
+        if self._message is not None:
             painter.save()
             painter.setPen(self._ball_color)
 
@@ -108,8 +146,8 @@ class StimulusPlayerWidget(QWidget):
 
             painter.drawText(
                 self.rect(),
-                Qt.AlignHCenter | Qt.AlignVCenter,
-                self._initial_message
+                QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter,
+                self._message
             )
             painter.restore()
 
@@ -120,14 +158,10 @@ class StimulusPlayerWidget(QWidget):
 
         painter.end()
 
-        if self._moved is not None:
-            self.moved.emit(self._moved)
-            self._moved = None
-
     def keyPressEvent(self, event):
-        if not self._timer.isActive() and event.key() == Qt.Key_Space:
-            self._initial_message = None
-            self._start_stimulus()
-        elif self._timer.isActive() and (event.modifiers() & Qt.ControlModifier) and event.key() == Qt.Key_C:
-            self._timer.stop()
-            self.finished.emit()
+        if self._time.isActive():
+            if (event.modifiers() & QtCore.Qt.ControlModifier) and event.key() == QtCore.Qt.Key_C:
+                self.stop()
+        else:
+            if event.key() == QtCore.Qt.Key_Space:
+                self._start_test()
