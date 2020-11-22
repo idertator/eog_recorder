@@ -1,4 +1,4 @@
-from math import ceil, floor
+from math import ceil, floor, tan, radians
 from time import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -36,26 +36,17 @@ class StimulusPlayer(QtWidgets.QWidget):
         self._ball_position = None
 
     def _load_settings(self):
+        workspace = self._parent
+
         # Timer interval computing based on refresh rate
-        self._timeout = floor(1000.0 / screen.secondary_screen_refresh_rate / 2.0)
+        self._timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate / 2.0)
         self._timer.setInterval(self._timeout)
 
         # Sampling Step
         self._sampling_step = 1000 / settings.hardware.sampling_rate
 
-        # Ball properties computing
-        ball_radius = settings.stimuli.ball_radius
-
-        if self._stimuli is None:
-            self._ball_radius = ball_radius
-        else:
-            self._ball_radius = self._stimuli.cm_to_pixels_x(ball_radius)
-
-        self._ball_color = settings.stimuli.ball_color
-        self._background_color = settings.stimuli.back_color
-
         # Points Distance Computing
-        distance = (tan(radians(self._stimulus.angle / 2.0)) * self._stimulus.distance_to_subject) * 2
+        distance = (tan(radians(self._stimulus.angle / 2.0)) * workspace._protocol.distance_to_subject) * 2
 
         cm_width = settings.stimuli.screen_width
         cm_center, cm_delta = cm_width / 2, distance / 2
@@ -71,24 +62,36 @@ class StimulusPlayer(QtWidgets.QWidget):
         self._center_ball = QtCore.QPoint(center_x, y)
         self._right_ball = QtCore.QPoint(right_x, y)
 
-    def _screen_position(self, sample: int) -> QtCore.QPoint:
+        # Ball properties computing
+        ball_radius = settings.stimuli.ball_radius
+
+        if self._stimulus is None:
+            self._ball_radius = ball_radius
+        else:
+            self._ball_radius = ceil(ball_radius * self._cm_to_pixels_x)
+
+        self._ball_color = settings.stimuli.ball_color
+        self._background_color = settings.stimuli.back_color
+
+    def _screen_position(self, sample: int) -> tuple[QtCore.QPoint, StimulusPosition]:
         position = self._stimulus.position(sample)
         return {
             StimulusPosition.Left: self._left_ball,
             StimulusPosition.Right: self._right_ball,
             StimulusPosition.Center: self._center_ball,
-        }.get(position, None)
+        }.get(position, None), position
 
     def start(self, stimulus: Stimulus):
         self._stimulus = stimulus
 
         self._load_settings()
 
-        self._message = '\n'.join(
+        self._message = '\n'.join([
             self._stimulus.name,
             _('Presione espacio para continuar')
-        )
-        self.update()
+        ])
+        self.showFullScreen()
+        # self.update()
 
     def stop(self):
         self._timer.stop()
@@ -96,7 +99,7 @@ class StimulusPlayer(QtWidgets.QWidget):
 
         self._stimulus = None
 
-    def finished(self):
+    def finish(self):
         self._timer.stop()
         self.finished.emit()
 
@@ -109,7 +112,7 @@ class StimulusPlayer(QtWidgets.QWidget):
 
     def _start_test(self):
         self._message = None
-        self._ball_position = self.screen_position(0)
+        self._ball_position, _ = self._screen_position(0)
         self._start_time = time()
         self.update()
         self._timer.start()
@@ -120,14 +123,15 @@ class StimulusPlayer(QtWidgets.QWidget):
         current_sample = ceil(elapsed / self._sampling_step)
 
         previous_position = self._ball_position
-        self._ball_position = self.screen_position(current_sample)
+        self._ball_position, side = self._screen_position(current_sample)
 
         if previous_position != self._ball_position:
             self.update()
-            self.moved.emit(self._ball_position.value)
+            if side is not None:
+                self.moved.emit(side.value)
 
         if self._ball_position is None:
-            self.finished()
+            self.finish()
 
     def paintEvent(self, event):
         painter = QtGui.QPainter()
@@ -159,9 +163,10 @@ class StimulusPlayer(QtWidgets.QWidget):
         painter.end()
 
     def keyPressEvent(self, event):
-        if self._time.isActive():
+        if self._timer.isActive():
             if (event.modifiers() & QtCore.Qt.ControlModifier) and event.key() == QtCore.Qt.Key_C:
                 self.stop()
         else:
             if event.key() == QtCore.Qt.Key_Space:
                 self._start_test()
+

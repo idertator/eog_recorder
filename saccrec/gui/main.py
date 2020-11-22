@@ -8,27 +8,26 @@ from saccrec import settings
 import saccrec.gui.icons  # noqa: F401
 
 from .about import AboutDialog
-from .player import StimulusPlayer
 from .runner import Runner
 from .settings import SettingsDialog
-from .signals import SignalsWidget
 from .workspace import Workspace
 
 
-class MainWindow(Workspace, QMainWindow):
+class MainWindow(
+    Runner,
+    Workspace,
+    QMainWindow
+):
 
     def __init__(self):
-        Workspace.__init__(self)
         QMainWindow.__init__(self)
-
-        self._signals_widget = SignalsWidget(self)
-        self._signals_widget.setVisible(False)
+        Workspace.__init__(self)
+        Runner.__init__(self)
 
         self._new_record_wizard = None
 
+        self._about_dialog = AboutDialog()
         self._settings_dialog = SettingsDialog(self)
-        self._about_dialog = None
-        self._stimulus_player = StimulusPlayer(self)
 
         # self._runner = Runner(
         #     player=self._stimulus_player,
@@ -90,8 +89,6 @@ class MainWindow(Workspace, QMainWindow):
         self.setWindowTitle('SaccRec')
         self.setWindowIcon(QIcon(':app.png'))
 
-        self.setCentralWidget(self._signals_widget)
-
         self.show()
 
     def on_new_test_wizard_clicked(self):
@@ -107,7 +104,7 @@ class MainWindow(Workspace, QMainWindow):
         self._new_action.setEnabled(False)
         self._settings_action.setEnabled(False)
 
-        wizard = self._new_record_wizard
+        self.start()
 
         # self._runner.run(
         #     stimulus=wizard.stimulus,
@@ -153,7 +150,4 @@ class MainWindow(Workspace, QMainWindow):
     #     self._settings_action.setEnabled(True)
 
     def on_about_dialog_clicked(self):
-        if self._about_dialog is None:
-            self._about_dialog = AboutDialog(parent=self)
-
         self._about_dialog.open()

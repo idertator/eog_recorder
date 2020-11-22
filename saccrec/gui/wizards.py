@@ -139,7 +139,6 @@ class RecordSetupWizard(QtWidgets.QWizard):
         self.button(QtWidgets.QWizard.FinishButton).clicked.connect(self.finish_wizard)
 
     def finish_wizard(self):
-        self._stimulus_page.save()
         self.finished.emit()
 
     @property

@@ -199,18 +199,18 @@ class Stimulus(QtWidgets.QGroupBox):
     @property
     def channel(self) -> array:
         if self._channel is None:
-            samples = floor(self._fixation_duration * settings.hardware.sampling_rate)
-            delta = floor(((self._fixation_variability / 100.0) * samples) / 2)
+            samples = floor(self.fixation_duration * settings.hardware.sampling_rate)
+            delta = floor(((self.fixation_variability / 100.0) * samples) / 2)
 
             durations = [
                 randint(samples - delta, samples + delta)
-                for _ in range(self._saccades_count + 2)
+                for _ in range(self.saccades_count + 2)
             ]
 
             first, *main, last = durations
 
             chunks = [zeros(first, dtype=int8)]
-            current_angle = -floor(angle / 2)
+            current_angle = -floor(self.angle / 2)
             for duration in main:
                 chunks.append(ones(duration, dtype=int8) * current_angle)
                 current_angle *= -1
@@ -220,10 +220,10 @@ class Stimulus(QtWidgets.QGroupBox):
         return self._channel
 
     def position(self, sample: int) -> StimulusPosition:
-        if sample < len(self._channel):
-            if self._channel[sample] < 0:
+        if sample < len(self.channel):
+            if self.channel[sample] < 0:
                 return StimulusPosition.Left
-            if self._channel[sample] > 0:
+            if self.channel[sample] > 0:
                 return StimulusPosition.Right
             return StimulusPosition.Center
         return None
