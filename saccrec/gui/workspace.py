@@ -6,6 +6,9 @@ from saccrec.core.study import Subject, Protocol
 class Workspace:
 
     def __init__(self):
+        self.reset_workspace()
+
+    def reset_workspace(self):
         self._subject = Subject()
         self._protocol = Protocol()
         self._filepath = None

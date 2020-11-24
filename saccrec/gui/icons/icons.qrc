@@ -11,5 +11,6 @@
         <file>openbci.png</file>
         <file>stimuli.svg</file>
         <file>gui.svg</file>
+        <file>stop-solid.svg</file>
     </qresource>
 </RCC>

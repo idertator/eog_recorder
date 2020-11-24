@@ -1,5 +1,6 @@
 from os.path import join
 
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
 
@@ -29,12 +30,6 @@ class MainWindow(
         self._about_dialog = AboutDialog()
         self._settings_dialog = SettingsDialog(self)
 
-        # self._runner = Runner(
-        #     player=self._stimulus_player,
-        #     signals=self._signals_widget,
-        #     parent=self
-        # )
-
         # self._runner.stopped.connect(self.on_runner_stopped)
         # self._runner.finished.connect(self.on_runner_finished)
 
@@ -51,15 +46,20 @@ class MainWindow(
         self._new_action = QAction(QIcon(':document.svg'), _('&Iniciar Prueba'), self)
         self._new_action.triggered.connect(self.on_new_test_wizard_clicked)
 
-        exit_action = QAction(QIcon(':exit.svg'), _('&Salir'), self)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip(_('Salir de la aplicación'))
-        exit_action.triggered.connect(qApp.quit)
+        self._exit_action = QAction(QIcon(':exit.svg'), _('&Salir'), self)
+        self._exit_action.setShortcut('Ctrl+Q')
+        self._exit_action.setStatusTip(_('Salir de la aplicación'))
+        self._exit_action.triggered.connect(qApp.quit)
 
         self._settings_action = QAction(QIcon(':settings.svg'), _('&Configuración'), self)
         self._settings_action.setShortcut('Ctrl+P')
         self._settings_action.setStatusTip(_('Configurar aplicación'))
         self._settings_action.triggered.connect(self.open_settings_dialog)
+
+        self._stop_action = QAction(QIcon(':stop-solid.svg'), _('&Detener'), self)
+        self._stop_action.setShortcut('Ctrl+D')
+        self._stop_action.setStatusTip(_('Detener grabación'))
+        self._stop_action.triggered.connect(self._on_stop_clicked)
 
         self._about_action = QAction(QIcon(':help.svg'), _('&Acerca de ...'), self)
         self._about_action.triggered.connect(self.on_about_dialog_clicked)
@@ -68,28 +68,45 @@ class MainWindow(
 
         # Setting up top menu
         file_menu.addAction(self._new_action)
-        file_menu.addAction(self._new_action)
         file_menu.addAction(self._settings_action)
 
         file_menu.addSeparator()
 
-        file_menu.addAction(exit_action)
+        file_menu.addAction(self._exit_action)
 
         # Setting up top toolbar
         main_toolbar = self.addToolBar('Main Toolbar')
         main_toolbar.addAction(self._new_action)
         main_toolbar.addAction(self._settings_action)
-
         main_toolbar.addSeparator()
-
-        main_toolbar.addAction(exit_action)
+        main_toolbar.addAction(self._stop_action)
+        main_toolbar.addSeparator()
+        main_toolbar.addAction(self._exit_action)
 
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('SaccRec')
         self.setWindowIcon(QIcon(':app.png'))
 
+        self._setup_gui_for_non_recording()
+
         self.show()
+
+    def _setup_gui_for_recording(self):
+        self._new_action.setEnabled(False)
+        self._exit_action.setEnabled(False)
+        self._settings_action.setEnabled(False)
+        self._about_action.setEnabled(False)
+
+        self._stop_action.setEnabled(True)
+
+    def _setup_gui_for_non_recording(self):
+        self._new_action.setEnabled(True)
+        self._exit_action.setEnabled(True)
+        self._settings_action.setEnabled(True)
+        self._about_action.setEnabled(True)
+
+        self._stop_action.setEnabled(False)
 
     def on_new_test_wizard_clicked(self):
         if self._new_record_wizard is None:
@@ -151,3 +168,13 @@ class MainWindow(
 
     def on_about_dialog_clicked(self):
         self._about_dialog.open()
+
+    def _on_stop_clicked(self):
+        answer = QtWidgets.QMessageBox.critical(
+            self,
+            _('Confirmación de interrupción de prueba'),
+            _('Está seguro que desea detener la prueba'),
+            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No
+        )
+        if answer == QtWidgets.QMessageBox.Ok:
+            self.stop()

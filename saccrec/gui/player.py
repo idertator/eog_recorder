@@ -90,25 +90,23 @@ class StimulusPlayer(QtWidgets.QWidget):
             self._stimulus.name,
             _('Presione espacio para continuar')
         ])
+
+        self.move(
+            settings.screen.secondary_screen_rect.left(),
+            settings.screen.secondary_screen_rect.top()
+        )
         self.showFullScreen()
-        # self.update()
 
     def stop(self):
-        self._timer.stop()
+        self._stop_test()
         self.stopped.emit()
 
-        self._stimulus = None
-
     def finish(self):
-        self._timer.stop()
+        self._stop_test()
         self.finished.emit()
 
-        self._stimulus = None
-
     def close(self):
-        self.setParent(QtWidgets.qApp.topLevelWidgets()[0])
-        self.close()
-        self.setParent(None)
+        super().close()
 
     def _start_test(self):
         self._message = None
@@ -117,6 +115,12 @@ class StimulusPlayer(QtWidgets.QWidget):
         self.update()
         self._timer.start()
         self.started.emit(self._start_time)
+
+    def _stop_test(self):
+        self._timer.stop()
+        self._stimulus = None
+        self._message = None
+        self._ball_position = None
 
     def _on_timeout(self):
         elapsed = (time() - self._start_time) * 1000.0

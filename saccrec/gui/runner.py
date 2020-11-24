@@ -20,23 +20,34 @@ class Runner:
         self._current_test = None
 
     def start(self):
+        self._setup_gui_for_recording()
+
         self._current_test = 0
         stimulus = self.protocol[0]
         self._stimulus_player.start(stimulus)
         self._is_running = True
 
     def stop(self):
-        pass
+        self._setup_gui_for_non_recording()
 
-    def finish(self):
         self._current_test = None
         self._is_running = False
+        self._stimulus_player.close()
+
+    def finish(self):
+        self._setup_gui_for_non_recording()
+
+        self._current_test = None
+        self._is_running = False
+        self._stimulus_player.close()
 
     def _on_test_started(self, timestamp):
         pass
 
     def _on_test_stopped(self):
-        pass
+        self._current_test = None
+        self._is_running = False
+        self._stimulus_player.close()
 
     def _on_test_finished(self):
         self._current_test += 1
