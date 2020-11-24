@@ -33,11 +33,12 @@ class Runner:
         self._current_test = None
         self._is_running = False
         self._stimulus_player.close()
+        self.reset_workspace()
 
     def finish(self):
         self._setup_gui_for_non_recording()
 
-        self._current_test = None
+        self._current_test = 0
         self._is_running = False
         self._stimulus_player.close()
 
@@ -45,7 +46,7 @@ class Runner:
         pass
 
     def _on_test_stopped(self):
-        self._current_test = None
+        self._current_test = 0
         self._is_running = False
         self._stimulus_player.close()
 

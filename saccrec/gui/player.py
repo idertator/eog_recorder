@@ -105,9 +105,6 @@ class StimulusPlayer(QtWidgets.QWidget):
         self._stop_test()
         self.finished.emit()
 
-    def close(self):
-        super().close()
-
     def _start_test(self):
         self._message = None
         self._ball_position, _ = self._screen_position(0)

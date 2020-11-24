@@ -7,23 +7,28 @@ from saccrec import settings
 
 class SubjectWizardPage(QtWidgets.QWizardPage):
 
-    def __init__(self, parent):
+    def __init__(self, parent, workspace):
         super(SubjectWizardPage, self).__init__(parent=parent)
+        self._workspace = workspace
         self.setup_ui()
+
+    def _initialize_layout(self):
+        self._subject = self._workspace.subject
+        self._subject.setParent(self)
+        self._subject.nameChanged.connect(self.on_name_changed)
+        self._layout.addWidget(self._subject)
 
     def setup_ui(self):
         self.setTitle(_('Datos del sujeto'))
+        self._layout = QtWidgets.QVBoxLayout()
+        self.setLayout(self._layout)
+        self._initialize_layout()
 
-        workspace = self.parent().parent()
-
-        self._subject = workspace.subject
-        self._subject.setParent(self)
-        self._subject.nameChanged.connect(self.on_name_changed)
-
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self._subject)
-
-        self.setLayout(layout)
+    def reset(self):
+        self._subject.nameChanged.disconnect(self.on_name_changed)
+        self._subject.setParent(None)
+        self._layout.removeWidget(self._subject)
+        self._initialize_layout()
 
     def isComplete(self) -> bool:
         return self._subject.name.strip() != ''
@@ -34,22 +39,27 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
 
 class StimulusWizardPage(QtWidgets.QWizardPage):
 
-    def __init__(self, parent):
+    def __init__(self, parent, workspace):
         super(StimulusWizardPage, self).__init__(parent)
+        self._workspace = workspace
         self.setup_ui()
+
+    def _initialize_layout(self):
+        workspace = self.parent().parent()
+        self._protocol = self._workspace.protocol
+        self._protocol.setParent(self)
+        self._layout.addWidget(self._protocol)
 
     def setup_ui(self):
         self.setTitle(_('Configuración del estímulo'))
+        self._layout = QtWidgets.QVBoxLayout()
+        self.setLayout(self._layout)
+        self._initialize_layout()
 
-        workspace = self.parent().parent()
-
-        self._protocol = workspace.protocol
-        self._protocol.setParent(self)
-
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self._protocol)
-
-        self.setLayout(layout)
+    def reset(self):
+        self._protocol.setParent(None)
+        self._layout.removeWidget(self._protocol)
+        self._initialize_layout()
 
     @property
     def json(self) -> dict:
@@ -58,9 +68,12 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
 
 class OutputWizardPage(QtWidgets.QWizardPage):
 
-    def __init__(self, parent):
+    def __init__(self, parent, workspace):
         super(OutputWizardPage, self).__init__(parent=parent)
+        self._workspace = workspace
+        self.setup_ui()
 
+    def setup_ui(self):
         self.setTitle(_('Configuración de la salida'))
 
         layout = QtWidgets.QVBoxLayout()
@@ -83,6 +96,9 @@ class OutputWizardPage(QtWidgets.QWizardPage):
 
         self.setLayout(layout)
 
+    def reset(self):
+        self._output_path_edit.setText('')
+
     def isComplete(self) -> bool:
         filepath = self._output_path_edit.text()
         return exists(dirname(filepath)) and filepath.lower().endswith('.rec')
@@ -92,15 +108,13 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         return self._output_path_edit.text()
 
     def initializePage(self):
-        workspace = self.parent().parent().parent().parent()
-        self._overview_webview.setHtml(workspace.html_overview)
+        self._overview_webview.setHtml(self._workspace.html_overview)
 
     def on_output_path_changed(self):
         self.completeChanged.emit()
 
     def on_output_select_clicked(self):
-        workspace = self.parent().parent().parent().parent()
-        subject = workspace.subject
+        subject = self._workspace.subject
         output = QtWidgets.QFileDialog.getSaveFileName(
             self,
             _('Seleccione fichero de salida'),
@@ -112,7 +126,7 @@ class OutputWizardPage(QtWidgets.QWizardPage):
             filepath += '.rec'
 
         self._output_path_edit.setText(filepath)
-        workspace.filepath = filepath
+        self._workspace.filepath = filepath
         self.completeChanged.emit()
 
 
@@ -121,6 +135,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
 
     def __init__(self, parent):
         super(RecordSetupWizard, self).__init__(parent)
+        self._workspace = parent
         self.setup_ui()
 
     def setup_ui(self):
@@ -128,9 +143,9 @@ class RecordSetupWizard(QtWidgets.QWizard):
         self.setWizardStyle(QtWidgets.QWizard.ClassicStyle)
         self.resize(640, 480)
 
-        self._subject_page = SubjectWizardPage(self)
-        self._stimulus_page = StimulusWizardPage(self)
-        self._output_page = OutputWizardPage(self)
+        self._subject_page = SubjectWizardPage(self, self._workspace)
+        self._stimulus_page = StimulusWizardPage(self, self._workspace)
+        self._output_page = OutputWizardPage(self, self._workspace)
 
         self.addPage(self._subject_page)
         self.addPage(self._stimulus_page)
@@ -148,3 +163,9 @@ class RecordSetupWizard(QtWidgets.QWizard):
     @property
     def protocol(self):
         return self.parent().protocol
+
+    def reset(self):
+        self.restart()
+        self._subject_page.reset()
+        self._stimulus_page.reset()
+        self._output_page.reset()
