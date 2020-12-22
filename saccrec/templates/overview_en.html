@@ -1,15 +1,5 @@
 {% extends 'base.html' %}
 
-{% block css %}
-.stimuli {
-    max-height: 123px;
-    overflow: auto;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding: 0px;
-}
-{% endblock %}
-
 {% block content %}
 <h1>Summary</h1>
 
@@ -39,9 +29,7 @@ female born at
     </ol>
 </div>
 
-<div class="notes">
 <h2>Important Note</h2>
 
 <p>Distance of the subject to the screen: <strong>{{ "%.2f"|format(protocol.distance_to_subject) }} cm</strong></p>
-</div>
 {% endblock %}

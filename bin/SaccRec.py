@@ -1,11 +1,11 @@
 import gettext
+import sys
 
 from faulthandler import enable as enable_faulthandler
 from os import kill, system
 from os.path import join, exists, abspath, dirname
 from tempfile import gettempdir
 
-# import PySide6.QtWebEngineWidgets
 from PySide6.QtWidgets import QApplication
 
 from saccrec.gui.main import MainWindow
@@ -63,4 +63,4 @@ if __name__ == '__main__':
 
     initialize_screen(main_window)
 
-    app.exec_()
+    sys.exit(app.exec_())

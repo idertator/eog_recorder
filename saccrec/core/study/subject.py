@@ -91,7 +91,7 @@ class Subject(QtWidgets.QWidget):
 
     @property
     def borndate(self) -> date:
-        return self._borndate_edit.date().toPyDate()
+        return self._borndate_edit.date().toPython()
 
     @borndate.setter
     def borndate(self, value: Union[str, date]):

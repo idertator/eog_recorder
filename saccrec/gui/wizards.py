@@ -1,6 +1,6 @@
 from os.path import join, exists, dirname
 
-from PySide6 import QtCore, QtWidgets, QtWebEngineWidgets
+from PySide6 import QtCore, QtWidgets
 
 from saccrec import settings
 
@@ -90,8 +90,8 @@ class OutputWizardPage(QtWidgets.QWizardPage):
 
         layout.addLayout(output_layout)
 
-        self._overview_webview = QtWebEngineWidgets.QWebEngineView(self)
-        self._overview_webview.page().setBackgroundColor(QtCore.Qt.transparent)
+        self._overview_webview = QtWidgets.QTextBrowser(self)
+        # self._overview_webview.setBackgroundColor(QtCore.Qt.transparent)
         layout.addWidget(self._overview_webview)
 
         self.setLayout(layout)

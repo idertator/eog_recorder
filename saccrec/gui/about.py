@@ -14,11 +14,13 @@ class AboutDialog(QtWidgets.QDialog):
         self.setFixedWidth(640)
         self.setFixedHeight(400)
 
-        # self._webview = QtWebEngineWidgets.QWebEngineView(self)
-        # self._webview.page().setBackgroundColor(QtCore.Qt.transparent)
-        # self._webview.setHtml(render('about'))
+        self._webview = QtWidgets.QTextBrowser(self)
+        self._webview.viewport().setAutoFillBackground(False)
+        self._webview.setFrameStyle(QtWidgets.QFrame.NoFrame)
+        # self._webview.setBackgroundColor(QtCore.Qt.transparent)
+        self._webview.setHtml(render('about'))
 
         self._layout = QtWidgets.QVBoxLayout()
-        # self._layout.addWidget(self._webview)
+        self._layout.addWidget(self._webview)
 
         self.setLayout(self._layout)
