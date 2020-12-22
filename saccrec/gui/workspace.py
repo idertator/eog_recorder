@@ -1,6 +1,8 @@
 from typing import Optional
 
-from saccrec.core.study import Subject, Protocol
+from eoglib.models import Subject
+
+from saccrec.core.study import Protocol
 
 
 class Workspace:

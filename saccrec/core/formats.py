@@ -6,8 +6,10 @@ from zipfile import ZipFile
 
 from numpy import array, int32, mean, savez_compressed
 
+from eoglib.models import Subject
+
 from saccrec import settings
-from saccrec.core.study import Subject, Hardware
+from saccrec.core.study import Hardware
 
 
 _CURRENT_VERSION = 1

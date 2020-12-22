@@ -1,8 +1,6 @@
 from os.path import join
 
-from PySide6 import QtWidgets
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
-from PySide6.QtGui import QIcon, QAction
+from PySide6 import QtWidgets, QtGui
 
 from saccrec import settings
 
@@ -17,11 +15,11 @@ from .workspace import Workspace
 class MainWindow(
     Runner,
     Workspace,
-    QMainWindow
+    QtWidgets.QMainWindow
 ):
 
     def __init__(self):
-        QMainWindow.__init__(self)
+        QtWidgets.QMainWindow.__init__(self)
         Workspace.__init__(self)
         Runner.__init__(self)
 
@@ -43,25 +41,25 @@ class MainWindow(
         help_menu = menubar.addMenu(_('&Ayuda'))
 
         # Setting up actions
-        self._new_action = QAction(QIcon(':document.svg'), _('&Iniciar Prueba'), self)
+        self._new_action = QtGui.QAction(QtGui.QIcon(':document.svg'), _('&Iniciar Prueba'), self)
         self._new_action.triggered.connect(self.on_new_test_wizard_clicked)
 
-        self._exit_action = QAction(QIcon(':exit.svg'), _('&Salir'), self)
+        self._exit_action = QtGui.QAction(QtGui.QIcon(':exit.svg'), _('&Salir'), self)
         self._exit_action.setShortcut('Ctrl+Q')
         self._exit_action.setStatusTip(_('Salir de la aplicación'))
-        self._exit_action.triggered.connect(QApplication.instance().quit)
+        self._exit_action.triggered.connect(QtWidgets.QApplication.instance().quit)
 
-        self._settings_action = QAction(QIcon(':settings.svg'), _('&Configuración'), self)
+        self._settings_action = QtGui.QAction(QtGui.QIcon(':settings.svg'), _('&Configuración'), self)
         self._settings_action.setShortcut('Ctrl+P')
         self._settings_action.setStatusTip(_('Configurar aplicación'))
         self._settings_action.triggered.connect(self.open_settings_dialog)
 
-        self._stop_action = QAction(QIcon(':stop-solid.svg'), _('&Detener'), self)
+        self._stop_action = QtGui.QAction(QtGui.QIcon(':stop-solid.svg'), _('&Detener'), self)
         self._stop_action.setShortcut('Ctrl+D')
         self._stop_action.setStatusTip(_('Detener grabación'))
         self._stop_action.triggered.connect(self._on_stop_clicked)
 
-        self._about_action = QAction(QIcon(':help.svg'), _('&Acerca de ...'), self)
+        self._about_action = QtGui.QAction(QtGui.QIcon(':help.svg'), _('&Acerca de ...'), self)
         self._about_action.triggered.connect(self.on_about_dialog_clicked)
 
         help_menu.addAction(self._about_action)
@@ -86,7 +84,7 @@ class MainWindow(
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('SaccRec')
-        self.setWindowIcon(QIcon(':app.png'))
+        self.setWindowIcon(QtGui.QIcon(':app.png'))
 
         self._setup_gui_for_non_recording()
 
@@ -123,48 +121,8 @@ class MainWindow(
 
         self.start()
 
-        # self._runner.run(
-        #     stimulus=wizard.stimulus,
-        #     output=wizard.output_path,
-        #     distance_to_subject=wizard.fixed_distance_to_subject,
-        #     tests=wizard.tests
-        # )
-
     def open_settings_dialog(self):
         self._settings_dialog.open()
-
-    # def on_runner_stopped(self):
-    #     self._new_action.setEnabled(True)
-    #     self._settings_action.setEnabled(True)
-
-    # def on_runner_finished(self):
-    #     report = QMessageBox.question(
-    #         self,
-    #         _('Opción'),
-    #         _('¿Desea generar un reporte sacádico?'),
-    #         QMessageBox.Yes | QMessageBox.No
-    #     )
-
-    #     if report == QMessageBox.Yes:
-    #         output = QFileDialog.getSaveFileName(
-    #             self,
-    #             _('Seleccione fichero de salida'),
-    #             join(settings.gui.records_path, self.subject.code),
-    #             filter='Microsoft Excel (*.xls)'
-    #         )
-    #         filepath = output[0]
-    #         if not filepath.lower().endswith('.xls'):
-    #             filepath += '.xls'
-
-    #         if filepath:
-    #             from saccrec.core import Study
-    #             from saccrec.core.reports import excel_saccadic_report
-
-    #             study = Study.open(self._new_record_wizard.output_path)
-    #             excel_saccadic_report(study, filepath)
-
-    #     self._new_action.setEnabled(True)
-    #     self._settings_action.setEnabled(True)
 
     def on_about_dialog_clicked(self):
         self._about_dialog.open()

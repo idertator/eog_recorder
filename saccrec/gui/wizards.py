@@ -3,6 +3,7 @@ from os.path import join, exists, dirname
 from PySide6 import QtCore, QtWidgets
 
 from saccrec import settings
+from saccrec.gui.widgets import SubjectWidget
 
 
 class SubjectWizardPage(QtWidgets.QWizardPage):
@@ -10,28 +11,21 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
     def __init__(self, parent, workspace):
         super(SubjectWizardPage, self).__init__(parent=parent)
         self._workspace = workspace
-        self.setup_ui()
 
-    def _initialize_layout(self):
-        self._subject = self._workspace.subject
-        self._subject.setParent(self)
-        self._subject.nameChanged.connect(self.on_name_changed)
-        self._layout.addWidget(self._subject)
-
-    def setup_ui(self):
         self.setTitle(_('Datos del sujeto'))
+
+        self._subject_widget = SubjectWidget(workspace.subject)
+        self._subject_widget.nameChanged.connect(self.on_name_changed)
+
         self._layout = QtWidgets.QVBoxLayout()
+        self._layout.addWidget(self._subject_widget)
         self.setLayout(self._layout)
-        self._initialize_layout()
 
     def reset(self):
-        self._subject.nameChanged.disconnect(self.on_name_changed)
-        self._subject.setParent(None)
-        self._layout.removeWidget(self._subject)
-        self._initialize_layout()
+        self._subject_widget.reset()
 
     def isComplete(self) -> bool:
-        return self._subject.name.strip() != ''
+        return self._subject_widget.subject.name.strip() != ''
 
     def on_name_changed(self, value: str):
         self.completeChanged.emit()

@@ -6,11 +6,12 @@ from zipfile import ZipFile
 
 from numpy import load as array_load, savez_compressed
 
+from eoglib.models import Subject
+
 from saccrec import settings
 from saccrec.core.enums import Channel
 
 from .hardware import Hardware
-from .subject import Subject
 from .tests import Test
 
 
