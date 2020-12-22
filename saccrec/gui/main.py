@@ -1,8 +1,8 @@
 from os.path import join
 
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import qApp, QMainWindow, QAction, QMessageBox, QFileDialog
-from PyQt5.QtGui import QIcon
+from PySide6 import QtWidgets
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
+from PySide6.QtGui import QIcon, QAction
 
 from saccrec import settings
 
@@ -49,7 +49,7 @@ class MainWindow(
         self._exit_action = QAction(QIcon(':exit.svg'), _('&Salir'), self)
         self._exit_action.setShortcut('Ctrl+Q')
         self._exit_action.setStatusTip(_('Salir de la aplicación'))
-        self._exit_action.triggered.connect(qApp.quit)
+        self._exit_action.triggered.connect(QApplication.instance().quit)
 
         self._settings_action = QAction(QIcon(':settings.svg'), _('&Configuración'), self)
         self._settings_action.setShortcut('Ctrl+P')

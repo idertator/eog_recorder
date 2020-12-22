@@ -1,11 +1,11 @@
 from enum import Enum
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QDialog, QListWidget, QListView, QStackedWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QDialogButtonBox, QColorDialog, QPushButton, QMessageBox, QGroupBox
-from PyQt5.QtWidgets import QWidget, QFormLayout, QComboBox, QCheckBox, QSpinBox, QLabel, QDoubleSpinBox
+from PySide6.QtCore import QSize, Qt
+from PySide6.QtGui import QIcon, QColor
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QDialog, QListWidget, QListView, QStackedWidget, QListWidgetItem, QVBoxLayout, QHBoxLayout
+from PySide6.QtWidgets import QDialogButtonBox, QColorDialog, QPushButton, QMessageBox, QGroupBox
+from PySide6.QtWidgets import QWidget, QFormLayout, QComboBox, QCheckBox, QSpinBox, QLabel, QDoubleSpinBox
 
 from saccrec import settings
 from saccrec.engine.openbci import list_ports

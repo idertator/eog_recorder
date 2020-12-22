@@ -1,6 +1,6 @@
 from os.path import join, exists, dirname
 
-from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
+from PySide6 import QtCore, QtWidgets, QtWebEngineWidgets
 
 from saccrec import settings
 
@@ -131,7 +131,7 @@ class OutputWizardPage(QtWidgets.QWizardPage):
 
 
 class RecordSetupWizard(QtWidgets.QWizard):
-    finished = QtCore.pyqtSignal()
+    finished = QtCore.Signal()
 
     def __init__(self, parent):
         super(RecordSetupWizard, self).__init__(parent)

@@ -1,14 +1,14 @@
 from datetime import date
 from typing import Union, Optional
 
-from PyQt5 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from saccrec import settings
 from saccrec.core import Gender, SubjectStatus
 
 
 class Subject(QtWidgets.QWidget):
-    nameChanged = QtCore.pyqtSignal(str)
+    nameChanged = QtCore.Signal(str)
 
     def __init__(
         self,

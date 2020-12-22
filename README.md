@@ -3,9 +3,8 @@ Registro de señales sacádicas mediante la utilización del OpenBCI
 
 ## Requerimientos
 
-- [Python](https://www.python.org/downloads/) >= 3.7
-- [PyQt5](https://pypi.org/project/PyQt5/) >= 5.12.1
-- [openbci-interface](https://pypi.org/project/openbci-interface/) >= 0.8.0
+- [Python](https://www.python.org/downloads/) >= 3.9.1
+- [PySide6](https://pypi.org/project/PySide6) >= 6.0.0
 
 ## Instrucciones de instalación
 
@@ -26,7 +25,7 @@ $ ./SaccRec.py
 Lo primero es instalar todos los paquetes requeridos por el proceso de instalación. Para ello ejecutamos el siguiente comando:
 
 ```shell
-$ sudo apt-get install git python3.7 python3-distutils qt5dxcb-plugin
+$ sudo apt-get install git python3.9 python3-distutils qt5dxcb-plugin
 ```
 
 Una vez instalados los requrimientos, necesitamos instalar algunos paquetes base de python:

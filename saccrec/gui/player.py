@@ -1,7 +1,7 @@
 from math import ceil, floor, tan, radians
 from time import time
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
 from saccrec.core.enums import StimulusPosition
@@ -9,10 +9,10 @@ from saccrec.core.study import Stimulus
 
 
 class StimulusPlayer(QtWidgets.QWidget):
-    started = QtCore.pyqtSignal(float)
-    stopped = QtCore.pyqtSignal()
-    finished = QtCore.pyqtSignal()
-    moved = QtCore.pyqtSignal(int)
+    started = QtCore.Signal(float)
+    stopped = QtCore.Signal()
+    finished = QtCore.Signal()
+    moved = QtCore.Signal(int)
 
     def __init__(self, parent=None):
         super(StimulusPlayer, self).__init__()

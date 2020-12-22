@@ -1,6 +1,6 @@
 Jinja2>=2.11.2
-PyQt5>=5.15.1
-PyQtWebEngine>=5.15.1
+PySide6>=6.0.0
+# PyQtWebEngine>=5.15.1
 numba>=0.51.2
 scikit-learn>=0.23.2
 scipy>=1.5.4

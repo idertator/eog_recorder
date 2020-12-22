@@ -3,9 +3,9 @@ from json import loads
 from os.path import expanduser, join
 from typing import Optional
 
-from PyQt5.QtCore import QSettings
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMainWindow
+from PySide6.QtCore import QSettings
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QMainWindow
 
 from saccrec.core.screen import Screen
 

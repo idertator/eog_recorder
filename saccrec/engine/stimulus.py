@@ -3,7 +3,7 @@ from random import randint
 
 from numpy import array, int8, zeros, ones, hstack
 
-from PyQt5.QtCore import QPoint
+from PySide6.QtCore import QPoint
 
 from saccrec.core import StimulusPosition
 from saccrec.core.math import points_distance

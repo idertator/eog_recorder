@@ -3,7 +3,7 @@ from math import radians, tan
 from os import makedirs
 from os.path import join, exists
 
-from PyQt5 import QtWidgets
+from PySide6 import QtWidgets
 
 from saccrec import settings
 

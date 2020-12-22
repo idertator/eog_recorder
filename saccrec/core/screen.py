@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 
 class Screen(QtCore.QObject):
@@ -6,7 +6,7 @@ class Screen(QtCore.QObject):
     def __init__(self, parent=None):
         super(Screen, self).__init__(parent=parent)
 
-        qApp = QtWidgets.qApp
+        qApp = QtWidgets.QApplication.instance()
 
         self._screens = qApp.screens()
         self._connect_handler()
@@ -16,8 +16,10 @@ class Screen(QtCore.QObject):
         qApp.screenRemoved.connect(self._screen_count_changed)
 
     def _screen_count_changed(self):
+        qApp = QtWidgets.QApplication.instance()
+
         self._disconnect_handler()
-        self._screens = QtWidgets.qApp.screens()
+        self._screens = qApp.screens()
         self._connect_handler()
         self._reset()
 

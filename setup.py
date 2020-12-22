@@ -38,7 +38,7 @@ setup(
         'saccrec.gui.wizards.setup',
     ],
     requires=[
-        'PyQt5',
+        'PySide6',
         'numpy',
         'scipy',
     ],

@@ -1,2 +1,2 @@
 #!/bin/bash
-pyrcc5 icons.qrc -o __init__.py
+pyside6-rcc icons.qrc -o __init__.py

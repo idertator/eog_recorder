@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PySide6 import QtWidgets
 
 from .enums import Gender, SubjectStatus
 from .enums import Channel, StimulusPosition, BoardTypes, BoardModes, SampleRates

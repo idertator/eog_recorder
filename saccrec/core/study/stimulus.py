@@ -3,15 +3,15 @@ from random import randint
 
 from numpy import array, int8, zeros, ones, hstack
 
-from PyQt5 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from saccrec import settings
 from saccrec.core.enums import StimulusPosition
 
 
 class Stimulus(QtWidgets.QGroupBox):
-    addPressed = QtCore.pyqtSignal(int)
-    removePressed = QtCore.pyqtSignal(int)
+    addPressed = QtCore.Signal(int)
+    removePressed = QtCore.Signal(int)
 
     def __init__(
         self,

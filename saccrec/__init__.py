@@ -1,8 +1,8 @@
 import pdb
 
-import PyQt5
+import PySide6
 
 
 def debug():
-    PyQt5.QtCore.pyqtRemoveInputHook()
+    PySide6.QtCore.pyqtRemoveInputHook()
     pdb.set_trace()

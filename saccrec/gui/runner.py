@@ -62,8 +62,6 @@ class Runner:
         pass
 
 
-# from PyQt5.QtCore import pyqtSignal, QObject
-
 # from saccrec.core import Record
 # from saccrec.core.study import Hardware, Subject
 # from saccrec.engine.recording import OpenBCIRecorder
@@ -75,9 +73,9 @@ class Runner:
 
 
 # class Runner(QObject):
-#     started = pyqtSignal()
-#     stopped = pyqtSignal()
-#     finished = pyqtSignal()
+#     started = QtCore.Signal()
+#     stopped = QtCore.Signal()
+#     finished = QtCore.Signal()
 
 #     def __init__(
 #         self,
