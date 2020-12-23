@@ -12,10 +12,10 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
         super(SubjectWizardPage, self).__init__(parent=parent)
         self._workspace = workspace
 
-        self.title = _('Subject Info')
+        self.setTitle(_('Subject Info'))
 
         self._subject_widget = SubjectWidget(workspace.subject)
-        self._subject_widget.nameChanged.connect(self.on_name_changed)
+        self._subject_widget.nameChanged.connect(self._on_name_changed)
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self._subject_widget)
@@ -26,7 +26,7 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
     def isComplete(self) -> bool:
         return self._subject_widget.subject.name.strip() != ''
 
-    def on_name_changed(self, value: str):
+    def _on_name_changed(self, value: str):
         self.completeChanged.emit()
 
 
@@ -36,15 +36,19 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
         super(StimulusWizardPage, self).__init__(parent=parent)
         self._workspace = workspace
 
-        self.title = _('Stimuli Setup')
+        self.setTitle(_('Stimuli Setup'))
 
         self._protocol = ProtocolWidget(self)
+        self._protocol.protocolNameChanged.connect(self._on_protocol_name_changed)
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self._protocol)
 
     def isComplete(self) -> bool:
         return self._protocol.protocol.name.strip() != ''
+
+    def _on_protocol_name_changed(self, value: str):
+        self.completeChanged.emit()
 
 
 class OutputWizardPage(QtWidgets.QWizardPage):
@@ -55,7 +59,7 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         self.setup_ui()
 
     def setup_ui(self):
-        self.title = _('Output Setup')
+        self.setTitle(_('Output Setup'))
 
         layout = QtWidgets.QVBoxLayout()
 

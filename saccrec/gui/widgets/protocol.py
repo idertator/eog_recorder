@@ -1,7 +1,7 @@
 from os import makedirs
 from os.path import join, exists
 
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 
 from saccrec import settings
 
@@ -12,6 +12,7 @@ from .stimulus import SaccadicStimulusWidget
 
 
 class ProtocolWidget(QtWidgets.QWidget):
+    protocolNameChanged = QtCore.Signal(str)
 
     def __init__(self, parent=None):
         super(ProtocolWidget, self).__init__(parent=parent)
@@ -22,6 +23,12 @@ class ProtocolWidget(QtWidgets.QWidget):
             self._protocol = self._default_protocol()
         self._stimuli = self._protocol_widgets(self._protocol)
 
+        self._name_label = QtWidgets.QLabel(_('Protocol Name'))
+
+        self._name_edit = QtWidgets.QLineEdit()
+        self._name_edit.setText(self._protocol.name)
+        self._name_edit.textChanged.connect(self._on_protocol_name_changed)
+
         self._load_button = QtWidgets.QPushButton()
         self._load_button.setText(_('Open'))
         self._load_button.pressed.connect(self._on_load_pressed)
@@ -30,10 +37,12 @@ class ProtocolWidget(QtWidgets.QWidget):
         self._save_button.setText(_('Save'))
         self._save_button.pressed.connect(self._on_save_pressed)
 
-        self._top_buttons_layout = QtWidgets.QHBoxLayout()
-        self._top_buttons_layout.addStretch()
-        self._top_buttons_layout.addWidget(self._load_button)
-        self._top_buttons_layout.addWidget(self._save_button)
+        self._top_layout = QtWidgets.QHBoxLayout()
+        self._top_layout.addWidget(self._name_label)
+        self._top_layout.addWidget(self._name_edit)
+        # self._top_layout.addStretch()
+        self._top_layout.addWidget(self._load_button)
+        self._top_layout.addWidget(self._save_button)
 
         self._scroll_area_layout = QtWidgets.QVBoxLayout()
         self._populate_stimulus_widgets()
@@ -46,7 +55,7 @@ class ProtocolWidget(QtWidgets.QWidget):
         self._scroll_area.setWidget(self._scroll_area_widget)
 
         self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addLayout(self._top_buttons_layout)
+        self.layout.addLayout(self._top_layout)
         self.layout.addWidget(self._scroll_area)
 
     def _default_protocol(self) -> Protocol:
@@ -88,8 +97,7 @@ class ProtocolWidget(QtWidgets.QWidget):
                     stimulus=stimulus,
                     can_add=index < len(protocol) - 1,
                     can_remove=not stimulus.calibration,
-                    enabled=not stimulus.calibration,
-                    parent=self
+                    enabled=not stimulus.calibration
                 )
 
                 if widget.can_add:
@@ -115,6 +123,11 @@ class ProtocolWidget(QtWidgets.QWidget):
         for index, stimulus in enumerate(self._stimuli):
             self._scroll_area_layout.addWidget(stimulus)
 
+    def _on_protocol_name_changed(self, value: str):
+        self._protocol.name = value
+        self._save_button.setEnabled(value.strip() != '')
+        self.protocolNameChanged.emit(value)
+
     def _on_load_pressed(self):
         default_path = settings.gui.protocols_path
         if not exists(default_path):
@@ -139,7 +152,7 @@ class ProtocolWidget(QtWidgets.QWidget):
             default_path = settings.gui.protocols_path
             if not exists(default_path):
                 makedirs(default_path)
-            default_path = join(default_path, _('Unknown.json'))
+            default_path = join(default_path, f'{self._protocol.name}.json')
 
         filename, selected_filter = QtWidgets.QFileDialog.getSaveFileName(
             self,
@@ -169,8 +182,7 @@ class ProtocolWidget(QtWidgets.QWidget):
             stimulus=stimulus,
             can_add=True,
             can_remove=True,
-            enabled=True,
-            parent=self
+            enabled=True
         )
 
         stimulus_widget.addPressed.connect(self._on_stimulus_add_pressed)
@@ -195,7 +207,11 @@ class ProtocolWidget(QtWidgets.QWidget):
         if stimulus.can_remove:
             stimulus.removePressed.disconnect(self._on_stimulus_remove_pressed)
 
+        remove = self._stimuli[index]
+        remove.setParent(None)
         del self._stimuli[index]
+        remove.destroy()
+        self._protocol.remove(index)
         stimulus = None
 
         for i in range(index, len(self._stimuli)):
