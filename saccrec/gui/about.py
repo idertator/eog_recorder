@@ -10,7 +10,7 @@ class AboutDialog(QtWidgets.QDialog):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setWindowTitle(_('Acerca de DIATAX ...'))
+        self.setWindowTitle(_('About DIATAX ...'))
         self.setFixedWidth(640)
         self.setFixedHeight(400)
 

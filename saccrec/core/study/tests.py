@@ -125,7 +125,7 @@ class Test:
     @study.setter
     def study(self, value):
         from saccrec.core import Study
-        assert(isinstance(value, Study))
+        assert isinstance(value, Study)
         self._study = value
 
     @property

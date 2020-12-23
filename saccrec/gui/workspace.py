@@ -1,20 +1,18 @@
 from typing import Optional
 
-from eoglib.models import Subject
-
-from saccrec.core.study import Protocol
+from eoglib.models import Subject, Protocol
 
 
 class Workspace:
 
     def __init__(self):
         self._subject = Subject()
-        self._protocol = Protocol()
+        self._protocol = None
         self._filepath = None
 
     def reset_workspace(self):
         self._subject = Subject()
-        self._protocol = Protocol()
+        self._protocol = None
         self._filepath = None
         self._new_record_wizard.reset()
 
@@ -25,6 +23,11 @@ class Workspace:
     @property
     def protocol(self) -> Protocol:
         return self._protocol
+
+    @protocol.setter
+    def protocol(self, value: Protocol):
+        assert isinstance(value, Protocol)
+        self._protocol = value
 
     @property
     def filepath(self) -> Optional[str]:

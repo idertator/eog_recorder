@@ -1,2 +1,3 @@
-from .subject import SubjectWidget
+from .protocol import ProtocolWidget
 from .stimulus import SaccadicStimulusWidget
+from .subject import SubjectWidget

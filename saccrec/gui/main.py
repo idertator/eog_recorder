@@ -37,29 +37,29 @@ class MainWindow(
         # Setting up top level menus
         menubar = self.menuBar()
 
-        file_menu = menubar.addMenu(_('&Estudio'))
-        help_menu = menubar.addMenu(_('&Ayuda'))
+        file_menu = menubar.addMenu(_('&Study'))
+        help_menu = menubar.addMenu(_('&Help'))
 
         # Setting up actions
-        self._new_action = QtGui.QAction(QtGui.QIcon(':document.svg'), _('&Iniciar Prueba'), self)
+        self._new_action = QtGui.QAction(QtGui.QIcon(':document.svg'), _('&New Recording'), self)
         self._new_action.triggered.connect(self.on_new_test_wizard_clicked)
 
-        self._exit_action = QtGui.QAction(QtGui.QIcon(':exit.svg'), _('&Salir'), self)
+        self._exit_action = QtGui.QAction(QtGui.QIcon(':exit.svg'), _('&Exit'), self)
         self._exit_action.setShortcut('Ctrl+Q')
-        self._exit_action.setStatusTip(_('Salir de la aplicación'))
+        self._exit_action.setStatusTip(_('Exit the app'))
         self._exit_action.triggered.connect(QtWidgets.QApplication.instance().quit)
 
-        self._settings_action = QtGui.QAction(QtGui.QIcon(':settings.svg'), _('&Configuración'), self)
+        self._settings_action = QtGui.QAction(QtGui.QIcon(':settings.svg'), _('&Settings'), self)
         self._settings_action.setShortcut('Ctrl+P')
-        self._settings_action.setStatusTip(_('Configurar aplicación'))
+        self._settings_action.setStatusTip(_('Configure the application'))
         self._settings_action.triggered.connect(self.open_settings_dialog)
 
-        self._stop_action = QtGui.QAction(QtGui.QIcon(':stop-solid.svg'), _('&Detener'), self)
+        self._stop_action = QtGui.QAction(QtGui.QIcon(':stop-solid.svg'), _('&Stop'), self)
         self._stop_action.setShortcut('Ctrl+D')
-        self._stop_action.setStatusTip(_('Detener grabación'))
+        self._stop_action.setStatusTip(_('Stop recording'))
         self._stop_action.triggered.connect(self._on_stop_clicked)
 
-        self._about_action = QtGui.QAction(QtGui.QIcon(':help.svg'), _('&Acerca de ...'), self)
+        self._about_action = QtGui.QAction(QtGui.QIcon(':help.svg'), _('&About ...'), self)
         self._about_action.triggered.connect(self.on_about_dialog_clicked)
 
         help_menu.addAction(self._about_action)
@@ -130,8 +130,8 @@ class MainWindow(
     def _on_stop_clicked(self):
         answer = QtWidgets.QMessageBox.critical(
             self,
-            _('Confirmación de interrupción de prueba'),
-            _('Está seguro que desea detener la prueba'),
+            _('Test Interruption Confirmation'),
+            _('Are you sure to interrupt the test?'),
             QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No
         )
         if answer == QtWidgets.QMessageBox.Ok:

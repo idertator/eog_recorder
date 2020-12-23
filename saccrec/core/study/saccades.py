@@ -26,7 +26,7 @@ class Saccade:
         self._sampling_interval = test.study.sampling_interval
 
     def __str__(self) -> str:
-        return _('Sácada: {onset} -> {offset}').format(
+        return _('Saccade: {onset} -> {offset}').format(
             onset=self.onset,
             offset=self.offset
         )

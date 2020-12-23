@@ -3,7 +3,7 @@ from os.path import join, exists, dirname
 from PySide6 import QtCore, QtWidgets
 
 from saccrec import settings
-from saccrec.gui.widgets import SubjectWidget
+from saccrec.gui.widgets import SubjectWidget, ProtocolWidget
 
 
 class SubjectWizardPage(QtWidgets.QWizardPage):
@@ -12,14 +12,13 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
         super(SubjectWizardPage, self).__init__(parent=parent)
         self._workspace = workspace
 
-        self.setTitle(_('Datos del sujeto'))
+        self.title = _('Subject Info')
 
         self._subject_widget = SubjectWidget(workspace.subject)
         self._subject_widget.nameChanged.connect(self.on_name_changed)
 
-        self._layout = QtWidgets.QVBoxLayout()
-        self._layout.addWidget(self._subject_widget)
-        self.setLayout(self._layout)
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self._subject_widget)
 
     def reset(self):
         self._subject_widget.reset()
@@ -34,30 +33,18 @@ class SubjectWizardPage(QtWidgets.QWizardPage):
 class StimulusWizardPage(QtWidgets.QWizardPage):
 
     def __init__(self, parent, workspace):
-        super(StimulusWizardPage, self).__init__(parent)
+        super(StimulusWizardPage, self).__init__(parent=parent)
         self._workspace = workspace
-        self.setup_ui()
 
-    def _initialize_layout(self):
-        workspace = self.parent().parent()
-        self._protocol = self._workspace.protocol
-        self._protocol.setParent(self)
-        self._layout.addWidget(self._protocol)
+        self.title = _('Stimuli Setup')
 
-    def setup_ui(self):
-        self.setTitle(_('Configuración del estímulo'))
-        self._layout = QtWidgets.QVBoxLayout()
-        self.setLayout(self._layout)
-        self._initialize_layout()
+        self._protocol = ProtocolWidget(self)
 
-    def reset(self):
-        self._protocol.setParent(None)
-        self._layout.removeWidget(self._protocol)
-        self._initialize_layout()
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self._protocol)
 
-    @property
-    def json(self) -> dict:
-        return self._protocol.json
+    def isComplete(self) -> bool:
+        return self._protocol.protocol.name.strip() != ''
 
 
 class OutputWizardPage(QtWidgets.QWizardPage):
@@ -68,7 +55,7 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setTitle(_('Configuración de la salida'))
+        self.title = _('Output Setup')
 
         layout = QtWidgets.QVBoxLayout()
 
@@ -78,7 +65,7 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         self._output_path_edit.textChanged.connect(self.on_output_path_changed)
         output_layout.addWidget(self._output_path_edit)
 
-        self._output_select_button = QtWidgets.QPushButton(_('Seleccionar'), self)
+        self._output_select_button = QtWidgets.QPushButton(_('Select'), self)
         self._output_select_button.pressed.connect(self.on_output_select_clicked)
         output_layout.addWidget(self._output_select_button)
 
@@ -111,9 +98,9 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         subject = self._workspace.subject
         output = QtWidgets.QFileDialog.getSaveFileName(
             self,
-            _('Seleccione fichero de salida'),
+            _('Select Output File'),
             join(settings.gui.records_path, subject.code),
-            filter=_('Archivo de SaccRec (*.rec)')
+            filter=_('SaccRec File (*.rec)')
         )
         filepath = output[0]
         if not filepath.lower().endswith('.rec'):
@@ -133,7 +120,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setWindowTitle(_('Configuración de nuevo registro'))
+        self.setWindowTitle(_('New Record Wizard'))
         self.setWizardStyle(QtWidgets.QWizard.ClassicStyle)
         self.resize(640, 480)
 

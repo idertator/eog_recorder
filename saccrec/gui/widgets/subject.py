@@ -36,14 +36,13 @@ class SubjectWidget(QtWidgets.QWidget):
         self._status_combo.currentIndexChanged.connect(self._on_status_changed)
 
         layout = QtWidgets.QFormLayout(self)
-        layout.addRow(_('Nombre(s)'), self._name_edit)
-        layout.addRow(_('Género'), self._gender_combo)
-        layout.addRow(_('Fecha de nacimiento'), self._borndate_edit)
-        layout.addRow(_('Estado'), self._status_combo)
+        layout.addRow(_('Name'), self._name_edit)
+        layout.addRow(_('Gender'), self._gender_combo)
+        layout.addRow(_('Borndate'), self._borndate_edit)
+        layout.addRow(_('Status'), self._status_combo)
         self.layout = layout
 
-    def _on_name_changed(self):
-        value = self._name_edit.text
+    def _on_name_changed(self, value: str):
         self._subject.name = value
         self.nameChanged.emit(value)
 

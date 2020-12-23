@@ -25,20 +25,20 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
 
         self._stimulus = stimulus
 
-        self.title = str(stimulus)
-        self.flat = True
-        self.minimum_height = 90
-        self.fixed_height = 90
-        self.alignment = QtCore.Qt.AlignBottom
+        self.setTitle(str(stimulus))
+        self.setFlat(True)
+        self.setMinimumHeight(90)
+        self.setFixedHeight(90)
+        self.setAlignment(QtCore.Qt.AlignBottom)
 
         self._angle_edit = QtWidgets.QSpinBox(self)
-        self._angle_edit.minimum = 10
-        self._angle_edit.maximum = 60
-        self._angle_edit.single_step = 1
-        self._angle_edit.suffix = ' \u00B0'
-        self._angle_edit.fixed_width = 60
-        self._angle_edit.tool_tip = _('Angle')
-        self._angle_edit.enabled(self._enabled)
+        self._angle_edit.setMinimum(10)
+        self._angle_edit.setMaximum(60)
+        self._angle_edit.setSingleStep(1)
+        self._angle_edit.setSuffix(' \u00B0')
+        self._angle_edit.setFixedWidth(60)
+        self._angle_edit.setToolTip(_('Angle'))
+        self._angle_edit.setEnabled(self._enabled)
         self._angle_edit.valueChanged.connect(self._on_angle_value_changed)
 
         angle_layout = QtWidgets.QVBoxLayout()
@@ -46,11 +46,11 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
         angle_layout.addWidget(self._angle_edit)
 
         self._fixation_mean_duration_edit = QtWidgets.QDoubleSpinBox(self)
-        self._fixation_mean_duration_edit.single_step = 0.01
-        self._fixation_mean_duration_edit.suffix = _(' sec')
-        self._fixation_mean_duration_edit.fixed_width = 80
-        self._fixation_mean_duration_edit.tool_tip = _('Fixation Mean Duration')
-        self._fixation_mean_duration_edit.enabled = self._enabled
+        self._fixation_mean_duration_edit.setSingleStep(0.01)
+        self._fixation_mean_duration_edit.setSuffix(_(' sec'))
+        self._fixation_mean_duration_edit.setFixedWidth(80)
+        self._fixation_mean_duration_edit.setToolTip(_('Fixation Mean Duration'))
+        self._fixation_mean_duration_edit.setEnabled(self._enabled)
         self._fixation_mean_duration_edit.valueChanged.connect(self._on_fixation_duration_changed)
 
         duration_layout = QtWidgets.QVBoxLayout()
@@ -58,12 +58,12 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
         duration_layout.addWidget(self._fixation_mean_duration_edit)
 
         self._fixation_variability_edit = QtWidgets.QDoubleSpinBox(self)
-        self._fixation_variability_edit.minimum = 0
-        self._fixation_variability_edit.single_step = 0.01
-        self._fixation_variability_edit.suffix = ' %'
-        self._fixation_variability_edit.fixed_width = 80
-        self._fixation_variability_edit.tool_tip = _('Fixation Variability')
-        self._fixation_variability_edit.enabled = self._enabled
+        self._fixation_variability_edit.setMinimum(0)
+        self._fixation_variability_edit.setSingleStep(0.01)
+        self._fixation_variability_edit.setSuffix(' %')
+        self._fixation_variability_edit.setFixedWidth(80)
+        self._fixation_variability_edit.setToolTip(_('Fixation Variability'))
+        self._fixation_variability_edit.setEnabled(self._enabled)
         self._fixation_variability_edit.valueChanged.connect(self._on_fixation_variability_changed)
 
         variability_layout = QtWidgets.QVBoxLayout()
@@ -71,12 +71,12 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
         variability_layout.addWidget(self._fixation_variability_edit)
 
         self._saccades_count = QtWidgets.QSpinBox(self)
-        self._saccades_count.minimum = 5
-        self._saccades_count.maximum = 100
-        self._saccades_count.single_step = 1
-        self._saccades_count.fixed_width = 60
-        self._saccades_count.tool_tip = _('Saccades Count')
-        self._saccades_count.enabled = self._enabled
+        self._saccades_count.setMinimum(5)
+        self._saccades_count.setMaximum(100)
+        self._saccades_count.setSingleStep(1)
+        self._saccades_count.setFixedWidth(60)
+        self._saccades_count.setToolTip(_('Saccades Count'))
+        self._saccades_count.setEnabled(self._enabled)
         self._saccades_count.valueChanged.connect(self._on_saccades_count_changed)
 
         count_layout = QtWidgets.QVBoxLayout()
@@ -84,13 +84,11 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
         count_layout.addWidget(self._saccades_count)
 
         self._cancel_widget_button = QtWidgets.QPushButton('-')
-        self._cancel_widget_button.fixed_width = 20
-        self._cancel_widget_button.fixed_height = 20
+        self._cancel_widget_button.setFixedSize(20, 20)
         self._cancel_widget_button.pressed.connect(self._on_remove_pressed)
 
         self._add_widget_button = QtWidgets.QPushButton('+')
-        self._add_widget_button.fixed_width = 20
-        self._add_widget_button.fixed_height = 20
+        self._add_widget_button.setFixedSize(20, 20)
         self._add_widget_button.pressed.connect(self._on_add_pressed)
 
         layout = QtWidgets.QHBoxLayout(self)

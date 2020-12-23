@@ -1,409 +1,296 @@
-#
-#  <>, YEAR-2020.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: saccrec\n"
-"POT-Creation-Date: 2020-11-21 18:44+0100\n"
-"PO-Revision-Date: 2020-11-21 18:45+0100\n"
+"POT-Creation-Date: 2020-12-23 13:47+0100\n"
+"PO-Revision-Date: 2020-12-23 13:47+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 2.4.2\n"
+"X-Poedit-Basepath: ../../../saccrec\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.1\n"
-"X-Poedit-Basepath: ../../..\n"
-"X-Poedit-SearchPath-0: bin\n"
-"X-Poedit-SearchPath-1: saccrec\n"
+"X-Poedit-SearchPath-0: .\n"
 
-#: saccrec/core/enums.py:12 saccrec/core/enums.py:27
-msgid "Desconocido"
-msgstr "Unknown"
-
-#: saccrec/core/enums.py:13
-msgid "Masculino"
-msgstr "Male"
-
-#: saccrec/core/enums.py:14
-msgid "Femenino"
-msgstr "Female"
-
-#: saccrec/core/enums.py:28
-msgid "Control"
-msgstr "Control"
-
-#: saccrec/core/enums.py:29
-msgid "Presintomático"
-msgstr "Presymptomatic"
-
-#: saccrec/core/enums.py:30
-msgid "SCA2"
-msgstr "SCA2"
-
-#: saccrec/core/study/protocol.py:36
-msgid "Prueba de calibración horizontal inicial"
-msgstr "Initial Horizontal Calibration Test"
-
-#: saccrec/core/study/protocol.py:48
-msgid "Prueba sacádica a 30\\u00B0"
-msgstr "30\\u00B0 saccadic test"
-
-#: saccrec/core/study/protocol.py:60
-msgid "Prueba de calibración horizontal final"
-msgstr "Final Horizontal Calibration Test"
-
-#: saccrec/core/study/protocol.py:135
-msgid "Abrir"
-msgstr "Open"
-
-#: saccrec/core/study/protocol.py:139
-msgid "Guardar"
-msgstr "Save"
-
-#: saccrec/core/study/protocol.py:169
-msgid "Abrir fichero de protocolo"
-msgstr "Open protocol file"
-
-#: saccrec/core/study/protocol.py:171 saccrec/core/study/protocol.py:191
-msgid "Archivo de Protocolo (*.json)"
-msgstr "Protocol File (*.json)"
-
-#: saccrec/core/study/protocol.py:185
-msgid "SinNombre.json"
-msgstr "Unnamed.json"
-
-#: saccrec/core/study/protocol.py:189
-msgid "Guardar fichero de protocolo"
-msgstr "Save protocol file"
-
-#: saccrec/core/study/saccades.py:29
+#: core/study/saccades.py:29
 #, python-brace-format
-msgid "Sácada: {onset} -> {offset}"
+msgid "Saccade: {onset} -> {offset}"
 msgstr "Saccade: {onset} -> {offset}"
 
-#: saccrec/core/study/stimulus.py:50 saccrec/core/study/stimulus.py:54
-msgid "Ángulo"
-msgstr "Angle"
-
-#: saccrec/core/study/stimulus.py:60
-msgid " seg"
-msgstr " sec"
-
-#: saccrec/core/study/stimulus.py:62
-msgid "Duración de fijaciones"
-msgstr "Fixation duration"
-
-#: saccrec/core/study/stimulus.py:65
-msgid "T. Fijación"
-msgstr "Fixation time"
-
-#: saccrec/core/study/stimulus.py:74
-msgid "Variabilidad de fijaciones"
-msgstr "Fixation variability"
-
-#: saccrec/core/study/stimulus.py:77
-msgid "Variabilidad"
-msgstr "Variability"
-
-#: saccrec/core/study/stimulus.py:86
-msgid "Cantidad de sácadas"
-msgstr "Saccades count"
-
-#: saccrec/core/study/stimulus.py:89
-msgid "Cantidad"
-msgstr "Amount"
-
-#: saccrec/core/study/stimulus.py:144
-#, python-brace-format
-msgid "Prueba sacádica a {angle}"
-msgstr "Saccadic test of {angle}"
-
-#: saccrec/core/study/subject.py:34
-msgid "Nombre(s)"
-msgstr "Name(s)"
-
-#: saccrec/core/study/subject.py:39
-msgid "Género"
-msgstr "Gender"
-
-#: saccrec/core/study/subject.py:44
-msgid "Fecha de nacimiento"
-msgstr "Birthdate"
-
-#: saccrec/core/study/subject.py:49
-msgid "Estado"
-msgstr "Status"
-
-#: saccrec/gui/about.py:49
-msgid "Acerca de DIATAX ..."
+#: gui/about.py:13
+msgid "About DIATAX ..."
 msgstr "About DIATAX ..."
 
-#: saccrec/gui/main.py:49
-msgid "&Estudio"
+#: gui/main.py:40
+msgid "&Study"
 msgstr "&Study"
 
-#: saccrec/gui/main.py:50
-msgid "&Ayuda"
+#: gui/main.py:41
+msgid "&Help"
 msgstr "&Help"
 
-#: saccrec/gui/main.py:53
-msgid "&Iniciar Prueba"
-msgstr "S&tart Test"
+#: gui/main.py:44
+msgid "&New Recording"
+msgstr "&New Recording"
 
-#: saccrec/gui/main.py:56
-msgid "&Salir"
+#: gui/main.py:47
+msgid "&Exit"
 msgstr "&Exit"
 
-#: saccrec/gui/main.py:58
-msgid "Salir de la aplicación"
-msgstr "Exit app"
+#: gui/main.py:49
+msgid "Exit the app"
+msgstr "Exit the app"
 
-#: saccrec/gui/main.py:61
-msgid "&Configuración"
-msgstr "Settin&gs"
+#: gui/main.py:52
+msgid "&Settings"
+msgstr "&Settings"
 
-#: saccrec/gui/main.py:63
-msgid "Configurar aplicación"
-msgstr "Setup app"
+#: gui/main.py:54
+msgid "Configure the application"
+msgstr "Configure the application"
 
-#: saccrec/gui/main.py:66
-msgid "&Acerca de ..."
+#: gui/main.py:57
+msgid "&Stop"
+msgstr "&Stop"
+
+#: gui/main.py:59
+msgid "Stop recording"
+msgstr "Stop recording"
+
+#: gui/main.py:62
+msgid "&About ..."
 msgstr "&About ..."
 
-#: saccrec/gui/main.py:130
-msgid "Opción"
-msgstr "Option"
+#: gui/main.py:133
+msgid "Test Interruption Confirmation"
+msgstr "Test Interruption Confirmation"
 
-#: saccrec/gui/main.py:131
-msgid "¿Desea generar un reporte sacádico?"
-msgstr "Do you wish to generate a saccadic report?"
+#: gui/main.py:134
+msgid "Are you sure to interrupt the test?"
+msgstr "Are you sure to interrupt the test?"
 
-#: saccrec/gui/main.py:139 saccrec/gui/wizards.py:101
-msgid "Seleccione fichero de salida"
-msgstr "Select an output file"
-
-#: saccrec/gui/runner.py:91 saccrec/gui/runner.py:133
-msgid "Presione espacio para continuar"
+#: gui/player.py:91
+msgid "Press space to continue"
 msgstr "Press space to continue"
 
-#: saccrec/gui/settings.py:21
-msgid "Inglés"
+#: gui/settings.py:21
+msgid "English"
 msgstr "English"
 
-#: saccrec/gui/settings.py:22
-msgid "Español"
+#: gui/settings.py:22
+msgid "Spanish"
 msgstr "Spanish"
 
-#: saccrec/gui/settings.py:41
-msgid "Idioma"
+#: gui/settings.py:41
+msgid "Language"
 msgstr "Language"
 
-#: saccrec/gui/settings.py:58
-msgid "Alerta"
+#: gui/settings.py:58
+msgid "Alert"
 msgstr "Alert"
 
-#: saccrec/gui/settings.py:59
+#: gui/settings.py:59
 msgid ""
-"Para establecer los cambios se necesita reiniciar la aplicación. ¿Desea "
-"cerrar la aplicación?"
+"You need to restart the app in order to persist the changes. Do you really "
+"want to close the app?"
 msgstr ""
-"The application needs to be restarted to set the changes. Do you want to "
-"close it?"
+"You need to restart the app in order to persist the changes. Do you really "
+"want to close the app?"
 
-#: saccrec/gui/settings.py:67
-msgid "Interfaz de Usuario"
+#: gui/settings.py:67
+msgid "User Interface"
 msgstr "User Interface"
 
-#: saccrec/gui/settings.py:85
-msgid "Canal"
+#: gui/settings.py:85
+msgid "Channel"
 msgstr "Channel"
 
-#: saccrec/gui/settings.py:91
-msgid "Ganancia"
+#: gui/settings.py:91
+msgid "Gain"
 msgstr "Gain"
 
-#: saccrec/gui/settings.py:128
-msgid "Puerto"
+#: gui/settings.py:128
+msgid "Port"
 msgstr "Port"
 
-#: saccrec/gui/settings.py:134
-msgid "Frecuencia de muestreo"
-msgstr "Sampling Frequency"
+#: gui/settings.py:134
+msgid "Sampling frequency"
+msgstr "Sampling frequency"
 
-#: saccrec/gui/settings.py:136
-msgid "Canales"
+#: gui/settings.py:136
+msgid "Channels"
 msgstr "Channels"
 
-#: saccrec/gui/settings.py:182
-msgid "Configuración del Hardware"
-msgstr "Hardware settings"
+#: gui/settings.py:182
+msgid "Hardware"
+msgstr "Hardware"
 
-#: saccrec/gui/settings.py:216
-msgid "Tamaño Pantalla"
+#: gui/settings.py:216
+msgid "Screen Size"
 msgstr "Screen Size"
 
-#: saccrec/gui/settings.py:219
-msgid "Ancho"
+#: gui/settings.py:219
+msgid "Width"
 msgstr "Width"
 
-#: saccrec/gui/settings.py:228
-msgid "Alto"
+#: gui/settings.py:228
+msgid "Height"
 msgstr "Height"
 
-#: saccrec/gui/settings.py:249
-msgid "Distancia máxima de estímulo sacádico *"
-msgstr "Saccadic stimulus maximum distance *"
+#: gui/settings.py:249
+msgid "Maximum distance to saccadic stimulus *"
+msgstr "Maximum distance to saccadic stimulus *"
 
-#: saccrec/gui/settings.py:256
-msgid "Radio del estímulo sacádico"
+#: gui/settings.py:256
+msgid "Saccadic stimulus radius"
 msgstr "Saccadic stimulus radius"
 
-#: saccrec/gui/settings.py:259
-msgid "Color del estímulo"
+#: gui/settings.py:259
+msgid "Stimulus color"
 msgstr "Stimulus color"
 
-#: saccrec/gui/settings.py:262
-msgid "Color de fondo"
+#: gui/settings.py:262
+msgid "Background color"
 msgstr "Background color"
 
-#: saccrec/gui/settings.py:266
+#: gui/settings.py:266
 msgid ""
-"* Define la distancia entre los puntos de estímulo para la prueba con mayor "
-"ángulo de estimulación"
+"* Define the distance between the points of stimulus for the test with the "
+"greatest angle of stimulation"
 msgstr ""
-"* Define the distance between the stimulus points for the test with the "
-"higher stimulus angle"
+"* Define the distance between the points of stimulus for the test with the "
+"greatest angle of stimulation"
 
-#: saccrec/gui/settings.py:293
-msgid "Configuración de estímulo"
-msgstr "Stimulus settings"
+#: gui/settings.py:293
+msgid "Stimuli"
+msgstr "Stimuli"
 
-#: saccrec/gui/settings.py:318
-msgid "Interfaz"
+#: gui/settings.py:318
+msgid "Interface"
 msgstr "Interface"
 
-#: saccrec/gui/settings.py:323
+#: gui/settings.py:323
 msgid "OpenBCI"
 msgstr "OpenBCI"
 
-#: saccrec/gui/settings.py:328
-msgid "Estímulo"
-msgstr "Stimuli"
+#: gui/settings.py:328
+msgid "Stimulus"
+msgstr "Stimulus"
 
-#: saccrec/gui/settings.py:341
-msgid "Aplicar"
+#: gui/settings.py:341
+msgid "Apply"
 msgstr "Apply"
 
-#: saccrec/gui/settings.py:342
-msgid "Cancelar"
+#: gui/settings.py:342
+msgid "Cancel"
 msgstr "Cancel"
 
-#: saccrec/gui/signals.py:168
-msgid "Canal Horizontal"
+#: gui/signals.py:168
+msgid "Horizontal Channel"
 msgstr "Horizontal Channel"
 
-#: saccrec/gui/signals.py:195
-msgid "Canal Vertical"
+#: gui/signals.py:195
+msgid "Vertical Channel"
 msgstr "Vertical Channel"
 
-#: saccrec/gui/wizards.py:16
-msgid "Datos del sujeto"
-msgstr "Subject info"
+#: gui/widgets/protocol.py:26
+msgid "Open"
+msgstr "Open"
 
-#: saccrec/gui/wizards.py:41
-msgid "Configuración del estímulo"
-msgstr "Stimuli settings"
+#: gui/widgets/protocol.py:30
+msgid "Save"
+msgstr "Save"
 
-#: saccrec/gui/wizards.py:61
-msgid "Configuración de la salida"
-msgstr "Output settings"
+#: gui/widgets/protocol.py:125
+msgid "Open Protocol File"
+msgstr "Open Protocol File"
 
-#: saccrec/gui/wizards.py:71
-msgid "Seleccionar"
+#: gui/widgets/protocol.py:127 gui/widgets/protocol.py:148
+msgid "Protocol File (*.json)"
+msgstr "Protocol File (*.json)"
+
+#: gui/widgets/protocol.py:142
+msgid "Unknown.json"
+msgstr "Unknown.json"
+
+#: gui/widgets/protocol.py:146
+msgid "Save Protocol File"
+msgstr "Save Protocol File"
+
+#: gui/widgets/stimulus.py:40 gui/widgets/stimulus.py:45
+msgid "Angle"
+msgstr "Angle"
+
+#: gui/widgets/stimulus.py:50
+msgid " sec"
+msgstr " sec"
+
+#: gui/widgets/stimulus.py:52
+msgid "Fixation Mean Duration"
+msgstr "Fixation Mean Duration"
+
+#: gui/widgets/stimulus.py:57
+msgid "F. Duration"
+msgstr "F. Duration"
+
+#: gui/widgets/stimulus.py:65
+msgid "Fixation Variability"
+msgstr "Fixation Variability"
+
+#: gui/widgets/stimulus.py:70
+msgid "F. Variability"
+msgstr "F. Variability"
+
+#: gui/widgets/stimulus.py:78
+msgid "Saccades Count"
+msgstr "Saccades Count"
+
+#: gui/widgets/stimulus.py:83
+msgid "Cantidad"
+msgstr "Cantidad"
+
+#: gui/widgets/subject.py:39
+msgid "Name"
+msgstr "Name"
+
+#: gui/widgets/subject.py:40
+msgid "Gender"
+msgstr "Gender"
+
+#: gui/widgets/subject.py:41
+msgid "Borndate"
+msgstr "Borndate"
+
+#: gui/widgets/subject.py:42
+msgid "Status"
+msgstr "Status"
+
+#: gui/wizards.py:15
+msgid "Subject Info"
+msgstr "Subject Info"
+
+#: gui/wizards.py:39
+msgid "Stimuli Setup"
+msgstr "Stimuli Setup"
+
+#: gui/wizards.py:58
+msgid "Output Setup"
+msgstr "Output Setup"
+
+#: gui/wizards.py:68
+msgid "Select"
 msgstr "Select"
 
-#: saccrec/gui/wizards.py:103
-msgid "Archivo de SaccRec (*.rec)"
+#: gui/wizards.py:101
+msgid "Select Output File"
+msgstr "Select Output File"
+
+#: gui/wizards.py:103
+msgid "SaccRec File (*.rec)"
 msgstr "SaccRec File (*.rec)"
 
-#: saccrec/gui/wizards.py:122
-msgid "Configuración de nuevo registro"
-msgstr "Setup new record"
-
-#~ msgid "Prueba de Calibración Horizontal Inicial"
-#~ msgstr "Initial Horizontal Calibration Test"
-
-#~ msgid "Prueba sacádica a"
-#~ msgstr "Saccadic test of"
-
-#~ msgid "Prueba de Calibración Horizontal Final"
-#~ msgstr "Final Horizontal Calibration Test"
-
-#~ msgid "Resumen"
-#~ msgstr "Summary"
-
-#~ msgid "Notas importantes"
-#~ msgstr "Important notes"
-
-#~ msgid "Distancia del sujeto a la pantalla"
-#~ msgstr "Distance of the subject to the screen"
-
-#~ msgid "Estímulos"
-#~ msgstr "Stimuli"
-
-#~ msgid "a"
-#~ msgstr "of"
-
-#~ msgid "con"
-#~ msgstr "with"
-
-#~ msgid "sácadas"
-#~ msgstr "saccades"
-
-#~ msgid "La duración media de las fijaciones es de"
-#~ msgstr "The mean duration of fixations is"
-
-#~ msgid "segundos"
-#~ msgstr "seconds"
-
-#~ msgid "con una variabilidad del"
-#~ msgstr "with a variability of"
-
-#~ msgid "persona nacida el"
-#~ msgstr "person born at"
-
-#~ msgid "hombre nacido el"
-#~ msgstr "male born at"
-
-#~ msgid "mujer nacida el"
-#~ msgstr "female born at"
-
-#~ msgid "Sujeto"
-#~ msgstr "Subject"
-
-#~ msgid "Error"
-#~ msgstr "Error"
-
-#~ msgid "El recibidor Bluetooth no está conectado al ordenador"
-#~ msgstr "The Bluetooth receiver is not connected to the computer"
-
-#~ msgid "La tarjeta no está conectada"
-#~ msgstr "Board is not connected"
-
-#~ msgid "Configuración del OpenBCI"
-#~ msgstr "OpenBCI Settings"
-
-#~ msgid "Configuración de los canales del OpenBCI"
-#~ msgstr "OpenBCI Channels Settings"
-
-#~ msgid "Pantalla de estímulo"
-#~ msgstr "Stimulus screen"
-
-#~ msgid "Configuración de pantalla"
-#~ msgstr "Screen settings"
-
-#~ msgid "Prueba sacádica"
-#~ msgstr "Saccadic test"
+#: gui/wizards.py:123
+msgid "New Record Wizard"
+msgstr "New Record Wizard"

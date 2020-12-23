@@ -5,7 +5,7 @@ from saccrec.core import Study, SaccadicTest
 from saccrec.core.enums import Channel
 from saccrec.engine.calibration import calibrate
 
-_HEADERS = ['#', 'Onset', 'Offset', 'Amplitud', 'Duración', 'Velocidad Máxima']
+_HEADERS = ['#', 'Onset', 'Offset', 'Amplitude', 'Duration', 'Peak Velocity']
 
 
 def excel_saccadic_report(study: Study, output_path: str):
@@ -50,7 +50,7 @@ def excel_saccadic_report(study: Study, output_path: str):
         dataset.append([
             '',
             '',
-            'Desv. Típica:',
+            'Stdev:',
             std(amplitudes),
             std(durations),
             std(max_velocities)

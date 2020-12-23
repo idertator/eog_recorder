@@ -1,36 +1,6 @@
 from enum import IntEnum, Enum
 
 
-class Gender(IntEnum):
-    Unknown = 0
-    Male = 1
-    Female = 2
-
-    @property
-    def label(self) -> str:
-        return {
-            Gender.Unknown: _('Desconocido'),
-            Gender.Male: _('Masculino'),
-            Gender.Female: _('Femenino'),
-        }[self]
-
-
-class SubjectStatus(IntEnum):
-    Unknown = 0
-    Control = 1
-    Presymptomatic = 2
-    SCA2 = 3
-
-    @property
-    def label(self) -> str:
-        return {
-            SubjectStatus.Unknown: _('Desconocido'),
-            SubjectStatus.Control: _('Control'),
-            SubjectStatus.Presymptomatic: _('Presintomático'),
-            SubjectStatus.SCA2: _('SCA2'),
-        }[self]
-
-
 class Channel(Enum):
     Unknown = 'Unknown'
     Timestamps = 'Timestamps'
@@ -39,12 +9,6 @@ class Channel(Enum):
     Horizontal = 'Horizontal'
     Vertical = 'Vertical'
     Annotations = 'Annotations'
-
-
-class StimulusPosition(IntEnum):
-    Left = 1
-    Center = 2
-    Right = 3
 
 
 class BoardTypes(Enum):

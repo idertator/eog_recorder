@@ -4,8 +4,8 @@ from time import time
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
-from saccrec.core.enums import StimulusPosition
-from saccrec.core.study import Stimulus
+
+from eoglib.models import SaccadicStimulus, StimulusPosition
 
 
 class StimulusPlayer(QtWidgets.QWidget):
@@ -81,14 +81,14 @@ class StimulusPlayer(QtWidgets.QWidget):
             StimulusPosition.Center: self._center_ball,
         }.get(position, None), position
 
-    def start(self, stimulus: Stimulus):
+    def start(self, stimulus: SaccadicStimulus):
         self._stimulus = stimulus
 
         self._load_settings()
 
         self._message = '\n'.join([
             self._stimulus.name,
-            _('Presione espacio para continuar')
+            _('Press space to continue')
         ])
 
         self.move(

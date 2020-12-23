@@ -18,8 +18,8 @@ class _Language(Enum):
     @property
     def label(self) -> str:
         return {
-            _Language.English: _('Inglés'),
-            _Language.Spanish: _('Español'),
+            _Language.English: _('English'),
+            _Language.Spanish: _('Spanish'),
         }[self]
 
 
@@ -38,7 +38,7 @@ class _GUISettingsPage(QWidget):
         for lang in _Language:
             self._languages_combo.addItem(lang.label, lang.value)
 
-        layout.addRow(_('Idioma'), self._languages_combo)
+        layout.addRow(_('Language'), self._languages_combo)
         self.setLayout(layout)
 
         self.load()
@@ -55,8 +55,8 @@ class _GUISettingsPage(QWidget):
 
             answer = QMessageBox.question(
                 self,
-                _('Alerta'),
-                _('Para establecer los cambios se necesita reiniciar la aplicación. ¿Desea cerrar la aplicación?')
+                _('Alert'),
+                _('You need to restart the app in order to persist the changes. Do you really want to close the app?')
             )
 
             if answer == QMessageBox.Yes:
@@ -64,7 +64,7 @@ class _GUISettingsPage(QWidget):
 
     @property
     def title(self) -> str:
-        return _('Interfaz de Usuario')
+        return _('User Interface')
 
 
 class _OpenBCIChannelWidget(QWidget):
@@ -82,13 +82,13 @@ class _OpenBCIChannelWidget(QWidget):
         self._openbci_channel_activated_check.stateChanged.connect(self.on_activated_change)
         layout.addRow(
             '{channel} {number}    '.format(
-                channel=_('Canal'),
+                channel=_('Channel'),
                 number=self._channel_number + 1
             ),
             self._openbci_channel_activated_check
         )
 
-        self._gain_label = QLabel(_('Ganancia'))
+        self._gain_label = QLabel(_('Gain'))
         gain_layout.addWidget(self._gain_label)
 
         self._openbci_channel_gain_edit = QSpinBox()
@@ -125,15 +125,15 @@ class _HardwarePage(QWidget):
         self._openbci_ports_combo.setDuplicatesEnabled(False)
         for port in list_ports():
             self._openbci_ports_combo.addItem(port, port)
-        form_layout.addRow(_('Puerto'), self._openbci_ports_combo)
+        form_layout.addRow(_('Port'), self._openbci_ports_combo)
 
         self._openbci_sample_rate_combo = QComboBox()
         self._openbci_sample_rate_combo.setDuplicatesEnabled(False)
         for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
             self._openbci_sample_rate_combo.addItem(f'{sr} Hz', sr)
-        form_layout.addRow(_('Frecuencia de muestreo'), self._openbci_sample_rate_combo)
+        form_layout.addRow(_('Sampling frequency'), self._openbci_sample_rate_combo)
 
-        channels_group = QGroupBox(_('Canales'))
+        channels_group = QGroupBox(_('Channels'))
         self._channel_list = []
         channels_layout = QVBoxLayout()
         top_layout = QHBoxLayout()
@@ -179,7 +179,7 @@ class _HardwarePage(QWidget):
 
     @property
     def title(self) -> str:
-        return _('Configuración del Hardware')
+        return _('Hardware')
 
 
 class ColorButton(QPushButton):
@@ -213,10 +213,10 @@ class _StimulusSettingsPage(QWidget):
     def __init__(self, parent=None):
         super(_StimulusSettingsPage, self).__init__(parent)
 
-        screen_size_group = QGroupBox(_('Tamaño Pantalla'))
+        screen_size_group = QGroupBox(_('Screen Size'))
         screen_size_layout = QHBoxLayout()
 
-        screen_size_layout.addWidget(QLabel(_('Ancho')))
+        screen_size_layout.addWidget(QLabel(_('Width')))
 
         self._stimulus_screen_width_edit = QDoubleSpinBox()
         self._stimulus_screen_width_edit.setMinimum(10.0)
@@ -225,7 +225,7 @@ class _StimulusSettingsPage(QWidget):
         self._stimulus_screen_width_edit.setSuffix(' cm')
         screen_size_layout.addWidget(self._stimulus_screen_width_edit)
 
-        screen_size_layout.addWidget(QLabel(_('Alto')))
+        screen_size_layout.addWidget(QLabel(_('Height')))
 
         self._stimulus_screen_height_edit = QDoubleSpinBox()
         self._stimulus_screen_height_edit.setMinimum(10.0)
@@ -246,24 +246,24 @@ class _StimulusSettingsPage(QWidget):
         self._stimulus_saccadic_distance_edit.setMaximum(198.0)
         self._stimulus_saccadic_distance_edit.setSuffix(' cm')
 
-        form_layout.addRow(_('Distancia máxima de estímulo sacádico *'), self._stimulus_saccadic_distance_edit)
+        form_layout.addRow(_('Maximum distance to saccadic stimulus *'), self._stimulus_saccadic_distance_edit)
 
         self._stimulus_saccadic_ball_radius_edit = QDoubleSpinBox()
         self._stimulus_saccadic_ball_radius_edit.setFixedWidth(85)
         self._stimulus_saccadic_ball_radius_edit.setMinimum(0.1)
         self._stimulus_saccadic_ball_radius_edit.setMaximum(1.0)
         self._stimulus_saccadic_ball_radius_edit.setSuffix(' cm')
-        form_layout.addRow(_('Radio del estímulo sacádico'), self._stimulus_saccadic_ball_radius_edit)
+        form_layout.addRow(_('Saccadic stimulus radius'), self._stimulus_saccadic_ball_radius_edit)
 
         self._stimulus_saccadic_ball_color_select = ColorButton()
-        form_layout.addRow(_('Color del estímulo'), self._stimulus_saccadic_ball_color_select)
+        form_layout.addRow(_('Stimulus color'), self._stimulus_saccadic_ball_color_select)
 
         self._stimulus_saccadic_background_color_select = ColorButton()
-        form_layout.addRow(_('Color de fondo'), self._stimulus_saccadic_background_color_select)
+        form_layout.addRow(_('Background color'), self._stimulus_saccadic_background_color_select)
 
         form_layout.addRow('', QLabel())
         form_layout.addRow('', QLabel())
-        form_layout.addRow(QLabel(_('* Define la distancia entre los puntos de estímulo para la prueba con mayor ángulo de estimulación')))
+        form_layout.addRow(QLabel(_('* Define the distance between the points of stimulus for the test with the greatest angle of stimulation')))
 
         layout = QVBoxLayout()
         layout.addWidget(screen_size_group)
@@ -290,7 +290,7 @@ class _StimulusSettingsPage(QWidget):
 
     @property
     def title(self):
-        return _('Configuración de estímulo')
+        return _('Stimuli')
 
 
 class SettingsDialog(QDialog):
@@ -315,7 +315,7 @@ class SettingsDialog(QDialog):
         self.contentsWidget.setCurrentRow(0)
 
         # MENUS
-        gui_button = QListWidgetItem(QIcon(':gui.svg'), _('Interfaz'))
+        gui_button = QListWidgetItem(QIcon(':gui.svg'), _('Interface'))
         self.contentsWidget.addItem(gui_button)
         gui_button.setTextAlignment(Qt.AlignHCenter)
         gui_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
@@ -325,7 +325,7 @@ class SettingsDialog(QDialog):
         openbci_button.setTextAlignment(Qt.AlignHCenter)
         openbci_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-        stimulus_button = QListWidgetItem(QIcon(':stimuli.svg'), _('Estímulo'))
+        stimulus_button = QListWidgetItem(QIcon(':stimuli.svg'), _('Stimulus'))
         self.contentsWidget.addItem(stimulus_button)
         stimulus_button.setTextAlignment(Qt.AlignHCenter)
         stimulus_button.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
@@ -338,8 +338,8 @@ class SettingsDialog(QDialog):
         horizontal_layout.addWidget(self.pagesWidget, 1)
 
         dialog_buttons = QDialogButtonBox()
-        dialog_buttons.addButton(_('Aplicar'), QDialogButtonBox.AcceptRole)
-        dialog_buttons.addButton(_('Cancelar'), QDialogButtonBox.RejectRole)
+        dialog_buttons.addButton(_('Apply'), QDialogButtonBox.AcceptRole)
+        dialog_buttons.addButton(_('Cancel'), QDialogButtonBox.RejectRole)
         dialog_buttons.accepted.connect(self.on_accepted)
         dialog_buttons.rejected.connect(self.on_rejected)
         layout.addLayout(horizontal_layout)

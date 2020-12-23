@@ -108,7 +108,7 @@ class Study:
 
     @horizontal_calibration.setter
     def horizontal_calibration(self, value) -> float:
-        assert(isinstance(value, float))
+        assert isinstance(value, float)
         self._horizontal_calibration = value
 
     @property
@@ -117,7 +117,7 @@ class Study:
 
     @vertical_calibration.setter
     def vertical_calibration(self, value) -> float:
-        assert(isinstance(value, float))
+        assert isinstance(value, float)
         self._vertical_calibration = value
 
     @classmethod
