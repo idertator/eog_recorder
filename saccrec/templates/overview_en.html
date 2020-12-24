@@ -22,7 +22,7 @@ female born at
     <ol>
     {% for stimulus in protocol %}
         <li>
-            <strong>{{ stimulus.name }}</strong> with {{ stimulus.saccades_count }} saccades. The mean duration of fixations is <strong>{{
+            <strong>{{ stimulus }}</strong> with {{ stimulus.saccades_count }} saccades. The mean duration of fixations is <strong>{{
                 stimulus.fixation_duration }} seconds</strong> with a variability of <strong>{{ stimulus.fixation_variability }}%</strong>.
         </li>
     {% endfor %}
@@ -31,5 +31,5 @@ female born at
 
 <h2>Important Note</h2>
 
-<p>Distance of the subject to the screen: <strong>{{ "%.2f"|format(protocol.distance_to_subject) }} cm</strong></p>
+<p>Distance of the subject to the screen: <strong>{{ "%.2f"|format(distance) }} cm</strong></p>
 {% endblock %}

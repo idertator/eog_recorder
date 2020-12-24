@@ -22,7 +22,7 @@ mujer nacida el
     <ol>
     {% for stimulus in protocol %}
         <li>
-            <strong>{{ stimulus.name }}</strong> con {{ stimulus.saccades_count }} sácadas. La duración media de las
+            <strong>{{ stimulus }}</strong> con {{ stimulus.saccades_count }} sácadas. La duración media de las
         </li>
     {% endfor %}
     </ol>
@@ -31,6 +31,6 @@ mujer nacida el
 <div class="notes">
 <h2>Nota Importante</h2>
 
-<p>Distancia del sujeto a la pantalla: <strong>{{ "%.2f"|format(protocol.distance_to_subject) }} cm</strong></p>
+<p>Distancia del sujeto a la pantalla: <strong>{{ "%.2f"|format(distance) }} cm</strong></p>
 </div>
 {% endblock %}

@@ -3,24 +3,22 @@ from os.path import join, exists
 
 from PySide6 import QtWidgets, QtCore
 
-from saccrec import settings
-
 from eoglib.io import load_protocol, save_protocol
-from eoglib.models import Protocol, SaccadicStimulus, StimulusOrientation
+from eoglib.models import Protocol, SaccadicStimulus
+
+from saccrec import settings
 
 from .stimulus import SaccadicStimulusWidget
 
 
 class ProtocolWidget(QtWidgets.QWidget):
     protocolNameChanged = QtCore.Signal(str)
+    protocolLoaded = QtCore.Signal(Protocol)
 
-    def __init__(self, parent=None):
+    def __init__(self, protocol: Protocol, parent=None):
         super(ProtocolWidget, self).__init__(parent=parent)
 
-        if (path := settings.gui.current_protocol) is not None:
-            self._protocol = load_protocol(path)
-        else:
-            self._protocol = self._default_protocol()
+        self._protocol = protocol
         self._stimuli = self._protocol_widgets(self._protocol)
 
         self._name_label = QtWidgets.QLabel(_('Protocol Name'))
@@ -40,7 +38,6 @@ class ProtocolWidget(QtWidgets.QWidget):
         self._top_layout = QtWidgets.QHBoxLayout()
         self._top_layout.addWidget(self._name_label)
         self._top_layout.addWidget(self._name_edit)
-        # self._top_layout.addStretch()
         self._top_layout.addWidget(self._load_button)
         self._top_layout.addWidget(self._save_button)
 
@@ -58,35 +55,6 @@ class ProtocolWidget(QtWidgets.QWidget):
         self.layout.addLayout(self._top_layout)
         self.layout.addWidget(self._scroll_area)
 
-    def _default_protocol(self) -> Protocol:
-        return Protocol(
-            stimuli = [
-                SaccadicStimulus(
-                    calibration=True,
-                    angle=30,
-                    fixation_duration=3.0,
-                    fixation_variability=50.0,
-                    saccades_count=10,
-                    orientation=StimulusOrientation.Horizontal
-                ),
-                SaccadicStimulus(
-                    calibration=False,
-                    angle=30,
-                    fixation_duration=3.0,
-                    fixation_variability=50.0,
-                    saccades_count=20,
-                    orientation=StimulusOrientation.Horizontal
-                ),
-                SaccadicStimulus(
-                    calibration=True,
-                    angle=30,
-                    fixation_duration=3.0,
-                    fixation_variability=50.0,
-                    saccades_count=10,
-                    orientation=StimulusOrientation.Horizontal
-                ),
-            ]
-        )
 
     def _protocol_widgets(self, protocol: Protocol) -> list[SaccadicStimulusWidget]:
         widgets = []
@@ -118,6 +86,8 @@ class ProtocolWidget(QtWidgets.QWidget):
                     widget.removePressed.disconnect(self._on_stimulus_remove_pressed)
 
             self._scroll_area_layout.removeWidget(widget)
+            widget.setParent(None)
+            widget.destroy()
 
     def _populate_stimulus_widgets(self):
         for index, stimulus in enumerate(self._stimuli):
@@ -144,15 +114,14 @@ class ProtocolWidget(QtWidgets.QWidget):
             self._protocol = load_protocol(filename)
             self._stimuli = self._protocol_widgets(self._protocol)
             self._populate_stimulus_widgets()
+            self._name_edit.setText(self._protocol.name)
+            settings.gui.current_protocol = filename
 
     def _on_save_pressed(self):
-        if settings.gui.current_protocol is not None:
-            default_path = settings.gui.current_protocol
-        else:
-            default_path = settings.gui.protocols_path
-            if not exists(default_path):
-                makedirs(default_path)
-            default_path = join(default_path, f'{self._protocol.name}.json')
+        default_path = settings.gui.protocols_path
+        if not exists(default_path):
+            makedirs(default_path)
+        default_path = join(default_path, f'{self._protocol.name}.json')
 
         filename, selected_filter = QtWidgets.QFileDialog.getSaveFileName(
             self,
@@ -218,7 +187,3 @@ class ProtocolWidget(QtWidgets.QWidget):
             self._stimuli[i].index = i
 
         self._populate_stimulus_widgets()
-
-    @property
-    def protocol(self) -> Protocol:
-        return self._protocol

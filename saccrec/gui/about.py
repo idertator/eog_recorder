@@ -17,7 +17,6 @@ class AboutDialog(QtWidgets.QDialog):
         self._webview = QtWidgets.QTextBrowser(self)
         self._webview.viewport().setAutoFillBackground(False)
         self._webview.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        # self._webview.setBackgroundColor(QtCore.Qt.transparent)
         self._webview.setHtml(render('about'))
 
         self._layout = QtWidgets.QVBoxLayout()

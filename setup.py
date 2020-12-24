@@ -33,6 +33,9 @@ setup(
         'saccrec.engine',
         'saccrec.gui',
         'saccrec.gui.icons',
+        'saccrec.gui.widgets',
+        'saccrec.gui.wizards',
+        'saccrec.gui.wizards.setup',
     ],
     requires=[
         'PySide6',
