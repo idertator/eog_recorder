@@ -28,8 +28,6 @@ setup(
     packages=[
         'saccrec',
         'saccrec.core',
-        'saccrec.core.reports',
-        'saccrec.core.study',
         'saccrec.engine',
         'saccrec.gui',
         'saccrec.gui.icons',

@@ -9,18 +9,15 @@ import saccrec.gui.icons  # noqa: F401
 from .about import AboutDialog
 from .runner import Runner
 from .settings import SettingsDialog
-from .workspace import Workspace
 
 
 class MainWindow(
     Runner,
-    Workspace,
     QtWidgets.QMainWindow
 ):
 
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
-        Workspace.__init__(self)
         Runner.__init__(self)
 
         self._new_record_wizard = None

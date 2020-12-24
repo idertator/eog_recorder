@@ -20,7 +20,7 @@ class SubjectWidget(QtWidgets.QWidget):
         self._gender_combo = QtWidgets.QComboBox()
         for gender in Gender:
             self._gender_combo.addItem(gender.label, gender.value)
-        self._gender_combo.setCurrentIndex(self._subject.gender)
+        self._gender_combo.setCurrentIndex(self._subject.gender.index)
         self._gender_combo.currentIndexChanged.connect(self._on_gender_changed)
 
         bd = self._subject.borndate
@@ -34,7 +34,7 @@ class SubjectWidget(QtWidgets.QWidget):
         self._status_combo = QtWidgets.QComboBox()
         for status in Status:
             self._status_combo.addItem(status.label, status.value)
-        self._status_combo.setCurrentIndex(self._subject.status)
+        self._status_combo.setCurrentIndex(self._subject.status.index)
         self._status_combo.currentIndexChanged.connect(self._on_status_changed)
 
         layout = QtWidgets.QFormLayout(self)

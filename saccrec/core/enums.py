@@ -1,16 +1,6 @@
 from enum import IntEnum, Enum
 
 
-class Channel(Enum):
-    Unknown = 'Unknown'
-    Timestamps = 'Timestamps'
-    Time = 'Time'
-    Stimulus = 'Stimulus'
-    Horizontal = 'Horizontal'
-    Vertical = 'Vertical'
-    Annotations = 'Annotations'
-
-
 class BoardTypes(Enum):
     Cyton = 'cyton'
     Ganglion = 'ganglion'
@@ -23,13 +13,3 @@ class BoardModes(Enum):
     Analog = 'analog'
     Digital = 'digital'
     Marker = 'marker'
-
-
-class SampleRates(IntEnum):
-    SR250 = 250
-    SR500 = 500
-    SR1000 = 1000
-    SR2000 = 2000
-    SR4000 = 4000
-    SR8000 = 8000
-    SR16000 = 16000

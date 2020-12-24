@@ -1,13 +1,12 @@
-from math import floor, ceil
+from math import floor, ceil, radians, tan
 from random import randint
 
 from numpy import array, int8, zeros, ones, hstack
 
 from PySide6.QtCore import QPoint
 
-from saccrec.core import StimulusPosition
-from saccrec.core.math import points_distance
 from saccrec import settings
+from saccrec.core import StimulusPosition
 
 
 class SaccadicStimuli(object):
@@ -66,7 +65,7 @@ class SaccadicStimuli(object):
         return f'{self._test_name}'
 
     def _update_positions(self):
-        distance = points_distance(self._distance_to_subject, self._angle)
+        distance = (tan(radians(self._angle / 2.0)) * self._distance_to_subject) * 2
 
         cm_width = settings.stimuli.screen_width
         cm_center = cm_width / 2
