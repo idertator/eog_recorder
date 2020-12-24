@@ -13,7 +13,7 @@ from .subject import SubjectWizardPage
 
 
 class RecordSetupWizard(QtWidgets.QWizard):
-    finished = QtCore.Signal(Subject, Protocol, str)
+    finished = QtCore.Signal(dict)
 
     def __init__(self, parent):
         super(RecordSetupWizard, self).__init__(parent)
@@ -32,6 +32,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
         else:
             self._protocol = self._default_protocol()
 
+        self._light_intensity = 0.0
         self._output_path = ''
 
         self._subject_page = SubjectWizardPage(
@@ -51,6 +52,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
             parent=self
         )
         self._output_page.outputPathChanged.connect(self._on_output_path_changed)
+        self._output_page.lightIntensityChanged.connect(self._on_light_intensity_changed)
 
         self.addPage(self._subject_page)
         self.addPage(self._stimulus_page)
@@ -59,7 +61,12 @@ class RecordSetupWizard(QtWidgets.QWizard):
         self.button(QtWidgets.QWizard.FinishButton).clicked.connect(self.finish_wizard)
 
     def finish_wizard(self):
-        self.finished.emit(self._subject, self._protocol, self._output_path)
+        self.finished.emit({
+            'subject': self._subject,
+            'protocol': self._protocol,
+            'output_path': self._output_path,
+            'light_intensity': self._light_intensity,
+        })
 
     def _default_protocol(self) -> Protocol:
         return Protocol(
@@ -96,3 +103,6 @@ class RecordSetupWizard(QtWidgets.QWizard):
 
     def _on_output_path_changed(self, output_path: str):
         self._output_path = output_path
+
+    def _on_light_intensity_changed(self, value: int):
+        self._light_intensity = value
