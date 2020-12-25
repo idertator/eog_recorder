@@ -3,34 +3,44 @@ from os.path import join
 from PySide6 import QtWidgets, QtGui
 
 from saccrec import settings
+from saccrec.gui import icons  # noqa: F401
+from saccrec.gui.dialogs import AboutDialog, SettingsDialog
+from saccrec.gui.widgets import StimulusPlayer, SignalsWidget
+from saccrec.gui.wizards import RecordSetupWizard
 
-import saccrec.gui.icons  # noqa: F401
-
-from .about import AboutDialog
-from .runner import Runner
-from .settings import SettingsDialog
+from eoglib.models import Subject, Protocol
 
 
-class MainWindow(
-    Runner,
-    QtWidgets.QMainWindow
-):
+class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
-        Runner.__init__(self)
 
-        self._new_record_wizard = None
+        # Local State
+        self._is_running = False
+        self._current_test = None
 
+        self._subject: Subject = None
+        self._protocol: Protocol = None
+        self._output_path: str = ''
+        self._light_intensity: int = 0
+
+        # Related Widgets
+        self._new_record_wizard: RecordSetupWizard = None
         self._about_dialog = AboutDialog()
         self._settings_dialog = SettingsDialog(self)
 
-        # self._runner.stopped.connect(self.on_runner_stopped)
-        # self._runner.finished.connect(self.on_runner_finished)
+        # Local Widgets
+        self._signals_widget = SignalsWidget(self)
+        self._signals_widget.setVisible(False)
+        self.setCentralWidget(self._signals_widget)
 
-        self.setup_ui()
+        self._stimulus_player = StimulusPlayer(self)
+        self._stimulus_player.started.connect(self._on_test_started)
+        self._stimulus_player.stopped.connect(self._on_test_stopped)
+        self._stimulus_player.finished.connect(self._on_test_finished)
+        self._stimulus_player.moved.connect(self._on_test_moved)
 
-    def setup_ui(self):
         # Setting up top level menus
         menubar = self.menuBar()
 
@@ -105,16 +115,21 @@ class MainWindow(
 
     def on_new_test_wizard_clicked(self):
         if self._new_record_wizard is None:
-            from .wizards import RecordSetupWizard
-
             self._new_record_wizard = RecordSetupWizard(parent=self)
             self._new_record_wizard.finished.connect(self.on_new_test_wizard_finished)
-
         self._new_record_wizard.show()
 
-    def on_new_test_wizard_finished(self):
-        self._new_action.setEnabled(False)
-        self._settings_action.setEnabled(False)
+    def on_new_test_wizard_finished(self, record_setup: dict):
+        self._setup_gui_for_recording()
+
+        self._new_record_wizard.finished.disconnect(self.on_new_test_wizard_finished)
+        self._new_record_wizard.destroy()
+        self._new_record_wizard = None
+
+        self._subject = record_setup['subject']
+        self._protocol = record_setup['protocol']
+        self._output_path = record_setup['output_path']
+        self._light_intensity = record_setup['light_intensity']
 
         self.start()
 
@@ -133,3 +148,44 @@ class MainWindow(
         )
         if answer == QtWidgets.QMessageBox.Ok:
             self.stop()
+
+    def start(self):
+        self._setup_gui_for_recording()
+
+        self._current_test = 0
+        stimulus = self.protocol[0]
+        self._stimulus_player.start(stimulus)
+        self._is_running = True
+
+    def stop(self):
+        self._setup_gui_for_non_recording()
+
+        self._current_test = None
+        self._is_running = False
+        self._stimulus_player.close()
+
+    def finish(self):
+        self._setup_gui_for_non_recording()
+
+        self._current_test = 0
+        self._is_running = False
+        self._stimulus_player.close()
+
+    def _on_test_started(self, timestamp):
+        pass
+
+    def _on_test_stopped(self):
+        self._current_test = 0
+        self._is_running = False
+        self._stimulus_player.close()
+
+    def _on_test_finished(self):
+        self._current_test += 1
+        if self._current_test < len(self.protocol):
+            stimulus = self.protocol[self._current_test]
+            self._stimulus_player.start(stimulus)
+        else:
+            self.finish()
+
+    def _on_test_moved(self, value: int):
+        pass
