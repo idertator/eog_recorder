@@ -13,6 +13,7 @@ class StimulusPlayer(QtWidgets.QWidget):
     stopped = QtCore.Signal()
     finished = QtCore.Signal()
     moved = QtCore.Signal(int)
+    refreshed = QtCore.Signal()
 
     def __init__(self, parent=None):
         super(StimulusPlayer, self).__init__()
@@ -40,7 +41,8 @@ class StimulusPlayer(QtWidgets.QWidget):
         workspace = self._parent
 
         # Timer interval computing based on refresh rate
-        self._timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate / 2.0)
+        # self._timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate / 2.0)
+        self._timeout = 1
         self._timer.setInterval(self._timeout)
 
         # Sampling Step
@@ -135,6 +137,8 @@ class StimulusPlayer(QtWidgets.QWidget):
 
         if self._ball_position is None:
             self.finish()
+
+        self.refreshed.emit()
 
     def paintEvent(self, event):
         painter = QtGui.QPainter()

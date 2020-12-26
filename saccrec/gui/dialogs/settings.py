@@ -4,7 +4,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
 from saccrec.core.enums import Language
-from saccrec.engine.openbci import list_ports
+from saccrec.recording import CytonBoard
 from saccrec.gui.widgets import ColorButton
 
 
@@ -108,7 +108,7 @@ class _HardwarePage(QtWidgets.QWidget):
 
         self._ports_combo = QtWidgets.QComboBox()
         self._ports_combo.setDuplicatesEnabled(False)
-        for port in list_ports():
+        for port in CytonBoard.list_ports():
             self._ports_combo.addItem(port, port)
 
         self._sample_rate_combo = QtWidgets.QComboBox()

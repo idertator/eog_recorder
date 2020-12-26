@@ -28,12 +28,12 @@ setup(
     packages=[
         'saccrec',
         'saccrec.core',
-        'saccrec.engine',
         'saccrec.gui',
         'saccrec.gui.icons',
         'saccrec.gui.widgets',
         'saccrec.gui.wizards',
         'saccrec.gui.wizards.setup',
+        'saccrec.recording',
     ],
     requires=[
         'PySide6',

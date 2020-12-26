@@ -1,14 +1,14 @@
 from os.path import join
 
-from eoglib.models import Protocol, Subject, StimulusPosition
+from eoglib.models import Protocol, StimulusPosition, Subject
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
-from saccrec.engine import Recorder, list_ports
 from saccrec.gui import icons  # noqa: F401
 from saccrec.gui.dialogs import AboutDialog, SettingsDialog
 from saccrec.gui.widgets import SignalsWidget, StimulusPlayer
 from saccrec.gui.wizards import RecordSetupWizard
+from saccrec.recording import CytonBoard
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -17,7 +17,6 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
 
         # Local State
-        self._is_running = False
         self._current_test = None
 
         self._subject: Subject = None
@@ -26,10 +25,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._light_intensity: int = 0
         self._filenames: list[str] = []
 
-        self._recorder: Recorder = None
-        self._recorder_timer = QtCore.QTimer()
-        self._recorder_timer.setInterval(200)
-        self._recorder_timer.timeout.connect(self._on_fetch_data)
+        self._board: CytonBoard = None
+        self._corrupt_packets = 0
 
         # Related Widgets
         self._new_record_wizard: RecordSetupWizard = None
@@ -46,6 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._stimulus_player.stopped.connect(self._on_test_stopped)
         self._stimulus_player.finished.connect(self._on_test_finished)
         self._stimulus_player.moved.connect(self._on_stimulus_moved)
+        self._stimulus_player.refreshed.connect(self._on_stimulus_refreshed)
 
         # Setting up top level menus
         menubar = self.menuBar()
@@ -104,12 +102,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
         # Check for OpenBCI Connection
-        if not list_ports():
+        ports = CytonBoard.list_ports()
+        if not ports:
             QtWidgets.QMessageBox.critical(
                 self,
                 _('OpenBCI Cyton Not Detected'),
                 _('Please connect the recording device and restart this application')
             )
+
+        if settings.hardware.port in {'None', None}:
+            settings.hardware.port = ports[0]
 
     # ======================================
     #         GUI State Management
@@ -160,7 +162,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self._setup_gui_for_non_recording()
 
             self._current_test = None
-            self._is_running = False
             self._stimulus_player.close()
 
     # ======================================
@@ -188,37 +189,35 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Initialize Recorder
         self._filenames = []
-        self._recorder = Recorder(
+        self._board = CytonBoard(
             port=settings.hardware.port,
-            sampling_rate=settings.hardware.sampling_rate
+            sampling_rate=settings.hardware.sampling_rate,
+            channels='12',
+            use_sd=True
         )
+        self._board.initialize()
 
         self._current_test = 0
         stimulus = self._protocol[0]
         saccadic_distance = settings.stimuli.saccadic_distance
         distance_to_subject = self._protocol.distance_to_subject(saccadic_distance)
         self._stimulus_player.start(stimulus, distance_to_subject)
-        self._is_running = True
 
     def _on_test_started(self, timestamp):
-        sd_filename = self._recorder.start_recording()
-        self._recorder.put_marker(StimulusPosition.Center.value)
+        sd_filename = self._board.create_sd_file()
+        self._board.start()
+        self._board.marker(StimulusPosition.Center.value)
         self._filenames.append(sd_filename)
-
-        self._recorder_timer.start()
 
     def _on_test_stopped(self):
         self._current_test = 0
-        self._is_running = False
+        self._stimulus_player.stop()
         self._stimulus_player.close()
-        self._recorder_timer.stop()
-        self._recorder.stop_recording()
-        self._recorder.close_recorder()
+        self._board.stop()
 
     def _on_test_finished(self):
         self._current_test += 1
-        self._recorder_timer.stop()
-        self._recorder.stop_recording()
+        self._board.stop()
         if self._current_test < len(self._protocol):
             stimulus = self._protocol[self._current_test]
             saccadic_distance = settings.stimuli.saccadic_distance
@@ -228,17 +227,19 @@ class MainWindow(QtWidgets.QMainWindow):
             self._setup_gui_for_non_recording()
 
             self._current_test = 0
-            self._is_running = False
             self._stimulus_player.close()
 
     def _on_stimulus_moved(self, value: int):
-        self._recorder.put_marker(value)
+        self._board.marker(value)
 
-    # ======================================
-    #        Recording Timer Handlers
-    # ======================================
-
-    def _on_fetch_data(self):
-        samples = self._recorder.read_samples()
-        if samples:
-            self._signals_widget.add_samples(samples)
+    def _on_stimulus_refreshed(self):
+        try:
+            all_samples = self._board.read()
+            if all_samples:
+                samples = [
+                    (sample[0], sample[1], sample[8])
+                    for sample in all_samples
+                ]
+                self._signals_widget.add_samples(samples)
+        except ValueError:
+            self._corrupt_packets += 1

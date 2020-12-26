@@ -1,7 +1,7 @@
-from math import floor
-from typing import List, Tuple
+from math import floor, log10
 
-from numpy import array, float32, hstack
+from eoglib.models import StimulusPosition
+from numpy import array, int32, hstack
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
@@ -14,14 +14,17 @@ class SignalsManager:
 
     def __init__(self, window_width: int = WINDOWS_WIDTH):
         self._window_width = window_width
+        self._current_stimulus_position = 0
 
-        self._hc_window = array([], dtype=float32)
+        self._hc_window = array([], dtype=int32)
         self._hc_max = 0
-        self._vc_window = array([], dtype=float32)
+        self._vc_window = array([], dtype=int32)
         self._vc_max = 0
+        self._sc_window = array([], dtype=int32)
+        self._sc_max = 0
         self._x_offset = 0
 
-    def _samples_to_lines(self, samples: array) -> List[QtCore.QLineF]:
+    def _samples_to_lines(self, samples: array) -> list[QtCore.QLineF]:
         lines = []
 
         last = None
@@ -33,27 +36,41 @@ class SignalsManager:
 
         return lines
 
-    def add_samples(self, samples: List[Tuple[int, float, float]]):
+    def add_samples(self, samples: list[tuple[int, int, int]]):
         horizontal = []
         vertical = []
-        for _, timestamp, h, v in samples:
+        stimulus = []
+        for  h, v, c in samples:
+            if c != 0:
+                position = StimulusPosition(c)
+                if position == StimulusPosition.Left:
+                    self._current_stimulus_position = -1
+                elif position == StimulusPosition.Right:
+                    self._current_stimulus_position = 1
+                elif position == StimulusPositiona.Center:
+                    self._current_stimulus_position = 0
+
             horizontal.append(h)
             vertical.append(v)
+            stimulus.append(self._current_stimulus_position)
 
-        horizontal = array(horizontal, dtype=float32)
-        vertical = array(vertical, dtype=float32)
+        horizontal = array(horizontal, dtype=int32)
+        vertical = array(vertical, dtype=int32)
+        stimulus = array(stimulus, dtype=int32)
 
         self._hc_window = hstack((self._hc_window, horizontal))
         self._vc_window = hstack((self._vc_window, vertical))
+        self._sc_window = hstack((self._sc_window, stimulus))
 
         length = len(self._hc_window)
         if length > self._window_width:
             self._x_offset += length - self._window_width
             self._hc_window = self._hc_window[length - self._window_width:]
             self._vc_window = self._vc_window[length - self._window_width:]
+            self._sc_window = self._sc_window[length - self._window_width:]
 
     @property
-    def horizontal_lines(self) -> List[QtCore.QLineF]:
+    def horizontal_lines(self) -> list[QtCore.QLineF]:
         if self._hc_window.any():
             channel = self._hc_window - self._hc_window.mean()
             self._hc_max = max(abs(channel.min()), abs(channel.max()))
@@ -61,10 +78,17 @@ class SignalsManager:
         return []
 
     @property
-    def vertical_lines(self) -> List[QtCore.QLineF]:
+    def vertical_lines(self) -> list[QtCore.QLineF]:
         if self._vc_window.any():
             channel = self._vc_window - self._vc_window.mean()
             self._vc_max = max(abs(channel.min()), abs(channel.max()))
+            return self._samples_to_lines(channel)
+        return []
+
+    @property
+    def stimulus_lines(self) -> list[QtCore.QLineF]:
+        if self._sc_window.any():
+            channel = self._sc_window * (10 ** floor(log10(self._hc_max)))
             return self._samples_to_lines(channel)
         return []
 
@@ -98,7 +122,7 @@ class SignalsWidget(QtWidgets.QWidget):
 
         self._manager = SignalsManager(window_width=WINDOWS_WIDTH)
 
-    def add_samples(samples):
+    def add_samples(self, samples: list[tuple[int, int, int]]):
         self._manager.add_samples(samples)
         self.update()
 
@@ -129,13 +153,13 @@ class SignalsWidget(QtWidgets.QWidget):
         viewport = channel_rect.adjusted(1, 1, -1, -1)
         painter.setClipRect(viewport)
         painter.setViewport(viewport)
-        lines = self._manager.horizontal_lines
         painter.setWindow(self._manager.horizontal_window)
 
         pen = QtGui.QPen(self._signals_color, 2.0)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(lines)
+        painter.drawLines(self._manager.stimulus_lines)
+        painter.drawLines(self._manager.horizontal_lines)
 
         painter.restore()
 
@@ -156,13 +180,12 @@ class SignalsWidget(QtWidgets.QWidget):
         viewport = channel_rect.adjusted(1, 1, -1, -1)
         painter.setClipRect(viewport)
         painter.setViewport(viewport)
-        lines = self._manager.vertical_lines
         painter.setWindow(self._manager.vertical_window)
 
         pen = QtGui.QPen(self._signals_color, 3.0)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(lines)
+        painter.drawLines(self._manager.vertical_lines)
 
         painter.restore()
 

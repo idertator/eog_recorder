@@ -1,10 +1,10 @@
 import logging
 import re
+from struct import unpack
+from time import sleep, time
 
 from serial import Serial
-from struct import unpack
-from time import sleep
-from typing import Tuple, List
+from serial.tools.list_ports import comports
 
 
 _COMMUNICATIONS_TIMEOUT_MSG = b'Failure: Communications timeout - Device failed to poll Host$$$'
@@ -40,12 +40,19 @@ class Sample:
         data = self._channels[index]
         return (data[0] << 16) | (data[1] << 8) | data[2]
 
-    def channels(self, count: int = 8) -> List[int]:
-        return [self.channel(i) for i in range(count)]
+    def channels(self, count: int = 8) -> list[int]:
+        return [
+            self.channel(i)
+            for i in range(count)
+        ]
 
     @property
-    def all_channels(self) -> Tuple[int]:
+    def all_channels(self) -> tuple[int]:
         return self.channels()
+
+    @property
+    def marker(self) -> int:
+        return self._aux[0]
 
 
 CHANNELS_ON = ' !@#$%*'
@@ -53,6 +60,33 @@ ALL_CHANNELS = '12345678'
 
 
 class CytonBoard:
+
+    @staticmethod
+    def list_ports() -> list[str]:
+        filter_regex = 'OpenBCI'
+        devices = [p.device for p in comports()]
+
+        def _get_firmware_string(port, timeout=2):
+            with Serial(port=port, baudrate=115200, timeout=timeout) as ser:
+                ser.write(b'v')
+                return ser.read_until(b'$$$').decode('utf-8', errors='ignore')
+
+        ports = []
+        for device in devices:
+            msg = _get_firmware_string(device)
+            if 'Device failed to poll Host' in msg:
+                _log.error(
+                    'Found USB dongle at "%s", '
+                    'but it failed to poll message from a board; %s',
+                    device, repr(msg)
+                )
+            elif re.search(filter_regex, msg):
+                _log.info('Matched   [%s] %s "%s"', filter_regex, device, msg)
+                ports.append(device)
+            else:
+                _log.info('Unmatched [%s] %s "%s"', filter_regex, device, msg)
+
+        return ports
 
     def __init__(
         self, port: str = '/dev/ttyUSB0',
@@ -65,7 +99,6 @@ class CytonBoard:
             port=port,
             baudrate=baudrate
         )
-        self._buffer = bytes()
         self._channels = channels
         self._sampling_rate = sampling_rate
         self._use_sd = use_sd
@@ -83,8 +116,6 @@ class CytonBoard:
 
             if log:
                 _log.info(output)
-                print(output)
-                print()
 
             return decoded_message
 
@@ -92,7 +123,7 @@ class CytonBoard:
 
     def create_sd_file(self) -> str:
         if self._use_sd:
-            msg = self._command('A', wait=0.5, log=True)
+            msg = self._command('A', wait=1, log=True)
             return re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
         return None
 
@@ -137,7 +168,6 @@ class CytonBoard:
         self._serial.write(b's')
         if self._use_sd:
             self._serial.write(b'j')
-        self._buffer = bytes()
 
     def reset(self):
         self._serial.write(b'v')
@@ -145,32 +175,28 @@ class CytonBoard:
         self._serial.read_all()
 
     def marker(self, label: int):
-        self._command(f'`{label}\'', log=True)
+        self._command(f'`{label}\'', wait=0, log=True)
 
-    def read(self) -> List[List[int]]:
-        self._buffer += self._serial.read_all()
+    def read(self) -> list[list[int]]:
+        buff = self._serial.read_all()
 
-        if self._buffer:
+        if buff:
             start = 0
-            while self._buffer[start] != 0xA0:
+            while buff[start] != 0xA0:
                 start += 1
-                if start >= len(self._buffer):
+                if start >= len(buff):
                     break
 
             if start > 0:
-                self._buffer = self._buffer[start:]
-
-        samples = len(self._buffer) // 33
+                buff = buff[start:]
 
         data = []
-        for index in range(samples):
-            offset = index * 33
-            sample = Sample(self._buffer[offset:offset + 33])
-            if sample.is_ok:
-                index = sample.sample
-                channels = sample.all_channels
-                data.append((index, channels))
-
-        self._buffer = self._buffer[samples * 33:]
+        if (samples := len(buff) // 33) > 0:
+            for index in range(samples):
+                offset = index * 33
+                sample = Sample(buff[offset:offset + 33])
+                if sample.is_ok:
+                    channels = sample.all_channels + [sample.marker]
+                    data.append(channels)
 
         return data
