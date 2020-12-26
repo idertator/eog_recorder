@@ -1,6 +1,0 @@
-CMD_DEVICE_NOT_CONNECTED = 'n'
-CMD_START = 't'
-CMD_STOP = 's'
-CMD_FINISH = 'f'
-CMD_MARKER = 'm'
-CMD_READY = 'r'

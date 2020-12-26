@@ -38,7 +38,6 @@ setup(
     requires=[
         'PySide6',
         'numpy',
-        'scipy',
     ],
     # include_package_data=True,
     zip_safe=False

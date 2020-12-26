@@ -1,14 +1,14 @@
 from os.path import join
 
-from PySide6 import QtWidgets, QtGui
+from eoglib.models import Protocol, Subject, StimulusPosition
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
+from saccrec.engine import Recorder, list_ports
 from saccrec.gui import icons  # noqa: F401
 from saccrec.gui.dialogs import AboutDialog, SettingsDialog
-from saccrec.gui.widgets import StimulusPlayer, SignalsWidget
+from saccrec.gui.widgets import SignalsWidget, StimulusPlayer
 from saccrec.gui.wizards import RecordSetupWizard
-
-from eoglib.models import Subject, Protocol
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -24,11 +24,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self._protocol: Protocol = None
         self._output_path: str = ''
         self._light_intensity: int = 0
+        self._filenames: list[str] = []
+
+        self._recorder: Recorder = None
+        self._recorder_timer = QtCore.QTimer()
+        self._recorder_timer.setInterval(200)
+        self._recorder_timer.timeout.connect(self._on_fetch_data)
 
         # Related Widgets
         self._new_record_wizard: RecordSetupWizard = None
         self._about_dialog = None
-        self._settings_dialog = None
+        self._settings_dialog = SettingsDialog(self)
 
         # Local Widgets
         self._signals_widget = SignalsWidget(self)
@@ -97,6 +103,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.show()
 
+        # Check for OpenBCI Connection
+        if not list_ports():
+            QtWidgets.QMessageBox.critical(
+                self,
+                _('OpenBCI Cyton Not Detected'),
+                _('Please connect the recording device and restart this application')
+            )
+
     # ======================================
     #         GUI State Management
     # ======================================
@@ -128,8 +142,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._new_record_wizard.show()
 
     def _on_settings_action_clicked(self):
-        if self._settings_dialog is None:
-            self._settings_dialog = SettingsDialog(self)
         self._settings_dialog.open()
 
     def _on_about_action_clicked(self):
@@ -157,6 +169,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_wizard_finished(self, record_setup: dict):
         self._setup_gui_for_recording()
+        self._signals_widget.setVisible(True)
 
         self._new_record_wizard.finished.disconnect(self._on_wizard_finished)
         self._new_record_wizard.destroy()
@@ -167,24 +180,50 @@ class MainWindow(QtWidgets.QMainWindow):
         self._output_path = record_setup['output_path']
         self._light_intensity = record_setup['light_intensity']
 
+        sampling_rate = settings.hardware.sampling_rate
+
+        # Generating stimulus signals
+        for stimulus in self._protocol:
+            stimulus.generate_channel(sampling_rate)
+
+        # Initialize Recorder
+        self._filenames = []
+        self._recorder = Recorder(
+            port=settings.hardware.port,
+            sampling_rate=settings.hardware.sampling_rate
+        )
+
         self._current_test = 0
         stimulus = self._protocol[0]
-        self._stimulus_player.start(stimulus)
+        saccadic_distance = settings.stimuli.saccadic_distance
+        distance_to_subject = self._protocol.distance_to_subject(saccadic_distance)
+        self._stimulus_player.start(stimulus, distance_to_subject)
         self._is_running = True
 
     def _on_test_started(self, timestamp):
-        pass
+        sd_filename = self._recorder.start_recording()
+        self._recorder.put_marker(StimulusPosition.Center.value)
+        self._filenames.append(sd_filename)
+
+        self._recorder_timer.start()
 
     def _on_test_stopped(self):
         self._current_test = 0
         self._is_running = False
         self._stimulus_player.close()
+        self._recorder_timer.stop()
+        self._recorder.stop_recording()
+        self._recorder.close_recorder()
 
     def _on_test_finished(self):
         self._current_test += 1
-        if self._current_test < len(self.protocol):
-            stimulus = self.protocol[self._current_test]
-            self._stimulus_player.start(stimulus)
+        self._recorder_timer.stop()
+        self._recorder.stop_recording()
+        if self._current_test < len(self._protocol):
+            stimulus = self._protocol[self._current_test]
+            saccadic_distance = settings.stimuli.saccadic_distance
+            distance_to_subject = self._protocol.distance_to_subject(saccadic_distance)
+            self._stimulus_player.start(stimulus, distance_to_subject)
         else:
             self._setup_gui_for_non_recording()
 
@@ -193,4 +232,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self._stimulus_player.close()
 
     def _on_stimulus_moved(self, value: int):
-        pass
+        self._recorder.put_marker(value)
+
+    # ======================================
+    #        Recording Timer Handlers
+    # ======================================
+
+    def _on_fetch_data(self):
+        samples = self._recorder.read_samples()
+        if samples:
+            self._signals_widget.add_samples(samples)

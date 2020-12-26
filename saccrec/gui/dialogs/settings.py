@@ -60,7 +60,7 @@ class _OpenBCIChannelWidget(QtWidgets.QWidget):
         self.setFixedSize(120, 100)
 
         self._activated_check = QtWidgets.QCheckBox()
-        self._activated_check.stateChanged.connect(self.on_activated_change)
+        self._activated_check.stateChanged.connect(self._on_activated_changed)
 
         self._gain_label = QtWidgets.QLabel(_('Gain'))
 
@@ -80,11 +80,11 @@ class _OpenBCIChannelWidget(QtWidgets.QWidget):
             self._activated_check
         )
         layout.addRow(gain_layout)
-        layout.setSpacing(1)
+        layout.setSpacing(3)
 
         self.setLayout(layout)
 
-    def on_activated_change(self):
+    def _on_activated_changed(self):
         self._gain_edit.setVisible(self._activated_check.checkState())
         self._gain_label.setVisible(self._activated_check.checkState())
 
@@ -287,8 +287,8 @@ class SettingsDialog(QtWidgets.QDialog):
         dialog_buttons = QtWidgets.QDialogButtonBox()
         dialog_buttons.addButton(_('Apply'), QtWidgets.QDialogButtonBox.AcceptRole)
         dialog_buttons.addButton(_('Cancel'), QtWidgets.QDialogButtonBox.RejectRole)
-        dialog_buttons.accepted.connect(self.on_accepted)
-        dialog_buttons.rejected.connect(self.on_rejected)
+        dialog_buttons.accepted.connect(self._on_accepted)
+        dialog_buttons.rejected.connect(self._on_rejected)
 
         horizontal_layout = QtWidgets.QHBoxLayout()
         horizontal_layout.addWidget(self._contents_widget)
@@ -307,12 +307,12 @@ class SettingsDialog(QtWidgets.QDialog):
         self._pages_widget.setCurrentIndex(self._contents_widget.row(current))
         self.setWindowTitle(self._pages_widget.currentWidget().title)
 
-    def on_accepted(self):
+    def _on_accepted(self):
         for i in range(self._pages_widget.count()):
             self._pages_widget.widget(i).save()
         self.accept()
 
-    def on_rejected(self):
+    def _on_rejected(self):
         self.reject()
 
     def open(self):

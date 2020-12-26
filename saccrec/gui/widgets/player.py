@@ -34,6 +34,7 @@ class StimulusPlayer(QtWidgets.QWidget):
         self._right_ball = None
 
         self._ball_position = None
+        self._distance_to_subject = None
 
     def _load_settings(self):
         workspace = self._parent
@@ -46,7 +47,7 @@ class StimulusPlayer(QtWidgets.QWidget):
         self._sampling_step = 1000 / settings.hardware.sampling_rate
 
         # Points Distance Computing
-        distance = (tan(radians(self._stimulus.angle / 2.0)) * workspace._protocol.distance_to_subject) * 2
+        distance = (tan(radians(self._stimulus.angle / 2.0)) * self._distance_to_subject) * 2
 
         cm_width = settings.stimuli.screen_width
         cm_center, cm_delta = cm_width / 2, distance / 2
@@ -81,13 +82,14 @@ class StimulusPlayer(QtWidgets.QWidget):
             StimulusPosition.Center: self._center_ball,
         }.get(position, None), position
 
-    def start(self, stimulus: SaccadicStimulus):
+    def start(self, stimulus: SaccadicStimulus, distance_to_subject: float):
         self._stimulus = stimulus
+        self._distance_to_subject = distance_to_subject
 
         self._load_settings()
 
         self._message = '\n'.join([
-            self._stimulus.name,
+            str(self._stimulus),
             _('Press space to continue')
         ])
 

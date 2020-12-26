@@ -3,11 +3,7 @@ from typing import List, Tuple
 
 from numpy import array, float32, hstack
 
-from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import QPainter, QColor, QPen
-from PySide6.QtCore import QRect, QPoint, QLineF, QPointF, QTimer
-
-from saccrec.engine.recording import OpenBCIRecorder
+from PySide6 import QtWidgets, QtCore, QtGui
 
 
 SIGNALS_PADDING = 1.5
@@ -25,14 +21,14 @@ class SignalsManager:
         self._vc_max = 0
         self._x_offset = 0
 
-    def _samples_to_lines(self, samples: array) -> List[QLineF]:
+    def _samples_to_lines(self, samples: array) -> List[QtCore.QLineF]:
         lines = []
 
         last = None
         for index, sample in enumerate(samples):
-            current = QPointF(index + self._x_offset, sample)
+            current = QtCore.QPointF(index + self._x_offset, sample)
             if last is not None:
-                lines.append(QLineF(last, current))
+                lines.append(QtCore.QLineF(last, current))
             last = current
 
         return lines
@@ -57,7 +53,7 @@ class SignalsManager:
             self._vc_window = self._vc_window[length - self._window_width:]
 
     @property
-    def horizontal_lines(self) -> List[QLineF]:
+    def horizontal_lines(self) -> List[QtCore.QLineF]:
         if self._hc_window.any():
             channel = self._hc_window - self._hc_window.mean()
             self._hc_max = max(abs(channel.min()), abs(channel.max()))
@@ -65,7 +61,7 @@ class SignalsManager:
         return []
 
     @property
-    def vertical_lines(self) -> List[QLineF]:
+    def vertical_lines(self) -> List[QtCore.QLineF]:
         if self._vc_window.any():
             channel = self._vc_window - self._vc_window.mean()
             self._vc_max = max(abs(channel.min()), abs(channel.max()))
@@ -73,21 +69,21 @@ class SignalsManager:
         return []
 
     @property
-    def horizontal_window(self) -> QRect:
-        return QRect(
-            QPoint(self._x_offset, self._hc_max * SIGNALS_PADDING),
-            QPoint(self._x_offset + WINDOWS_WIDTH, -self._hc_max * SIGNALS_PADDING)
+    def horizontal_window(self) -> QtCore.QRect:
+        return QtCore.QRect(
+            QtCore.QPoint(self._x_offset, self._hc_max * SIGNALS_PADDING),
+            QtCore.QPoint(self._x_offset + WINDOWS_WIDTH, -self._hc_max * SIGNALS_PADDING)
         )
 
     @property
-    def vertical_window(self) -> QRect:
-        return QRect(
-            QPoint(self._x_offset, self._vc_max * SIGNALS_PADDING),
-            QPoint(self._x_offset + WINDOWS_WIDTH, -self._vc_max * SIGNALS_PADDING)
+    def vertical_window(self) -> QtCore.QRect:
+        return QtCore.QRect(
+            QtCore.QPoint(self._x_offset, self._vc_max * SIGNALS_PADDING),
+            QtCore.QPoint(self._x_offset + WINDOWS_WIDTH, -self._vc_max * SIGNALS_PADDING)
         )
 
 
-class SignalsWidget(QWidget):
+class SignalsWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(SignalsWidget, self).__init__(parent=parent)
@@ -95,38 +91,16 @@ class SignalsWidget(QWidget):
         self._channel_padding = 10
         self._left_padding = 100
 
-        self._background = QColor(255, 255, 255)
+        self._background = QtGui.QColor(255, 255, 255)
         self._channels_outline_width = 2
-        self._channels_outline = QColor(150, 150, 150)
-        self._signals_color = QColor(30, 30, 100)
+        self._channels_outline = QtGui.QColor(150, 150, 150)
+        self._signals_color = QtGui.QColor(30, 30, 100)
 
         self._manager = SignalsManager(window_width=WINDOWS_WIDTH)
 
-        self._refresh_timer = QTimer()
-        self._refresh_timer.setInterval(200)
-        self._refresh_timer.timeout.connect(self.fetch_signals)
-        self._rendering = False
-
-        self._recorder = None
-
-    def start(self, recorder: OpenBCIRecorder):
-        self._rendering = True
-        self._recorder = recorder
-        self._refresh_timer.start()
-
-    def stop(self):
-        self._refresh_timer.stop()
-        self._rendering = False
-
-    def fetch_signals(self):
-        samples = self._recorder.read_samples()
-        if samples:
-            self._manager.add_samples(samples)
-            self.update()
-
-    @property
-    def is_rendering(self) -> bool:
-        return self._rendering
+    def add_samples(samples):
+        self._manager.add_samples(samples)
+        self.update()
 
     @property
     def channel_height(self) -> int:
@@ -138,17 +112,17 @@ class SignalsWidget(QWidget):
         return self.size().width() - (self._left_padding + self._channel_padding)
 
     def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.fillRect(self.rect(), self._background)
 
         # Horizontal Channel
         painter.save()
-        channel_rect = QRect(
+        channel_rect = QtCore.QRect(
             self._left_padding, self._channel_padding,
             self.channel_width, self.channel_height
         )
-        painter.setPen(QPen(self._channels_outline, self._channels_outline_width))
+        painter.setPen(QtGui.QPen(self._channels_outline, self._channels_outline_width))
         painter.drawRect(channel_rect)
 
         painter.save()
@@ -158,24 +132,24 @@ class SignalsWidget(QWidget):
         lines = self._manager.horizontal_lines
         painter.setWindow(self._manager.horizontal_window)
 
-        pen = QPen(self._signals_color, 2.0)
+        pen = QtGui.QPen(self._signals_color, 2.0)
         pen.setCosmetic(True)
         painter.setPen(pen)
         painter.drawLines(lines)
 
         painter.restore()
 
-        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), _('Horizontal Channel'))
+        painter.drawText(channel_rect.topLeft() + QtCore.QPoint(10, 20), _('Horizontal Channel'))
 
         painter.restore()
 
         # Vertical Channel
         painter.save()
-        channel_rect = QRect(
+        channel_rect = QtCore.QRect(
             self._left_padding, self._channel_padding + self.channel_height + self._channel_padding,
             self.channel_width, self.channel_height
         )
-        painter.setPen(QPen(self._channels_outline, self._channels_outline_width))
+        painter.setPen(QtGui.QPen(self._channels_outline, self._channels_outline_width))
         painter.drawRect(channel_rect)
 
         painter.save()
@@ -185,14 +159,14 @@ class SignalsWidget(QWidget):
         lines = self._manager.vertical_lines
         painter.setWindow(self._manager.vertical_window)
 
-        pen = QPen(self._signals_color, 3.0)
+        pen = QtGui.QPen(self._signals_color, 3.0)
         pen.setCosmetic(True)
         painter.setPen(pen)
         painter.drawLines(lines)
 
         painter.restore()
 
-        painter.drawText(channel_rect.topLeft() + QPoint(10, 20), _('Vertical Channel'))
+        painter.drawText(channel_rect.topLeft() + QtCore.QPoint(10, 20), _('Vertical Channel'))
 
         painter.restore()
 
