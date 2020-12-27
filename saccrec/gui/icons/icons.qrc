@@ -1,16 +1,24 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource>
-        <file>eyestracker.svg</file>
-        <file>diatax.svg</file>
-        <file>app.png</file>
-        <file>document.svg</file>
-        <file>exit.svg</file>
-        <file>help.svg</file>
-        <file>settings.svg</file>
-        <file>openbci.png</file>
-        <file>stimuli.svg</file>
-        <file>gui.svg</file>
-        <file>stop-solid.svg</file>
+        <file>actions/cog.svg</file>
+        <file>actions/door-open.svg</file>
+        <file>actions/file.svg</file>
+        <file>actions/info-circle.svg</file>
+        <file>actions/sd-card.svg</file>
+        <file>actions/stop-circle.svg</file>
+
+        <file>brand/app.png</file>
+        <file>brand/diatax.svg</file>
+        <file>brand/eyestracker.svg</file>
+
+        <file>common/file-import.svg</file>
+        <file>common/folder-open.svg</file>
+        <file>common/minus-square.svg</file>
+        <file>common/plus-square.svg</file>
+
+        <file>settings/gui.svg</file>
+        <file>settings/openbci.png</file>
+        <file>settings/stimuli.svg</file>
     </qresource>
 </RCC>

@@ -6,7 +6,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from saccrec import settings
 from saccrec.core.formats import create_study
 from saccrec.gui import icons  # noqa: F401
-from saccrec.gui.dialogs import AboutDialog, SettingsDialog
+from saccrec.gui.dialogs import AboutDialog, SettingsDialog, SDCardImport
 from saccrec.gui.widgets import SignalsWidget, StimulusPlayer
 from saccrec.gui.wizards import RecordSetupWizard
 from saccrec.recording import CytonBoard
@@ -25,13 +25,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self._output_path: str = ''
         self._light_intensity: int = 0
         self._filenames: list[str] = []
+        self._studies: list[str] = []
 
         self._board: CytonBoard = None
         self._corrupt_packets = 0
 
         # Related Widgets
         self._new_record_wizard: RecordSetupWizard = None
-        self._about_dialog = None
+        self._sd_import_dialog: SDCardImport = None
+        self._about_dialog: AboutDialog = None
         self._settings_dialog = SettingsDialog(self)
 
         # Local Widgets
@@ -53,25 +55,28 @@ class MainWindow(QtWidgets.QMainWindow):
         help_menu = menubar.addMenu(_('&Help'))
 
         # Setting up actions
-        self._new_action = QtGui.QAction(QtGui.QIcon(':document.svg'), _('&New Recording'), self)
+        self._new_action = QtGui.QAction(QtGui.QIcon(':/actions/file.svg'), _('&New Recording'), self)
         self._new_action.triggered.connect(self._on_new_action_clicked)
 
-        self._exit_action = QtGui.QAction(QtGui.QIcon(':exit.svg'), _('&Exit'), self)
+        self._import_sd_action = QtGui.QAction(QtGui.QIcon(':/actions/sd-card.svg'), _('&Import SD Data'), self)
+        self._import_sd_action.triggered.connect(self._on_import_sd_action_clicked)
+
+        self._exit_action = QtGui.QAction(QtGui.QIcon(':/actions/door-open.svg'), _('&Exit'), self)
         self._exit_action.setShortcut('Ctrl+Q')
         self._exit_action.setStatusTip(_('Exit the app'))
         self._exit_action.triggered.connect(QtWidgets.QApplication.instance().quit)
 
-        self._settings_action = QtGui.QAction(QtGui.QIcon(':settings.svg'), _('&Settings'), self)
+        self._settings_action = QtGui.QAction(QtGui.QIcon(':/actions/cog.svg'), _('&Settings'), self)
         self._settings_action.setShortcut('Ctrl+P')
         self._settings_action.setStatusTip(_('Configure the application'))
         self._settings_action.triggered.connect(self._on_settings_action_clicked)
 
-        self._stop_action = QtGui.QAction(QtGui.QIcon(':stop-solid.svg'), _('&Stop'), self)
+        self._stop_action = QtGui.QAction(QtGui.QIcon(':/actions/stop-circle.svg'), _('&Stop'), self)
         self._stop_action.setShortcut('Ctrl+D')
         self._stop_action.setStatusTip(_('Stop recording'))
         self._stop_action.triggered.connect(self._on_stop_clicked)
 
-        self._about_action = QtGui.QAction(QtGui.QIcon(':help.svg'), _('&About ...'), self)
+        self._about_action = QtGui.QAction(QtGui.QIcon(':/actions/info-circle.svg'), _('&About ...'), self)
         self._about_action.triggered.connect(self._on_about_action_clicked)
 
         help_menu.addAction(self._about_action)
@@ -87,6 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Setting up top toolbar
         main_toolbar = self.addToolBar('Main Toolbar')
         main_toolbar.addAction(self._new_action)
+        main_toolbar.addAction(self._import_sd_action)
         main_toolbar.addAction(self._settings_action)
         main_toolbar.addSeparator()
         main_toolbar.addAction(self._stop_action)
@@ -96,7 +102,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('SaccRec')
-        self.setWindowIcon(QtGui.QIcon(':app.png'))
+        self.setWindowIcon(QtGui.QIcon(':/brand/app.png'))
 
         self._setup_gui_for_non_recording()
 
@@ -105,6 +111,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Check for OpenBCI Connection
         ports = CytonBoard.list_ports()
         if not ports:
+            self._new_action.setEnabled(False)
             QtWidgets.QMessageBox.critical(
                 self,
                 _('OpenBCI Cyton Not Detected'),
@@ -120,6 +127,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _setup_gui_for_recording(self):
         self._new_action.setEnabled(False)
+        self._import_sd_action.setEnabled(False)
         self._exit_action.setEnabled(False)
         self._settings_action.setEnabled(False)
         self._about_action.setEnabled(False)
@@ -128,6 +136,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _setup_gui_for_non_recording(self):
         self._new_action.setEnabled(True)
+        self._import_sd_action.setEnabled(True)
         self._exit_action.setEnabled(True)
         self._settings_action.setEnabled(True)
         self._about_action.setEnabled(True)
@@ -142,7 +151,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if self._new_record_wizard is None:
             self._new_record_wizard = RecordSetupWizard(parent=self)
             self._new_record_wizard.finished.connect(self._on_wizard_finished)
-        self._new_record_wizard.show()
+        self._new_record_wizard.open()
+
+    def _on_import_sd_action_clicked(self):
+        if self._sd_import_dialog is None:
+            self._sd_import_dialog = SDCardImport(self._studies, self)
+        self._sd_import_dialog.open()
 
     def _on_settings_action_clicked(self):
         self._settings_dialog.open()

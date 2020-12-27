@@ -267,17 +267,17 @@ class SettingsDialog(QtWidgets.QDialog):
         self._contents_widget.setCurrentRow(0)
 
         # MENUS
-        gui_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':gui.svg'), _('Interface'))
+        gui_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':/settings/gui.svg'), _('Interface'))
         self._contents_widget.addItem(gui_button)
         gui_button.setTextAlignment(QtCore.Qt.AlignHCenter)
         gui_button.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
-        openbci_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':openbci.png'), _('OpenBCI'))
+        openbci_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':/settings/openbci.png'), _('OpenBCI'))
         self._contents_widget.addItem(openbci_button)
         openbci_button.setTextAlignment(QtCore.Qt.AlignHCenter)
         openbci_button.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
-        stimulus_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':stimuli.svg'), _('Stimulus'))
+        stimulus_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':/settings/stimuli.svg'), _('Stimulus'))
         self._contents_widget.addItem(stimulus_button)
         stimulus_button.setTextAlignment(QtCore.Qt.AlignHCenter)
         stimulus_button.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
