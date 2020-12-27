@@ -1,3 +1,3 @@
 from .about import AboutDialog
-from .sddata import SDCardImport
+from .sdimport import SDCardImport
 from .settings import SettingsDialog

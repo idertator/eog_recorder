@@ -155,8 +155,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_import_sd_action_clicked(self):
         if self._sd_import_dialog is None:
-            self._sd_import_dialog = SDCardImport(self._studies, self)
-        self._sd_import_dialog.open()
+            self._sd_import_dialog = SDCardImport(self)
+        self._sd_import_dialog.open(self._studies)
+        self._studies = []
 
     def _on_settings_action_clicked(self):
         self._settings_dialog.open()

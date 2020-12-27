@@ -62,6 +62,14 @@ class _GUISettings:
     def current_protocol(self, value: str):
         _settings.setValue('GUI/CurrentProtocol', value)
 
+    @property
+    def sd_path(self) -> str:
+        return _settings.value('GUI/SDPath', expanduser('~'))
+
+    @sd_path.setter
+    def sd_path(self, value: str):
+        _settings.setValue('GUI/SDPath', value)
+
 
 gui = _GUISettings()
 
