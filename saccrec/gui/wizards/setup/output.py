@@ -55,10 +55,10 @@ class OutputWizardPage(QtWidgets.QWizardPage):
 
     def isComplete(self) -> bool:
         filepath = self._output_path_edit.text()
-        return exists(dirname(filepath)) and filepath.lower().endswith('.rec')
+        return exists(dirname(filepath)) and filepath.lower().endswith('.eog')
 
     def initializePage(self):
-        self._output_path = join(settings.gui.records_path, self._subject.code) + '.rec'
+        self._output_path = join(settings.gui.records_path, self._subject.code) + '.eog'
         self._output_path_edit.setText(self._output_path)
 
         html = render(
@@ -81,11 +81,11 @@ class OutputWizardPage(QtWidgets.QWizardPage):
             self,
             _('Select Output File'),
             self._output_path,
-            filter=_('SaccRec File (*.rec)')
+            filter=_('SaccRec File (*.eog)')
         )
         filepath = output[0]
-        if not filepath.lower().endswith('.rec'):
-            filepath += '.rec'
+        if not filepath.lower().endswith('.eog'):
+            filepath += '.eog'
 
         self._output_path = filepath
         self._output_path_edit.setText(filepath)

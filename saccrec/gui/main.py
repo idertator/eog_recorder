@@ -4,6 +4,7 @@ from eoglib.models import Protocol, StimulusPosition, Subject
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
+from saccrec.core.formats import create_study
 from saccrec.gui import icons  # noqa: F401
 from saccrec.gui.dialogs import AboutDialog, SettingsDialog
 from saccrec.gui.widgets import SignalsWidget, StimulusPlayer
@@ -228,6 +229,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self._current_test = 0
             self._stimulus_player.close()
+
+            if (study := create_study(
+                subject=self._subject,
+                protocol=self._protocol,
+                light_intensity=self._light_intensity,
+                output_path=self.output_path,
+                filenames=self.filenames
+            )) is not None:
+                QtWidgets.QMessageBox.information(
+                    self,
+                    _('Success'),
+                    _('Your study was successfully writed to {path}').format(
+                        path=output_path
+                    )
+                )
 
     def _on_stimulus_moved(self, value: int):
         self._board.marker(value)
