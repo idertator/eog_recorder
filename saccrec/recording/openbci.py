@@ -123,7 +123,9 @@ class CytonBoard:
 
     def create_sd_file(self) -> str:
         if self._use_sd:
-            msg = self._command('A', wait=1, log=True)
+            msg = self._command('A', wait=1, log=True).strip()
+            if msg in {'', None}:
+                raise RuntimeError(_('The recorder is not working properly. Please check the batteries and restart the app.'))
             return re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
         return None
 

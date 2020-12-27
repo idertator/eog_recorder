@@ -1,4 +1,3 @@
-from typing import List
 from json import loads
 from os.path import expanduser, join
 from typing import Optional
@@ -120,7 +119,7 @@ class _Channels:
         return len(self._channels)
 
     @property
-    def json(self) -> List[dict]:
+    def json(self) -> list[dict]:
         return [channel.json for channel in self._channels]
 
 
@@ -233,13 +232,13 @@ class _TestsSettings:
         _settings.setValue('Test/InitialCalibration', value)
 
     @property
-    def test_stimulus(self) -> List[dict]:
+    def test_stimulus(self) -> list[dict]:
         if (json := _settings.value('Test/TestStimulus', None)) is not None:
             return loads(json)
         return [DEFAULT_TEST]
 
     @test_stimulus.setter
-    def test_stimulus(self, value: List[dict]):
+    def test_stimulus(self, value: list[dict]):
         return _settings.setValue('Test/TestStimulus', value)
 
     @property

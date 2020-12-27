@@ -161,7 +161,7 @@ class SDCardImport(QtWidgets.QDialog):
     def _on_import_button_clicked(self):
         msg = _('Importing %p%')
         self._progress_bar.setRange(0, len(self._studies))
-        self._progress_bar.setText(msg)
+        self._progress_bar.setFormat(msg)
 
         errors = defaultdict(list)
         input_path = self._input_path
@@ -169,21 +169,22 @@ class SDCardImport(QtWidgets.QDialog):
         for index, study_path in enumerate(self._studies):
             study = load_eog(study_path)
 
-            have_errors = False
-            if (filenames := study.parameters.get('filename', None)) is not None:
+            filenames = study.parameters.get('filenames', None)
+            if filenames is not None:
+                have_errors = False
                 for filename in filenames:
                     if not exists(join(input_path, filename)):
                         errors[study_path].append(filename)
                         have_errors = True
 
-            if not have_errors:
-                for filename, test in zip(filenames, study):
-                    horizontal, vertical, stimulus = load_openbci(filename)
-                    test[Channel.Horizontal] = horizontal
-                    test[Channel.Vertical] = vertical
-                    test[Channel.Stimulus] = stimulus
+                if not have_errors:
+                    for filename, test in zip(filenames, study):
+                        horizontal, vertical, stimulus = load_openbci(join(self._input_path, filename))
+                        test[Channel.Horizontal] = horizontal
+                        test[Channel.Vertical] = vertical
+                        test[Channel.Stimulus] = stimulus
 
-                save_eog(study_path, study)
+                    save_eog(study_path, study)
 
             percent = ((index + 1) / float(len(self._studies))) * 100
             self._progress_bar.setValue(index + 1)

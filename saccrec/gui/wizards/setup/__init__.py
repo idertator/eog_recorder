@@ -32,7 +32,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
         else:
             self._protocol = self._default_protocol()
 
-        self._light_intensity = 0.0
+        self._light_intensity = 0
         self._output_path = ''
 
         self._subject_page = SubjectWizardPage(

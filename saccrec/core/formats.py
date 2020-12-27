@@ -14,8 +14,8 @@ def create_study(
     study = Study(
         recorder=Recorder(
             board=Board.OpenBCI_Cyton,
-            sample_rate=settings.hardware.sample_rate,
-            channels=settings.hardware.channels.to_json()
+            sample_rate=settings.hardware.sampling_rate,
+            channels=settings.hardware.channels.json
         ),
         subject=subject,
         protocol_name=protocol.name,

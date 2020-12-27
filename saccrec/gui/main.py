@@ -220,10 +220,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self._stimulus_player.start(stimulus, distance_to_subject)
 
     def _on_test_started(self, timestamp):
-        sd_filename = self._board.create_sd_file()
-        self._board.start()
-        self._board.marker(StimulusPosition.Center.value)
-        self._filenames.append(sd_filename)
+        try:
+            sd_filename = self._board.create_sd_file()
+            self._board.start()
+            self._board.marker(StimulusPosition.Center.value)
+            self._filenames.append(sd_filename)
+        except RuntimeError as error:
+            QtWidgets.QMessageBox.critical(
+                self,
+                _('Error'),
+                str(error)
+            )
 
     def _on_test_stopped(self):
         self._current_test = 0
@@ -249,14 +256,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 subject=self._subject,
                 protocol=self._protocol,
                 light_intensity=self._light_intensity,
-                output_path=self.output_path,
-                filenames=self.filenames
+                output_path=self._output_path,
+                filenames=self._filenames
             )) is not None:
+                self._studies.append(self._output_path)
                 QtWidgets.QMessageBox.information(
                     self,
                     _('Success'),
                     _('Your study was successfully writed to {path}').format(
-                        path=output_path
+                        path=self._output_path
                     )
                 )
 

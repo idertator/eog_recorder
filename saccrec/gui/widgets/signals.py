@@ -47,7 +47,7 @@ class SignalsManager:
                     self._current_stimulus_position = -1
                 elif position == StimulusPosition.Right:
                     self._current_stimulus_position = 1
-                elif position == StimulusPositiona.Center:
+                elif position == StimulusPosition.Center:
                     self._current_stimulus_position = 0
 
             horizontal.append(h)
