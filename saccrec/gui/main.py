@@ -118,7 +118,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 _('Please connect the recording device and restart this application')
             )
 
-        if settings.hardware.port in {'None', None}:
+        if settings.hardware.port in {'None', None} and ports:
             settings.hardware.port = ports[0]
 
     # ======================================
