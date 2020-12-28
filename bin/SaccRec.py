@@ -9,6 +9,7 @@ from tempfile import gettempdir
 
 from PySide6.QtWidgets import QApplication
 
+import saccrec
 from saccrec.settings import gui, hardware, initialize_screen
 from saccrec.gui.main import MainWindow
 
@@ -39,7 +40,7 @@ def kill_hanged_processes():
 
 
 def setup_i18n():
-    LOCALE_PATH = join(abspath(dirname(dirname(__file__))), 'locales')
+    LOCALE_PATH = join(dirname(saccrec.__file__), 'locales')
 
     tr = gettext.translation('saccrec', LOCALE_PATH, languages=[gui.lang])
     tr.install('saccrec')
