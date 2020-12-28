@@ -55,7 +55,7 @@ class Sample:
         return self._aux[0]
 
 
-CHANNELS_ON = ' !@#$%*'
+CHANNELS_ON = ' !@#$%^&*'
 ALL_CHANNELS = '12345678'
 
 
@@ -139,26 +139,23 @@ class CytonBoard:
             500: 5,
             250: 6,
         }.get(self._sampling_rate, 6)
+        self._command('v', wait=0.5)
         self._command(f'~{rate}', log=True)
 
-        # Set active channels
-        self._command(
-            ''.join(
-                CHANNELS_ON[int(c)] if c in self._channels else c
-                for c in ALL_CHANNELS
-            ),
-            log=True
+        channels = ''.join(
+            CHANNELS_ON[int(c)] if c in self._channels else c
+            for c in ALL_CHANNELS
         )
 
+        # Set active channels
+        self._command(channels, log=True)
+
         # Configure channels
-        self._command(
-            ''.join(
-                f'x{c}060110X'
-                for c in ALL_CHANNELS
-                if c in self._channels
-            ),
-            log=True
-        )
+        for c in ALL_CHANNELS:
+            if c in self._channels:
+                self._command(f'x{c}060110X', log=True)
+            else:
+                self._command(f'x{c}160110X', log=True)
 
         # Set board mode to Marker mode
         self._command('/4', log=True)
