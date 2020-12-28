@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.9
 import gettext
 import sys
 
@@ -13,7 +14,6 @@ from saccrec.gui.main import MainWindow
 
 
 _GUI_PID_FILE = '/tmp/saccrec_gui.pid'
-_REC_PID_FILE = '/tmp/saccrec_rec.pid'
 
 
 def declare_gui_running_pid():
@@ -27,17 +27,15 @@ def clear_gui_running_pid():
 
 
 def kill_hanged_processes():
-    pid_path = join(gettempdir(), 'saccrec.pid')
-    for pid_path in [_GUI_PID_FILE, _REC_PID_FILE]:
-        if exists(pid_path):
-            with open(pid_path, 'rt') as f:
-                pid = int(f.read().strip())
-                try:
-                    kill(pid, 0)
-                except OSError:
-                    pass
-                else:
-                    print('Killed hanged process')
+    if exists(_GUI_PID_FILE):
+        with open(_GUI_PID_FILE, 'rt') as f:
+            pid = int(f.read().strip())
+            try:
+                kill(pid, 0)
+            except OSError:
+                pass
+            else:
+                print('Killed hanged process')
 
 
 def setup_i18n():

@@ -8,15 +8,24 @@ def readme():
 
 setup(
     name='saccrec',
-    version='0.2',
+    version='1.0.0-alpha',
     description='Saccades recording using OpenBCI Hardware',
     long_description=readme(),
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha'
+        'Development Status :: 3 - Alpha',
+        'Environment :: X11 Applications',
+        'Intended Audience :: Education',
+        'Intended Audience :: Healthcare Industry',
+        'Intended Audience :: Science/Research',
+        'License :: Other/Proprietary License',
+        'Natural Language :: English',
+        'Operating System :: POSIX :: Linux',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
+        'Topic :: Scientific/Engineering :: Medical Science Apps.',
     ],
     url='https://github.com/rdlfgrcwork/saccrec',
-    author='Rodolfo Valentín García Bermúdez',
-    author_email='rodgarberm@gmail.com',
+    author='Roberto Antonio Becerra García',
+    author_email='idertator@gmail.com',
     license='GPLv3',
     scripts=[
         'bin/SaccRec.py',
@@ -36,9 +45,13 @@ setup(
         'saccrec.recording',
     ],
     requires=[
-        'PySide6',
-        'numpy',
+        'PySide6(>=6.0.0)',
+        'numpy(>=1.19.4)',
+        'Jinja2(>=2.11.2)',
+        'pyserial(>=3.5)',
+        'eoglib(>=0.1.0)',
     ],
-    # include_package_data=True,
+    python_requires='>=3.9',
+    include_package_data=True,
     zip_safe=False
 )

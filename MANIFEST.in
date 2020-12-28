@@ -1,1 +1,2 @@
 recursive-include locales *
+recursive-include saccrec/templates *.html
