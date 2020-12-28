@@ -6,6 +6,14 @@ def readme():
         return f.read()
 
 
+def requirements() -> List[str]:
+    with open('requirements/base.txt') as f:
+        return [
+            line.strip()
+            for line in f if line.strip() != ''
+        ]
+
+
 setup(
     name='saccrec',
     version='1.0.0-alpha',
@@ -38,19 +46,14 @@ setup(
         'saccrec',
         'saccrec.core',
         'saccrec.gui',
+        'saccrec.gui.dialogs',
         'saccrec.gui.icons',
         'saccrec.gui.widgets',
         'saccrec.gui.wizards',
         'saccrec.gui.wizards.setup',
         'saccrec.recording',
     ],
-    requires=[
-        'PySide6(>=6.0.0)',
-        'numpy(>=1.19.4)',
-        'Jinja2(>=2.11.2)',
-        'pyserial(>=3.5)',
-        'eoglib(>=0.1.0)',
-    ],
+    install_requires=requirements(),
     python_requires='>=3.9',
     include_package_data=True,
     zip_safe=False
