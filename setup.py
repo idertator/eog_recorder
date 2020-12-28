@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 
-def requirements() -> List[str]:
+def requirements() -> list[str]:
     with open('requirements/base.txt') as f:
         return [
             line.strip()
