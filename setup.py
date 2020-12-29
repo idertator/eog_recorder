@@ -37,7 +37,7 @@ setup(
     license='GPLv3',
     entry_points={
         'gui_scripts': [
-            'saccrec = saccrec:main'
+            'SaccRec = saccrec:main'
         ]
     },
     data_files=[
