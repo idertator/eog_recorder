@@ -7,7 +7,7 @@ def readme():
 
 
 def requirements() -> list[str]:
-    with open('requirements/base.txt') as f:
+    with open('requirements.txt') as f:
         return [
             line.strip()
             for line in f if line.strip() != ''
@@ -16,8 +16,8 @@ def requirements() -> list[str]:
 
 setup(
     name='saccrec',
-    version='1.0.0-alpha',
-    description='Saccades recording using OpenBCI Hardware',
+    version='1.0.0-beta',
+    description='Saccade Recorder',
     long_description=readme(),
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -35,9 +35,11 @@ setup(
     author='Roberto Antonio Becerra García',
     author_email='idertator@gmail.com',
     license='GPLv3',
-    scripts=[
-        'bin/SaccRec.py',
-    ],
+    entry_points={
+        'gui_scripts': [
+            'saccrec = saccrec:main'
+        ]
+    },
     data_files=[
         ('share/icons', ['data/SaccRec.png']),
         ('share/applications', ['data/SaccRec.desktop']),
