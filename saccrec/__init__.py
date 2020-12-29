@@ -56,7 +56,7 @@ def main():
 
     # app = QtWidgets.QApplication()
     app = mkQApp()
-    app.setOrganizationName('SaccRec')
+    app.setOrganizationName('idertator')
     app.setApplicationName('SaccRec')
 
     main_window = MainWindow()

@@ -31,7 +31,7 @@ setup(
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Topic :: Scientific/Engineering :: Medical Science Apps.',
     ],
-    url='https://github.com/rdlfgrcwork/saccrec',
+    url='https://git.topgroupexpress.com/eog/saccrec',
     author='Roberto Antonio Becerra García',
     author_email='idertator@gmail.com',
     license='GPLv3',
