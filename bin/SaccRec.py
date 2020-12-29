@@ -8,6 +8,7 @@ from os.path import join, exists, abspath, dirname
 from tempfile import gettempdir
 
 from PySide2 import QtWidgets
+from pyqtgraph import mkQApp
 
 import saccrec
 from saccrec.settings import gui, hardware, initialize_screen
@@ -54,7 +55,8 @@ if __name__ == '__main__':
 
     setup_i18n()
 
-    app = QtWidgets.QApplication()
+    # app = QtWidgets.QApplication()
+    app = mkQApp()
     app.setOrganizationName('SaccRec')
     app.setApplicationName('SaccRec')
 

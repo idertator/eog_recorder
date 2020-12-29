@@ -3,12 +3,17 @@ import re
 from struct import unpack
 from time import sleep, time
 
+from numpy import array, ndarray, float32, int8
+
 from serial import Serial
 from serial.tools.list_ports import comports
 
 
 _COMMUNICATIONS_TIMEOUT_MSG = b'Failure: Communications timeout - Device failed to poll Host$$$'
 _log = logging.getLogger(__name__)
+
+_GAIN = 24
+_COUNTS_TO_VOLTS = 4.5 / _GAIN / (2**23-1)
 
 
 class Sample:
@@ -52,7 +57,7 @@ class Sample:
 
     @property
     def marker(self) -> int:
-        return self._aux[0]
+        return int(hex(self._aux[0])[-1])
 
 
 CHANNELS_ON = ' !@#$%^&*'
@@ -124,9 +129,11 @@ class CytonBoard:
     def create_sd_file(self) -> str:
         if self._use_sd:
             msg = self._command('A', wait=1, log=True).strip()
-            if msg in {'', None}:
+            try:
+                result = re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
+                return result
+            except TypeError:
                 raise RuntimeError(_('The recorder is not working properly. Please check the batteries and restart the app.'))
-            return re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
         return None
 
     def initialize(self):
@@ -176,7 +183,7 @@ class CytonBoard:
     def marker(self, label: int):
         self._command(f'`{label}\'', wait=0, log=True)
 
-    def read(self) -> list[list[int]]:
+    def read(self) -> tuple[ndarray, ndarray]:
         buff = self._serial.read_all()
 
         if buff:
@@ -189,13 +196,16 @@ class CytonBoard:
             if start > 0:
                 buff = buff[start:]
 
-        data = []
+        horizontal, vertical = [], []
         if (samples := len(buff) // 33) > 0:
             for index in range(samples):
                 offset = index * 33
                 sample = Sample(buff[offset:offset + 33])
                 if sample.is_ok:
-                    channels = sample.all_channels + [sample.marker]
-                    data.append(channels)
+                    horizontal.append(sample.channel(0))
+                    vertical.append(sample.channel(1))
 
-        return data
+        return (
+            array(horizontal, dtype=float32) * _COUNTS_TO_VOLTS,
+            array(vertical, dtype=float32) * _COUNTS_TO_VOLTS,
+        )

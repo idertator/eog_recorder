@@ -37,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings_dialog = SettingsDialog(self)
 
         # Local Widgets
-        self._signals_widget = SignalsWidget(self)
+        self._signals_widget = SignalsWidget(2000, self)
         self._signals_widget.setVisible(False)
         self.setCentralWidget(self._signals_widget)
 
@@ -45,7 +45,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._stimulus_player.started.connect(self._on_test_started)
         self._stimulus_player.stopped.connect(self._on_test_stopped)
         self._stimulus_player.finished.connect(self._on_test_finished)
-        self._stimulus_player.moved.connect(self._on_stimulus_moved)
         self._stimulus_player.refreshed.connect(self._on_stimulus_refreshed)
 
         # Setting up top level menus
@@ -120,6 +119,27 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if settings.hardware.port in {'None', None} and ports:
             settings.hardware.port = ports[0]
+
+        # Erase this
+
+        # _GAIN = 24
+        # _COUNTS_TO_VOLTS = 4.5 / _GAIN / (2**23-1)
+        # def update():
+        #     from numpy import array, float32, int8
+        #     from numpy.random import randint, choice
+        #     count = 2
+        #     horizontal = array(randint(10000, 15000, count), dtype=float32) * _COUNTS_TO_VOLTS
+        #     vertical = array(randint(10000, 15000, count), dtype=float32) * _COUNTS_TO_VOLTS
+
+        #     self._signals_widget.add_samples(horizontal, vertical)
+
+        # self._signals_widget.setVisible(True)
+        # self._test_timer = QtCore.QTimer()
+        # self._test_timer.setInterval(10)
+        # self._test_timer.timeout.connect(update)
+        # self._test_timer.start()
+
+        # End Erase this
 
     # ======================================
     #         GUI State Management
@@ -221,6 +241,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_test_started(self, timestamp):
         try:
+            self._signals_widget.reset()
             sd_filename = self._board.create_sd_file()
             self._board.start()
             self._board.marker(StimulusPosition.Center.value)
@@ -268,17 +289,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     )
                 )
 
-    def _on_stimulus_moved(self, value: int):
-        self._board.marker(value)
-
-    def _on_stimulus_refreshed(self):
+    def _on_stimulus_refreshed(self, value: int):
         try:
-            all_samples = self._board.read()
-            if all_samples:
-                samples = [
-                    (sample[0], sample[1], sample[8])
-                    for sample in all_samples
-                ]
-                self._signals_widget.add_samples(samples)
+            self._board.marker(value)
+            horizontal, vertical = self._board.read()
+            self._signals_widget.add_samples(horizontal, vertical)
         except ValueError:
             self._corrupt_packets += 1

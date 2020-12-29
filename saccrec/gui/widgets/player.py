@@ -12,8 +12,7 @@ class StimulusPlayer(QtWidgets.QWidget):
     started = QtCore.Signal(float)
     stopped = QtCore.Signal()
     finished = QtCore.Signal()
-    moved = QtCore.Signal(int)
-    refreshed = QtCore.Signal()
+    refreshed = QtCore.Signal(int)
 
     def __init__(self, parent=None):
         super(StimulusPlayer, self).__init__()
@@ -132,13 +131,11 @@ class StimulusPlayer(QtWidgets.QWidget):
 
         if previous_position != self._ball_position:
             self.update()
-            if side is not None:
-                self.moved.emit(side.value)
 
         if self._ball_position is None:
             self.finish()
 
-        self.refreshed.emit()
+        self.refreshed.emit(side.value)
 
     def paintEvent(self, event):
         painter = QtGui.QPainter()
