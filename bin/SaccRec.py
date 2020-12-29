@@ -7,7 +7,7 @@ from os import kill, system, getpid, remove
 from os.path import join, exists, abspath, dirname
 from tempfile import gettempdir
 
-from PySide6.QtWidgets import QApplication
+from PySide2 import QtWidgets
 
 import saccrec
 from saccrec.settings import gui, hardware, initialize_screen
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     setup_i18n()
 
-    app = QApplication([])
+    app = QtWidgets.QApplication()
     app.setOrganizationName('SaccRec')
     app.setApplicationName('SaccRec')
 

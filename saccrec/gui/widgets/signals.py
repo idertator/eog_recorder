@@ -3,7 +3,7 @@ from math import floor, log10
 from eoglib.models import StimulusPosition
 from numpy import array, int32, hstack
 
-from PySide6 import QtWidgets, QtCore, QtGui
+from PySide2 import QtWidgets, QtCore, QtGui
 
 
 SIGNALS_PADDING = 1.5

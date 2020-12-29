@@ -1,6 +1,6 @@
 from os.path import join, exists, dirname
 
-from PySide6 import QtCore, QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 from eoglib.models import Subject, Protocol
 

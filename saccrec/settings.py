@@ -2,14 +2,11 @@ from json import loads
 from os.path import expanduser, join
 from typing import Optional
 
-from PySide6.QtCore import QSettings
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QMainWindow
+from PySide2 import QtCore, QtGui, QtWidgets
 
 from saccrec.core.screen import Screen
 
-
-_settings: QSettings = QSettings()
+_settings = QtCore.QSettings()
 
 
 DATE_FORMAT = '%d/%m/%Y'
@@ -18,7 +15,7 @@ DATETIME_FORMAT = '%d/%m/%Y %H:%M'
 screen: Screen = None
 
 
-def initialize_screen(main_window: QMainWindow):
+def initialize_screen(main_window: QtWidgets.QMainWindow):
     global screen
     screen = Screen(main_window)
 
@@ -171,19 +168,19 @@ class _StimuliSettings:
         _settings.setValue('Stimuli/BallRadius', value)
 
     @property
-    def ball_color(self) -> QColor:
-        return _settings.value('Stimuli/BallColor', QColor(255, 255, 255))
+    def ball_color(self) -> QtGui.QColor:
+        return _settings.value('Stimuli/BallColor', QtGui.QColor(255, 255, 255))
 
     @ball_color.setter
-    def ball_color(self, value: QColor):
+    def ball_color(self, value: QtGui.QColor):
         _settings.setValue('Stimuli/BallColor', value)
 
     @property
-    def back_color(self) -> QColor:
-        return _settings.value('Stimuli/BackColor', QColor(0, 0, 0))
+    def back_color(self) -> QtGui.QColor:
+        return _settings.value('Stimuli/BackColor', QtGui.QColor(0, 0, 0))
 
     @back_color.setter
-    def back_color(self, value: QColor):
+    def back_color(self, value: QtGui.QColor):
         _settings.setValue('Stimuli/BackColor', value)
 
     @property

@@ -4,7 +4,7 @@ Registro de señales sacádicas mediante la utilización del OpenBCI
 ## Requerimientos
 
 - [Python](https://www.python.org/downloads/) >= 3.9.1
-- [PySide6](https://pypi.org/project/PySide6) >= 6.0.0
+- [PySide2](https://pypi.org/project/PySide2) >= 5.15.2
 
 ## Instrucciones de instalación
 

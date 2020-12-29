@@ -1,7 +1,7 @@
 from math import ceil, floor, tan, radians
 from time import time
 
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
 
