@@ -1,10 +1,9 @@
 #!/usr/bin/env python3.9
 import gettext
 import sys
-
 from faulthandler import enable as enable_faulthandler
-from os import kill, system, getpid, remove
-from os.path import join, exists, abspath, dirname
+from os import getpid, kill, remove, system
+from os.path import abspath, dirname, exists, join
 from tempfile import gettempdir
 
 from PySide6 import QtWidgets

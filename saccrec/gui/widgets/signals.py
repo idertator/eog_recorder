@@ -3,7 +3,7 @@ from time import time
 
 from eoglib.models import StimulusPosition
 from eoglib.filtering import notch_filter
-from numpy import (abs, arange, array, float64, hstack, int32, max, mean,
+from numpy import (abs, arange, array, int32, hstack, int32, max, mean,
                    ndarray, ones)
 from numpy.random import random
 # from pyqtgraph import PlotCurveItem, PlotWidget, AxisItem
@@ -60,16 +60,16 @@ class SignalsWidget(QtWidgets.QWidget):
         # horizontal_width = max(sample_horizontal) - min(sample_horizontal)
         # vertical_width = max(sample_vertical) - min(sample_vertical)
 
-        # sample_horizontal = random(len(sample_horizontal), dtype=float64) * horizontal_width - horizontal_width / 2
-        # sample_vertical = random(len(sample_vertical), dtype=float64) * vertical_width - vertical_width / 2
+        # sample_horizontal = random(len(sample_horizontal), dtype=int32) * horizontal_width - horizontal_width / 2
+        # sample_vertical = random(len(sample_vertical), dtype=int32) * vertical_width - vertical_width / 2
 
         # self._horizontal_channel = hstack((self._horizontal_channel, sample_horizontal))[-self._window_samples:]
         # self._vertical_channel = hstack((self._vertical_channel, sample_vertical))[-self._window_samples:]
 
     # def add_samples(self, horizontal: ndarray, vertical: ndarray):
         # if self._horizontal_channel is None:
-        #     self._horizontal_channel = ones(self._window_samples, dtype=float64) * mean(horizontal)
-        #     self._vertical_channel = ones(self._window_samples, dtype=float64) * mean(vertical)
+        #     self._horizontal_channel = ones(self._window_samples, dtype=int32) * mean(horizontal)
+        #     self._vertical_channel = ones(self._window_samples, dtype=int32) * mean(vertical)
 
         # self._horizontal_channel = hstack((self._horizontal_channel, horizontal))[-self._window_samples:]
         # self._vertical_channel = hstack((self._vertical_channel, vertical))[-self._window_samples:]

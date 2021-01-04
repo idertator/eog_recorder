@@ -1,6 +1,8 @@
+import logging
+
 from os.path import join
 
-from numpy import mean, std, hstack, float64
+from numpy import mean, std, hstack, int32
 from numpy.random import random
 
 from eoglib.models import Protocol, StimulusPosition, Subject
@@ -10,9 +12,13 @@ from saccrec import settings
 from saccrec.core.formats import create_study
 from saccrec.gui import icons  # noqa: F401
 from saccrec.gui.dialogs import AboutDialog, SettingsDialog, SDCardImport
-from saccrec.gui.widgets import SignalsWidget, StimulusPlayer
+from saccrec.gui.widgets import SignalsWidget, StimulusPlayer, LoggerWidget
 from saccrec.gui.wizards import RecordSetupWizard
 from saccrec.recording import CytonBoard
+
+
+logger = logging.getLogger('saccrec')
+logger.setLevel(logging.INFO)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -30,8 +36,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self._filenames: list[str] = []
         self._studies: list[str] = []
         self._current_file = None
+        self._board = None
 
-        self._board = CytonBoard.instance(port=settings.hardware.port)
+        # Setting logger
+        self._logger = LoggerWidget()
+
+        logger.addHandler(self._logger)
 
         # Related Widgets
         self._new_record_wizard: RecordSetupWizard = None
@@ -40,9 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._settings_dialog = SettingsDialog(self)
 
         # Local Widgets
-        self._signals_widget = SignalsWidget(2000, self)
-        self._signals_widget.setVisible(False)
-        self.setCentralWidget(self._signals_widget)
+        self.setCentralWidget(self._logger)
 
         self._stimulus_player = StimulusPlayer(self)
         self._stimulus_player.started.connect(self._on_test_started)
@@ -57,8 +65,12 @@ class MainWindow(QtWidgets.QMainWindow):
         help_menu = menubar.addMenu(_('&Help'))
 
         # Setting up actions
+        self._connect_action = QtGui.QAction(QtGui.QIcon(':/actions/plug.svg'), _('&Connect'), self)
+        self._connect_action.triggered.connect(self._on_connect_clicked)
+
         self._new_action = QtGui.QAction(QtGui.QIcon(':/actions/file.svg'), _('&New Recording'), self)
         self._new_action.triggered.connect(self._on_new_action_clicked)
+        self._new_action.setEnabled(False)
 
         self._import_sd_action = QtGui.QAction(QtGui.QIcon(':/actions/sd-card.svg'), _('&Import SD Data'), self)
         self._import_sd_action.triggered.connect(self._on_import_sd_action_clicked)
@@ -93,6 +105,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting up top toolbar
         main_toolbar = self.addToolBar('Main Toolbar')
+        main_toolbar.addAction(self._connect_action)
         main_toolbar.addAction(self._new_action)
         main_toolbar.addAction(self._import_sd_action)
         main_toolbar.addAction(self._settings_action)
@@ -107,42 +120,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon(':/brand/app.png'))
 
         self._setup_gui_for_non_recording()
-
-        self.show()
-
-        # Check for OpenBCI Connection
-        if self._board is None:
-            self._new_action.setEnabled(False)
-            QtWidgets.QMessageBox.critical(
-                self,
-                _('OpenBCI Cyton Not Detected'),
-                _('Please connect the recording device and restart this application')
-            )
-
-        if settings.hardware.port in {'None', None} and ports:
-            settings.hardware.port = ports[0]
-
-        # Erase this
-        # Simulate data for the realtime renderer
-
-        # _GAIN = 24
-        # _COUNTS_TO_VOLTS = 4.5 / _GAIN / (2**23-1)
-        # def update():
-        #     from numpy import array, float64, int8
-        #     from numpy.random import randint, choice
-        #     count = 2
-        #     horizontal = array(randint(10000, 15000, count), dtype=float64) * _COUNTS_TO_VOLTS
-        #     vertical = array(randint(10000, 15000, count), dtype=float64) * _COUNTS_TO_VOLTS
-
-        #     self._signals_widget.add_samples(horizontal, vertical)
-
-        # self._signals_widget.setVisible(True)
-        # self._test_timer = QtCore.QTimer()
-        # self._test_timer.setInterval(10)
-        # self._test_timer.timeout.connect(update)
-        # self._test_timer.start()
-
-        # End Erase this
 
     # ======================================
     #         GUI State Management
@@ -169,6 +146,15 @@ class MainWindow(QtWidgets.QMainWindow):
     # ======================================
     #       Actions Events Handlers
     # ======================================
+
+    def _on_connect_clicked(self):
+        self._board = CytonBoard.reset(port=settings.hardware.port)
+
+        # Check for OpenBCI Connection
+        if self._board.ready:
+            self._new_action.setEnabled(True)
+        else:
+            self._new_action.setEnabled(False)
 
     def _on_new_action_clicked(self):
         if self._new_record_wizard is None:
@@ -209,7 +195,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_wizard_finished(self, record_setup: dict):
         self._setup_gui_for_recording()
-        self._signals_widget.setVisible(True)
+        # self._signals_widget.setVisible(True)
 
         self._new_record_wizard.finished.disconnect(self._on_wizard_finished)
         self._new_record_wizard.destroy()
@@ -236,19 +222,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self._stimulus_player.start(stimulus, distance_to_subject)
 
     def _on_test_started(self, timestamp):
-        try:
-            self._signals_widget.reset()
+        if self._board.ready:
             sd_filename = self._board.create_sd_file()
             self._current_file = open(f'/tmp/{sd_filename}.dat', 'wb')
             self._board.start()
             self._board.marker(StimulusPosition.Center.value)
             self._filenames.append(sd_filename)
-        except RuntimeError as error:
-            QtWidgets.QMessageBox.critical(
-                self,
-                _('Error'),
-                str(error)
-            )
 
     def _on_test_stopped(self):
         self._current_test = 0
@@ -295,9 +274,3 @@ class MainWindow(QtWidgets.QMainWindow):
         self._board.marker(value)
         if self._current_file is not None:
             self._current_file.write(self._board.read())
-        # horizontal, vertical, markers, dropped = self._board.read()
-        # if dropped > 0:
-        #     print(f'Dropped {dropped} samples')
-        #     self._signals_widget.add_dropped(dropped)
-        # if horizontal is not None:
-        #     self._signals_widget.add_samples(horizontal, vertical)

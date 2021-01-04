@@ -4,12 +4,13 @@ import re
 from struct import unpack
 from time import sleep, time
 
-from numpy import array, float64, uint8, ndarray
+from numpy import array, int32, uint8, ndarray
 from serial import Serial
 from serial.tools.list_ports import comports
 
-_GAIN = 24
-_COUNTS_TO_VOLTS = 4.5 / _GAIN / (2**23-1)
+logger = logging.getLogger('saccrec')
+
+_COM_ERROR = b'Failure: Communications timeout - Device failed to poll Host$$$'
 
 
 class Sample:
@@ -32,7 +33,7 @@ class Sample:
         value = (self._buffer[i] << 16) | (self._buffer[i + 1] << 8) | self._buffer[i + 2]
         if (value & 0x00800000) > 0:
             value = -(value & 0x007FFFFF)
-        return value * _COUNTS_TO_VOLTS
+        return value
 
     @property
     def marker(self) -> int:
@@ -74,12 +75,13 @@ class CytonBoard:
         return ports
 
     def __init__(self, port: str = '/dev/ttyUSB0'):
-        print('Initializing Cyton Board')
+        logger.info('Initializing Cyton Board')
         self._buffer = b''
         self._recording = False
         self._last_sample = 255
         self._dropped_samples = 0
         self._processed_samples = 0
+        self._ready = True
 
         self._serial = Serial(
             port=port,
@@ -94,32 +96,40 @@ class CytonBoard:
         self._command('!@345678')        # Activate first 2 channels
 
         if self._command('x1060110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 1')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 1')
 
         if self._command('x2060110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 2')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 2')
 
         if self._command('x3160110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 3')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 3')
 
         if self._command('x4160110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 4')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 4')
 
         if self._command('x5160110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 5')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 5')
 
         if self._command('x6160110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 6')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 6')
 
         if self._command('x7160110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 7')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 7')
 
         if self._command('x8160110X') == 'Failure: too few chars$$$':
-            raise ValueError('Error setting Cyton Channel 8')
+            self._ready = False
+            logger.error('Error setting Cyton Channel 8')
 
         sleep(1)
         if msg := self._serial.read_all():
-            print(f'Hanged data: {msg}')
+            logger.warn(f'Hanged data: {msg}')
 
     board_instance = None
 
@@ -129,12 +139,19 @@ class CytonBoard:
             cls.board_instance = CytonBoard(port=port)
         return cls.board_instance
 
+    @classmethod
+    def reset(cls, port: str = '/dev/ttyUSB0'):
+        if cls.board_instance is not None:
+            cls.board_instance.close()
+        cls.board_instance = CytonBoard(port=port)
+        return cls.board_instance
+
     def close(self):
         if self._recording:
             self.stop()
         self._serial.close()
 
-        print('Closing Cyton Board')
+        logger.info('Closing Cyton Board')
 
     def _command(self, cmd: str, wait: float = 0.2) -> str:
         self._serial.write(cmd.encode('ASCII'))
@@ -145,7 +162,11 @@ class CytonBoard:
             msg = self._serial.read_all()
             if b'$$$' in msg:
                 decoded_message = msg.decode('ASCII', errors='ignore')
-                print(f'({cmd}): {decoded_message}')
+                if msg == _COM_ERROR:
+                    logger.error(f'<strong>[{cmd}]</strong>: {decoded_message}')
+                    self._ready = False
+                else:
+                    logger.info(f'<strong>[{cmd}]</strong>: {decoded_message}')
                 return decoded_message
 
         return ''
@@ -155,22 +176,21 @@ class CytonBoard:
         return self._dropped_samples
 
     @property
+    def ready(self) -> bool:
+        return self._ready
+
+    @property
     def processed_samples(self) -> int:
         return self._processed_samples
 
     def create_sd_file(self) -> str:
-        self._serial.read_all()
-        sleep(1)
-        for i in range(3):
-            msg = self._command('A', wait=2)
-            try:
-                result = re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
-                return result
-            except TypeError:
-                self._command('j', wait=2)
-                print(f'Create SD File failed. Attempt to reconnect number {i}')
-        else:
-            raise RuntimeError(_('The recorder is not working properly. Please check the batteries and restart the app.'))
+        msg = self._command('S', wait=2)
+        try:
+            result = re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
+            return result
+        except TypeError:
+            logger.error_('The recorder is not working properly. Please check the batteries and restart the app.')
+            self._ready = False
 
     def start(self):
         self._command('b', wait=0)
@@ -179,7 +199,6 @@ class CytonBoard:
     def stop(self):
         self._command('s', wait=0)
         self._command('j', wait=0)
-        self._serial.read_all()
         self._recording = False
 
     def marker(self, label: int):
@@ -222,8 +241,8 @@ class CytonBoard:
 
         # if horizontal:
         #     return (
-        #         array(horizontal, dtype=float64),
-        #         array(vertical, dtype=float64),
+        #         array(horizontal, dtype=int32),
+        #         array(vertical, dtype=int32),
         #         array(markers, dtype=uint8),
         #         dropped
         #     )
