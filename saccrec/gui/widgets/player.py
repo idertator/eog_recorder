@@ -40,9 +40,9 @@ class StimulusPlayer(QtWidgets.QWidget):
         workspace = self._parent
 
         # Timer interval computing based on refresh rate
-        # self._timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate / 2.0)
-        self._timeout = 1
-        self._timer.setInterval(self._timeout)
+        timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate // 2)
+        self._timer.setInterval(timeout)
+        print(f'Refresh Timeout: {timeout} ms')
 
         # Sampling Step
         self._sampling_step = 1000 / settings.hardware.sampling_rate

@@ -1,16 +1,12 @@
+import atexit
 import logging
 import re
 from struct import unpack
 from time import sleep, time
 
-from numpy import array, ndarray, float32, int8
-
+from numpy import array, float64, uint8, ndarray
 from serial import Serial
 from serial.tools.list_ports import comports
-
-
-_COMMUNICATIONS_TIMEOUT_MSG = b'Failure: Communications timeout - Device failed to poll Host$$$'
-_log = logging.getLogger(__name__)
 
 _GAIN = 24
 _COUNTS_TO_VOLTS = 4.5 / _GAIN / (2**23-1)
@@ -18,50 +14,43 @@ _COUNTS_TO_VOLTS = 4.5 / _GAIN / (2**23-1)
 
 class Sample:
 
-    def __init__(self, data: bytes):
-        if len(data) != 33:
-            raise ValueError('Data frames must have 33 bytes')
+    def __init__(self, buffer: bytes):
+        if len(buffer) != 33:
+            raise ValueError('buffer frames must have 33 bytes')
 
-        if data[0] != 0xA0:
+        if buffer[0] != 0xA0 or buffer[32] != 0xC1:
             raise ValueError('Packet corrupted')
 
-        unpacked = unpack('BB3s3s3s3s3s3s3s3s6sB', data)
-
-        self._header = unpacked[0]
-        self._sample = unpacked[1]
-        self._channels = unpacked[2:10]
-        self._aux = unpacked[10]
-        self._footer = unpacked[11]
+        self._buffer = buffer
 
     @property
-    def is_ok(self) -> bool:
-        return self._header == 0xA0 and 0xC0 <= self._footer <= 0xCF
+    def number(self) -> int:
+        return self._buffer[1]
 
-    @property
-    def sample(self) -> int:
-        return self._sample
-
-    def channel(self, index: int) -> int:
-        data = self._channels[index]
-        return (data[0] << 16) | (data[1] << 8) | data[2]
-
-    def channels(self, count: int = 8) -> list[int]:
-        return [
-            self.channel(i)
-            for i in range(count)
-        ]
-
-    @property
-    def all_channels(self) -> tuple[int]:
-        return self.channels()
+    def channel(self, index: int) -> float:
+        i = index * 3 + 2
+        value = (self._buffer[i] << 16) | (self._buffer[i + 1] << 8) | self._buffer[i + 2]
+        if (value & 0x00800000) > 0:
+            value = -(value & 0x007FFFFF)
+        return value * _COUNTS_TO_VOLTS
 
     @property
     def marker(self) -> int:
-        return int(hex(self._aux[0])[-1])
+        return int(chr(self._buffer[26]))
 
 
-CHANNELS_ON = ' !@#$%^&*'
-ALL_CHANNELS = '12345678'
+    @property
+    def dropped_samples(self, previous: int) -> int:
+        if previous == 255:
+            return self.number
+
+        if previous < self.number:
+            return self.number - previous - 115200
+
+        if previous > self.number:
+            return 255 - previous + self.number
+
+        return 255
 
 
 class CytonBoard:
@@ -79,133 +68,170 @@ class CytonBoard:
         ports = []
         for device in devices:
             msg = _get_firmware_string(device)
-            if 'Device failed to poll Host' in msg:
-                _log.error(
-                    'Found USB dongle at "%s", '
-                    'but it failed to poll message from a board; %s',
-                    device, repr(msg)
-                )
-            elif re.search(filter_regex, msg):
-                _log.info('Matched   [%s] %s "%s"', filter_regex, device, msg)
+            if re.search(filter_regex, msg):
                 ports.append(device)
-            else:
-                _log.info('Unmatched [%s] %s "%s"', filter_regex, device, msg)
 
         return ports
 
-    def __init__(
-        self, port: str = '/dev/ttyUSB0',
-        baudrate: int = 115200,
-        channels: str = ALL_CHANNELS,
-        sampling_rate: int = 1000,
-        use_sd: bool = False
-    ):
+    def __init__(self, port: str = '/dev/ttyUSB0'):
+        print('Initializing Cyton Board')
+        self._buffer = b''
+        self._recording = False
+        self._last_sample = 255
+        self._dropped_samples = 0
+        self._processed_samples = 0
+
         self._serial = Serial(
             port=port,
-            baudrate=baudrate
+            baudrate=115200
         )
-        self._channels = channels
-        self._sampling_rate = sampling_rate
-        self._use_sd = use_sd
 
-    def _command(self, cmd: str, wait: float = 0.3, log: bool = False) -> str:
+        sleep(2)
+
+        self._command('v', wait=2)       # Soft reset
+        self._command('~6', wait=0.6)    # 250 SPS
+        self._command('/4')              # Set Marker Mode
+        self._command('!@345678')        # Activate first 2 channels
+
+        if self._command('x1060110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 1')
+
+        if self._command('x2060110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 2')
+
+        if self._command('x3160110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 3')
+
+        if self._command('x4160110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 4')
+
+        if self._command('x5160110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 5')
+
+        if self._command('x6160110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 6')
+
+        if self._command('x7160110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 7')
+
+        if self._command('x8160110X') == 'Failure: too few chars$$$':
+            raise ValueError('Error setting Cyton Channel 8')
+
+        sleep(1)
+        if msg := self._serial.read_all():
+            print(f'Hanged data: {msg}')
+
+    board_instance = None
+
+    @classmethod
+    def instance(cls, port: str = '/dev/ttyUSB0'):
+        if cls.board_instance is None:
+            cls.board_instance = CytonBoard(port=port)
+        return cls.board_instance
+
+    def close(self):
+        if self._recording:
+            self.stop()
+        self._serial.close()
+
+        print('Closing Cyton Board')
+
+    def _command(self, cmd: str, wait: float = 0.2) -> str:
         self._serial.write(cmd.encode('ASCII'))
 
         if wait > 0:
             sleep(wait)
 
-        msg = self._serial.read_all()
-        if b'$$$' in msg:
-            decoded_message = msg.decode('ASCII', errors='ignore')
-            output = f'({cmd}): {decoded_message}'
-
-            if log:
-                _log.info(output)
-
-            return decoded_message
+            msg = self._serial.read_all()
+            if b'$$$' in msg:
+                decoded_message = msg.decode('ASCII', errors='ignore')
+                print(f'({cmd}): {decoded_message}')
+                return decoded_message
 
         return ''
 
+    @property
+    def dropped_samples(self) -> int:
+        return self._dropped_samples
+
+    @property
+    def processed_samples(self) -> int:
+        return self._processed_samples
+
     def create_sd_file(self) -> str:
-        if self._use_sd:
-            msg = self._command('A', wait=1, log=True).strip()
+        self._serial.read_all()
+        sleep(1)
+        for i in range(3):
+            msg = self._command('A', wait=2)
             try:
                 result = re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
                 return result
             except TypeError:
-                raise RuntimeError(_('The recorder is not working properly. Please check the batteries and restart the app.'))
-        return None
-
-    def initialize(self):
-        rate = {
-            16000: 0,
-            8000: 1,
-            4000: 2,
-            2000: 3,
-            1000: 4,
-            500: 5,
-            250: 6,
-        }.get(self._sampling_rate, 6)
-        self._command('v', wait=0.5)
-        self._command(f'~{rate}', log=True)
-
-        channels = ''.join(
-            CHANNELS_ON[int(c)] if c in self._channels else c
-            for c in ALL_CHANNELS
-        )
-
-        # Set active channels
-        self._command(channels, log=True)
-
-        # Configure channels
-        for c in ALL_CHANNELS:
-            if c in self._channels:
-                self._command(f'x{c}060110X', log=True)
-            else:
-                self._command(f'x{c}160110X', log=True)
-
-        # Set board mode to Marker mode
-        self._command('/4', log=True)
+                self._command('j', wait=2)
+                print(f'Create SD File failed. Attempt to reconnect number {i}')
+        else:
+            raise RuntimeError(_('The recorder is not working properly. Please check the batteries and restart the app.'))
 
     def start(self):
-        self._serial.write(b'b')
+        self._command('b', wait=0)
+        self._recording = True
 
     def stop(self):
-        self._serial.write(b's')
-        if self._use_sd:
-            self._serial.write(b'j')
-
-    def reset(self):
-        self._serial.write(b'v')
-        sleep(0.2)
+        self._command('s', wait=0)
+        self._command('j', wait=0)
         self._serial.read_all()
+        self._recording = False
 
     def marker(self, label: int):
-        self._command(f'`{label}\'', wait=0, log=True)
+        self._command(f'`{label}', wait=0)
 
-    def read(self) -> tuple[ndarray, ndarray]:
-        buff = self._serial.read_all()
+    def read(self) -> bytes:
+        return self._serial.read_all()
 
-        if buff:
-            start = 0
-            while buff[start] != 0xA0:
-                start += 1
-                if start >= len(buff):
-                    break
+        # horizontal, vertical, markers = [], [], []
+        # dropped = 0
 
-            if start > 0:
-                buff = buff[start:]
+        # while len(self._buffer) >= 33:
+        #     start = 0
+        #     while start < len(self._buffer) and (self._buffer[start] != 0xA0 or (start + 32 < len(self._buffer) and self._buffer[start + 32] != 0xC1)):
+        #         start += 1
 
-        horizontal, vertical = [], []
-        if (samples := len(buff) // 33) > 0:
-            for index in range(samples):
-                offset = index * 33
-                sample = Sample(buff[offset:offset + 33])
-                if sample.is_ok:
-                    horizontal.append(sample.channel(0))
-                    vertical.append(sample.channel(1))
+        #     if start > 0:
+        #         self._buffer = self._buffer[start:]
 
-        return (
-            array(horizontal, dtype=float32) * _COUNTS_TO_VOLTS,
-            array(vertical, dtype=float32) * _COUNTS_TO_VOLTS,
-        )
+        #     if len(self._buffer) < 33:
+        #         break
+
+        #     try:
+        #         sample = Sample(self._buffer[:33])
+
+        #         horizontal.append(sample.channel(0))
+        #         vertical.append(sample.channel(1))
+        #         markers.append(sample.marker)
+
+        #         dropped += sample.dropped_samples(self._last_sample)
+        #         self._last_sample = sample.number
+
+        #         self._processed_samples += 1
+        #     except ValueError:
+        #         pass
+
+        #     self._buffer = self._buffer[33:]
+
+        # self._dropped_samples += dropped
+
+        # if horizontal:
+        #     return (
+        #         array(horizontal, dtype=float64),
+        #         array(vertical, dtype=float64),
+        #         array(markers, dtype=uint8),
+        #         dropped
+        #     )
+
+        # return None, None, None, dropped
+
+
+@atexit.register
+def close_openbci():
+    if (board := CytonBoard.board_instance) is not None:
+        board.close()

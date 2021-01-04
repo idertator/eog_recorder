@@ -46,8 +46,17 @@ def setup_i18n():
     tr.install('saccrec')
 
 
+def improve_ftdi_latency():
+    for i in range(4):
+        path = f'/dev/ttyUSB{i}'
+        if exists(path):
+            system(f'setserial {path} low_latency')
+
+
 def main():
     kill_hanged_processes()
+
+    improve_ftdi_latency()
 
     declare_gui_running_pid()
     enable_faulthandler()

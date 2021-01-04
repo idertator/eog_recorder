@@ -1,5 +1,8 @@
 from os.path import join
 
+from numpy import mean, std, hstack, float64
+from numpy.random import random
+
 from eoglib.models import Protocol, StimulusPosition, Subject
 from PySide2 import QtCore, QtGui, QtWidgets
 
@@ -18,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
 
         # Local State
-        self._current_test = None
+        self._current_test = 0
 
         self._subject: Subject = None
         self._protocol: Protocol = None
@@ -26,9 +29,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._light_intensity: int = 0
         self._filenames: list[str] = []
         self._studies: list[str] = []
+        self._current_file = None
 
-        self._board: CytonBoard = None
-        self._corrupt_packets = 0
+        self._board = CytonBoard.instance(port=settings.hardware.port)
 
         # Related Widgets
         self._new_record_wizard: RecordSetupWizard = None
@@ -108,8 +111,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
         # Check for OpenBCI Connection
-        ports = CytonBoard.list_ports()
-        if not ports:
+        if self._board is None:
             self._new_action.setEnabled(False)
             QtWidgets.QMessageBox.critical(
                 self,
@@ -121,15 +123,16 @@ class MainWindow(QtWidgets.QMainWindow):
             settings.hardware.port = ports[0]
 
         # Erase this
+        # Simulate data for the realtime renderer
 
         # _GAIN = 24
         # _COUNTS_TO_VOLTS = 4.5 / _GAIN / (2**23-1)
         # def update():
-        #     from numpy import array, float32, int8
+        #     from numpy import array, float64, int8
         #     from numpy.random import randint, choice
         #     count = 2
-        #     horizontal = array(randint(10000, 15000, count), dtype=float32) * _COUNTS_TO_VOLTS
-        #     vertical = array(randint(10000, 15000, count), dtype=float32) * _COUNTS_TO_VOLTS
+        #     horizontal = array(randint(10000, 15000, count), dtype=float64) * _COUNTS_TO_VOLTS
+        #     vertical = array(randint(10000, 15000, count), dtype=float64) * _COUNTS_TO_VOLTS
 
         #     self._signals_widget.add_samples(horizontal, vertical)
 
@@ -197,7 +200,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if answer == QtWidgets.QMessageBox.Ok:
             self._setup_gui_for_non_recording()
 
-            self._current_test = None
+            self._current_test = 0
             self._stimulus_player.close()
 
     # ======================================
@@ -225,13 +228,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Initialize Recorder
         self._filenames = []
-        self._board = CytonBoard(
-            port=settings.hardware.port,
-            sampling_rate=settings.hardware.sampling_rate,
-            channels='12',
-            use_sd=True
-        )
-        self._board.initialize()
 
         self._current_test = 0
         stimulus = self._protocol[0]
@@ -243,6 +239,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self._signals_widget.reset()
             sd_filename = self._board.create_sd_file()
+            self._current_file = open(f'/tmp/{sd_filename}.dat', 'wb')
             self._board.start()
             self._board.marker(StimulusPosition.Center.value)
             self._filenames.append(sd_filename)
@@ -255,12 +252,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_test_stopped(self):
         self._current_test = 0
+        self._current_file.close()
+        self._current_file = None
         self._stimulus_player.stop()
         self._stimulus_player.close()
         self._board.stop()
 
     def _on_test_finished(self):
         self._current_test += 1
+        if self._current_file is not None:
+            self._current_file.close()
+        self._current_file = None
         self._board.stop()
         if self._current_test < len(self._protocol):
             stimulus = self._protocol[self._current_test]
@@ -290,9 +292,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 )
 
     def _on_stimulus_refreshed(self, value: int):
-        try:
-            self._board.marker(value)
-            horizontal, vertical = self._board.read()
-            self._signals_widget.add_samples(horizontal, vertical)
-        except ValueError:
-            self._corrupt_packets += 1
+        self._board.marker(value)
+        if self._current_file is not None:
+            self._current_file.write(self._board.read())
+        # horizontal, vertical, markers, dropped = self._board.read()
+        # if dropped > 0:
+        #     print(f'Dropped {dropped} samples')
+        #     self._signals_widget.add_dropped(dropped)
+        # if horizontal is not None:
+        #     self._signals_widget.add_samples(horizontal, vertical)

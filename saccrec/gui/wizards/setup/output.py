@@ -1,3 +1,4 @@
+from datetime import datetime
 from os.path import join, exists, dirname
 
 from PySide2 import QtCore, QtWidgets
@@ -58,7 +59,8 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         return exists(dirname(filepath)) and filepath.lower().endswith('.eog')
 
     def initializePage(self):
-        self._output_path = join(settings.gui.records_path, self._subject.code) + '.eog'
+        filename = self._subject.initials + datetime.now().strftime('%d%m%Y%H%M') + '.eog'
+        self._output_path = join(settings.gui.records_path, filename)
         self._output_path_edit.setText(self._output_path)
 
         html = render(
