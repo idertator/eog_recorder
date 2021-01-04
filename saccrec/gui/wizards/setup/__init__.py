@@ -1,6 +1,6 @@
 from os.path import exists
 
-from PySide2 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 from eoglib.io import load_protocol
 from eoglib.models import Subject, Protocol, SaccadicStimulus, StimulusOrientation

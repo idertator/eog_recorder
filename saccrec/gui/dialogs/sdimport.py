@@ -3,7 +3,7 @@ from os.path import exists, join
 
 from eoglib.io import load_openbci, load_eog, save_eog
 from eoglib.models import Channel
-from PySide2 import QtGui, QtWidgets
+from PySide6 import QtGui, QtWidgets
 
 from saccrec import settings
 

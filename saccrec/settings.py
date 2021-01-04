@@ -2,7 +2,7 @@ from json import loads
 from os.path import expanduser, join
 from typing import Optional
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec.core.screen import Screen
 

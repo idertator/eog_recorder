@@ -1,4 +1,4 @@
-from PySide2 import QtCore, QtWidgets, QtSvg
+from PySide6 import QtCore, QtWidgets, QtSvgWidgets
 
 from saccrec.core.templating import render
 
@@ -13,8 +13,8 @@ class AboutDialog(QtWidgets.QDialog):
         self.setWindowTitle(_('About DIATAX ...'))
         self.setFixedSize(640, 350)
 
-        self._diatax_logo = QtSvg.QSvgWidget(':/brand/diatax.svg')
-        self._eyestracker_logo = QtSvg.QSvgWidget(':/brand/eyestracker.svg')
+        self._diatax_logo = QtSvgWidgets.QSvgWidget(':/brand/diatax.svg')
+        self._eyestracker_logo = QtSvgWidgets.QSvgWidget(':/brand/eyestracker.svg')
 
         self._webview = QtWidgets.QTextBrowser(self)
         self._webview.viewport().setAutoFillBackground(False)

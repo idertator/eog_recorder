@@ -7,8 +7,7 @@ from os import kill, system, getpid, remove
 from os.path import join, exists, abspath, dirname
 from tempfile import gettempdir
 
-from PySide2 import QtWidgets
-from pyqtgraph import mkQApp
+from PySide6 import QtWidgets
 
 from saccrec.gui.main import MainWindow
 
@@ -63,8 +62,7 @@ def main():
 
     setup_i18n()
 
-    # app = QtWidgets.QApplication()
-    app = mkQApp()
+    app = QtWidgets.QApplication()
     app.setOrganizationName('idertator')
     app.setApplicationName('SaccRec')
 

@@ -4,7 +4,7 @@ from numpy import mean, std, hstack, float64
 from numpy.random import random
 
 from eoglib.models import Protocol, StimulusPosition, Subject
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
 from saccrec.core.formats import create_study
@@ -57,28 +57,28 @@ class MainWindow(QtWidgets.QMainWindow):
         help_menu = menubar.addMenu(_('&Help'))
 
         # Setting up actions
-        self._new_action = QtWidgets.QAction(QtGui.QIcon(':/actions/file.svg'), _('&New Recording'), self)
+        self._new_action = QtGui.QAction(QtGui.QIcon(':/actions/file.svg'), _('&New Recording'), self)
         self._new_action.triggered.connect(self._on_new_action_clicked)
 
-        self._import_sd_action = QtWidgets.QAction(QtGui.QIcon(':/actions/sd-card.svg'), _('&Import SD Data'), self)
+        self._import_sd_action = QtGui.QAction(QtGui.QIcon(':/actions/sd-card.svg'), _('&Import SD Data'), self)
         self._import_sd_action.triggered.connect(self._on_import_sd_action_clicked)
 
-        self._exit_action = QtWidgets.QAction(QtGui.QIcon(':/actions/door-open.svg'), _('&Exit'), self)
+        self._exit_action = QtGui.QAction(QtGui.QIcon(':/actions/door-open.svg'), _('&Exit'), self)
         self._exit_action.setShortcut('Ctrl+Q')
         self._exit_action.setStatusTip(_('Exit the app'))
         self._exit_action.triggered.connect(QtWidgets.QApplication.instance().quit)
 
-        self._settings_action = QtWidgets.QAction(QtGui.QIcon(':/actions/cog.svg'), _('&Settings'), self)
+        self._settings_action = QtGui.QAction(QtGui.QIcon(':/actions/cog.svg'), _('&Settings'), self)
         self._settings_action.setShortcut('Ctrl+P')
         self._settings_action.setStatusTip(_('Configure the application'))
         self._settings_action.triggered.connect(self._on_settings_action_clicked)
 
-        self._stop_action = QtWidgets.QAction(QtGui.QIcon(':/actions/stop-circle.svg'), _('&Stop'), self)
+        self._stop_action = QtGui.QAction(QtGui.QIcon(':/actions/stop-circle.svg'), _('&Stop'), self)
         self._stop_action.setShortcut('Ctrl+D')
         self._stop_action.setStatusTip(_('Stop recording'))
         self._stop_action.triggered.connect(self._on_stop_clicked)
 
-        self._about_action = QtWidgets.QAction(QtGui.QIcon(':/actions/info-circle.svg'), _('&About ...'), self)
+        self._about_action = QtGui.QAction(QtGui.QIcon(':/actions/info-circle.svg'), _('&About ...'), self)
         self._about_action.triggered.connect(self._on_about_action_clicked)
 
         help_menu.addAction(self._about_action)

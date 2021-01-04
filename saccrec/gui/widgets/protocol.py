@@ -1,7 +1,7 @@
 from os import makedirs
 from os.path import join, exists
 
-from PySide2 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore
 
 from eoglib.io import load_protocol, save_protocol
 from eoglib.models import Protocol, SaccadicStimulus
