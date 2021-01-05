@@ -24,6 +24,10 @@ class LoggerWidget(Handler, QtWidgets.QPlainTextEdit):
         elif record.levelno == WARN:
             fmt = '<span style="color: yellow">{msg}</span><br>'
 
-        self.textCursor().insertHtml(fmt.format(msg=msg))
-        self.repaint()
+        try:
+            self.textCursor().insertHtml(fmt.format(msg=msg))
+            self.repaint()
+        except ValueError as error:
+            print(f'ValueError: {msg}')
+            print(error)
 

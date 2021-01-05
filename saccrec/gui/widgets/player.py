@@ -1,3 +1,4 @@
+import logging
 from math import ceil, floor, tan, radians
 from time import time
 
@@ -6,6 +7,9 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from saccrec import settings
 
 from eoglib.models import SaccadicStimulus, StimulusPosition
+
+
+logger = logging.getLogger('saccrec')
 
 
 class StimulusPlayer(QtWidgets.QWidget):
@@ -18,6 +22,8 @@ class StimulusPlayer(QtWidgets.QWidget):
         super(StimulusPlayer, self).__init__()
 
         self._parent = parent
+
+        self._timeout = 0
 
         self._timer = QtCore.QTimer()
         self._timer.timeout.connect(self._on_timeout)
@@ -40,9 +46,11 @@ class StimulusPlayer(QtWidgets.QWidget):
         workspace = self._parent
 
         # Timer interval computing based on refresh rate
-        timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate // 2)
-        self._timer.setInterval(timeout)
-        print(f'Refresh Timeout: {timeout} ms')
+        timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate)
+        if timeout != self._timeout:
+            self._timeout = timeout
+            self._timer.setInterval(timeout)
+            logger.info(f'Refresh Timeout: {timeout} ms')
 
         # Sampling Step
         self._sampling_step = 1000 / settings.hardware.sampling_rate

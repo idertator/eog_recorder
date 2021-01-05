@@ -33,7 +33,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._protocol: Protocol = None
         self._output_path: str = ''
         self._light_intensity: int = 0
-        self._filenames: list[str] = []
+        self._filename: str = None
         self._studies: list[str] = []
         self._current_file = None
         self._board = None
@@ -194,54 +194,52 @@ class MainWindow(QtWidgets.QMainWindow):
     # ======================================
 
     def _on_wizard_finished(self, record_setup: dict):
-        self._setup_gui_for_recording()
-        # self._signals_widget.setVisible(True)
+        if self._board.ready:
+            self._filename = self._board.create_sd_file()
 
-        self._new_record_wizard.finished.disconnect(self._on_wizard_finished)
-        self._new_record_wizard.destroy()
-        self._new_record_wizard = None
+        if self._board.ready:
+            self._current_file = open(f'/tmp/{self._filename}.dat', 'wb')
 
-        self._subject = record_setup['subject']
-        self._protocol = record_setup['protocol']
-        self._output_path = record_setup['output_path']
-        self._light_intensity = record_setup['light_intensity']
+            self._setup_gui_for_recording()
+            # self._signals_widget.setVisible(True)
 
-        sampling_rate = settings.hardware.sampling_rate
+            self._new_record_wizard.finished.disconnect(self._on_wizard_finished)
+            self._new_record_wizard.destroy()
+            self._new_record_wizard = None
 
-        # Generating stimulus signals
-        for stimulus in self._protocol:
-            stimulus.generate_channel(sampling_rate)
+            self._subject = record_setup['subject']
+            self._protocol = record_setup['protocol']
+            self._output_path = record_setup['output_path']
+            self._light_intensity = record_setup['light_intensity']
 
-        # Initialize Recorder
-        self._filenames = []
+            sampling_rate = settings.hardware.sampling_rate
 
-        self._current_test = 0
-        stimulus = self._protocol[0]
-        saccadic_distance = settings.stimuli.saccadic_distance
-        distance_to_subject = self._protocol.distance_to_subject(saccadic_distance)
-        self._stimulus_player.start(stimulus, distance_to_subject)
+            # Generating stimulus signals
+            for stimulus in self._protocol:
+                stimulus.generate_channel(sampling_rate)
+
+            # Initialize Recorder
+
+            self._current_test = 0
+            stimulus = self._protocol[0]
+            saccadic_distance = settings.stimuli.saccadic_distance
+            distance_to_subject = self._protocol.distance_to_subject(saccadic_distance)
+            self._stimulus_player.start(stimulus, distance_to_subject)
 
     def _on_test_started(self, timestamp):
         if self._board.ready:
-            sd_filename = self._board.create_sd_file()
-            self._current_file = open(f'/tmp/{sd_filename}.dat', 'wb')
             self._board.start()
+            self._board.marker('T')
             self._board.marker(StimulusPosition.Center.value)
-            self._filenames.append(sd_filename)
 
     def _on_test_stopped(self):
         self._current_test = 0
-        self._current_file.close()
-        self._current_file = None
         self._stimulus_player.stop()
         self._stimulus_player.close()
         self._board.stop()
 
     def _on_test_finished(self):
         self._current_test += 1
-        if self._current_file is not None:
-            self._current_file.close()
-        self._current_file = None
         self._board.stop()
         if self._current_test < len(self._protocol):
             stimulus = self._protocol[self._current_test]
@@ -249,26 +247,33 @@ class MainWindow(QtWidgets.QMainWindow):
             distance_to_subject = self._protocol.distance_to_subject(saccadic_distance)
             self._stimulus_player.start(stimulus, distance_to_subject)
         else:
-            self._setup_gui_for_non_recording()
+            if self._current_file is not None:
+                self._current_file.close()
+                self._current_file = None
 
-            self._current_test = 0
-            self._stimulus_player.close()
+            if self._board.ready:
+                self._board.close_sd_file()
 
-            if (study := create_study(
-                subject=self._subject,
-                protocol=self._protocol,
-                light_intensity=self._light_intensity,
-                output_path=self._output_path,
-                filenames=self._filenames
-            )) is not None:
-                self._studies.append(self._output_path)
-                QtWidgets.QMessageBox.information(
-                    self,
-                    _('Success'),
-                    _('Your study was successfully writed to {path}').format(
-                        path=self._output_path
+                self._setup_gui_for_non_recording()
+
+                self._current_test = 0
+                self._stimulus_player.close()
+
+                if (study := create_study(
+                    subject=self._subject,
+                    protocol=self._protocol,
+                    light_intensity=self._light_intensity,
+                    output_path=self._output_path,
+                    source_filename=self._filename
+                )) is not None:
+                    self._studies.append(self._output_path)
+                    QtWidgets.QMessageBox.information(
+                        self,
+                        _('Success'),
+                        _('Your study was successfully writed to {path}').format(
+                            path=self._output_path
+                        )
                     )
-                )
 
     def _on_stimulus_refreshed(self, value: int):
         self._board.marker(value)

@@ -13,47 +13,6 @@ logger = logging.getLogger('saccrec')
 _COM_ERROR = b'Failure: Communications timeout - Device failed to poll Host$$$'
 
 
-class Sample:
-
-    def __init__(self, buffer: bytes):
-        if len(buffer) != 33:
-            raise ValueError('buffer frames must have 33 bytes')
-
-        if buffer[0] != 0xA0 or buffer[32] != 0xC1:
-            raise ValueError('Packet corrupted')
-
-        self._buffer = buffer
-
-    @property
-    def number(self) -> int:
-        return self._buffer[1]
-
-    def channel(self, index: int) -> float:
-        i = index * 3 + 2
-        value = (self._buffer[i] << 16) | (self._buffer[i + 1] << 8) | self._buffer[i + 2]
-        if (value & 0x00800000) > 0:
-            value = -(value & 0x007FFFFF)
-        return value
-
-    @property
-    def marker(self) -> int:
-        return int(chr(self._buffer[26]))
-
-
-    @property
-    def dropped_samples(self, previous: int) -> int:
-        if previous == 255:
-            return self.number
-
-        if previous < self.number:
-            return self.number - previous - 115200
-
-        if previous > self.number:
-            return 255 - previous + self.number
-
-        return 255
-
-
 class CytonBoard:
 
     @staticmethod
@@ -76,10 +35,10 @@ class CytonBoard:
 
     def __init__(self, port: str = '/dev/ttyUSB0'):
         logger.info('Initializing Cyton Board')
-        self._buffer = b''
+
         self._recording = False
-        self._last_sample = 255
-        self._dropped_samples = 0
+        self._sd_open = False
+
         self._processed_samples = 0
         self._ready = True
 
@@ -146,13 +105,6 @@ class CytonBoard:
         cls.board_instance = CytonBoard(port=port)
         return cls.board_instance
 
-    def close(self):
-        if self._recording:
-            self.stop()
-        self._serial.close()
-
-        logger.info('Closing Cyton Board')
-
     def _command(self, cmd: str, wait: float = 0.2) -> str:
         self._serial.write(cmd.encode('ASCII'))
 
@@ -165,6 +117,9 @@ class CytonBoard:
                 if msg == _COM_ERROR:
                     logger.error(f'<strong>[{cmd}]</strong>: {decoded_message}')
                     self._ready = False
+                elif b'createfdContiguous failCorresponding' in msg:
+                    logger.error(f'<strong>[{cmd}]</strong>: {decoded_message}')
+                    self._ready = False
                 else:
                     logger.info(f'<strong>[{cmd}]</strong>: {decoded_message}')
                 return decoded_message
@@ -172,25 +127,34 @@ class CytonBoard:
         return ''
 
     @property
-    def dropped_samples(self) -> int:
-        return self._dropped_samples
-
-    @property
     def ready(self) -> bool:
         return self._ready
 
-    @property
-    def processed_samples(self) -> int:
-        return self._processed_samples
+    def close(self):
+        if self._recording:
+            self.stop()
+
+        if self._sd_open:
+            self.close_sd_file()
+
+        self._serial.close()
+
+        logger.info('Closing Cyton Board')
 
     def create_sd_file(self) -> str:
         msg = self._command('S', wait=2)
         try:
             result = re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
+            self._sd_open = True
             return result
         except TypeError:
             logger.error_('The recorder is not working properly. Please check the batteries and restart the app.')
             self._ready = False
+
+    def close_sd_file(self):
+        self._command('j', wait=0)
+        self._sd_open = False
+        logger.info(f'SD File Closed')
 
     def start(self):
         self._command('b', wait=0)
@@ -198,56 +162,13 @@ class CytonBoard:
 
     def stop(self):
         self._command('s', wait=0)
-        self._command('j', wait=0)
         self._recording = False
 
-    def marker(self, label: int):
+    def marker(self, label: str):
         self._command(f'`{label}', wait=0)
 
     def read(self) -> bytes:
         return self._serial.read_all()
-
-        # horizontal, vertical, markers = [], [], []
-        # dropped = 0
-
-        # while len(self._buffer) >= 33:
-        #     start = 0
-        #     while start < len(self._buffer) and (self._buffer[start] != 0xA0 or (start + 32 < len(self._buffer) and self._buffer[start + 32] != 0xC1)):
-        #         start += 1
-
-        #     if start > 0:
-        #         self._buffer = self._buffer[start:]
-
-        #     if len(self._buffer) < 33:
-        #         break
-
-        #     try:
-        #         sample = Sample(self._buffer[:33])
-
-        #         horizontal.append(sample.channel(0))
-        #         vertical.append(sample.channel(1))
-        #         markers.append(sample.marker)
-
-        #         dropped += sample.dropped_samples(self._last_sample)
-        #         self._last_sample = sample.number
-
-        #         self._processed_samples += 1
-        #     except ValueError:
-        #         pass
-
-        #     self._buffer = self._buffer[33:]
-
-        # self._dropped_samples += dropped
-
-        # if horizontal:
-        #     return (
-        #         array(horizontal, dtype=int32),
-        #         array(vertical, dtype=int32),
-        #         array(markers, dtype=uint8),
-        #         dropped
-        #     )
-
-        # return None, None, None, dropped
 
 
 @atexit.register

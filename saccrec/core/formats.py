@@ -9,7 +9,7 @@ def create_study(
     protocol: Protocol,
     light_intensity: int,
     output_path: str,
-    filenames: list[str]
+    source_filename: str
 ) -> Study:
     study = Study(
         recorder=Recorder(
@@ -20,7 +20,7 @@ def create_study(
         subject=subject,
         protocol_name=protocol.name,
         light_intensity=light_intensity,
-        filenames=filenames
+        obci_filename=source_filename
     )
 
     for stimulus in protocol:
