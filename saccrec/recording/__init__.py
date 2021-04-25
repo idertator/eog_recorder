@@ -1,1 +1,1 @@
-from .openbci import CytonBoard
+from .openeog import CytonBoard

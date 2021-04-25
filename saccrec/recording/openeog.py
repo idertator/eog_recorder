@@ -50,9 +50,10 @@ class CytonBoard:
         sleep(2)
 
         self._command('v', wait=2)       # Soft reset
-        self._command('~6', wait=0.6)    # 250 SPS
-        self._command('/4')              # Set Marker Mode
+        self._command('~4', wait=0.6)    # 1000 SPS
+        # self._command('/4')              # Set Marker Mode
         self._command('!@345678')        # Activate first 2 channels
+        self._command('N12')
 
         if self._command('x1060110X') == 'Failure: too few chars$$$':
             self._ready = False
@@ -62,29 +63,29 @@ class CytonBoard:
             self._ready = False
             logger.error('Error setting Cyton Channel 2')
 
-        if self._command('x3160110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 3')
+        # if self._command('x3160110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 3')
 
-        if self._command('x4160110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 4')
+        # if self._command('x4160110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 4')
 
-        if self._command('x5160110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 5')
+        # if self._command('x5160110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 5')
 
-        if self._command('x6160110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 6')
+        # if self._command('x6160110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 6')
 
-        if self._command('x7160110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 7')
+        # if self._command('x7160110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 7')
 
-        if self._command('x8160110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 8')
+        # if self._command('x8160110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 8')
 
         sleep(1)
         if msg := self._serial.read_all():
@@ -144,31 +145,33 @@ class CytonBoard:
     def create_sd_file(self) -> str:
         msg = self._command('S', wait=2)
         try:
-            result = re.search('OBCI_[0-9A-F]{2}.TXT', msg)[0]
+            result = re.search('[0-9A-F]{6}.EOG', msg)[0]
             self._sd_open = True
             return result
         except TypeError:
-            logger.error_('The recorder is not working properly. Please check the batteries and restart the app.')
+            logger.error(msg)
             self._ready = False
 
     def close_sd_file(self):
-        self._command('j', wait=0)
+        self._command('j', wait=2)
         self._sd_open = False
         logger.info(f'SD File Closed')
 
     def start(self):
-        self._command('b', wait=0)
+        # self._command('b', wait=0)
+        self._command('(', wait=2)
         self._recording = True
+        logger.info('Streaming started')
 
     def stop(self):
-        self._command('s', wait=0)
+        # self._command('s', wait=0)
+        self._command(')', wait=2)
         self._recording = False
+        logger.info('Streaming stopped')
 
     def marker(self, label: str):
-        self._command(f'`{label}', wait=0)
-
-    def read(self) -> bytes:
-        return self._serial.read_all()
+        # self._command(f'`{label}', wait=0)
+        self._command(f'O{label}', wait=0)
 
 
 @atexit.register

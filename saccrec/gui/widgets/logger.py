@@ -1,4 +1,4 @@
-from logging import Handler, INFO, ERROR, WARN
+from logging import Handler, INFO, ERROR, WARN, DEBUG
 
 from PySide6 import QtWidgets
 

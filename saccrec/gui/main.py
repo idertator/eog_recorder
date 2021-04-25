@@ -228,9 +228,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_test_started(self, timestamp):
         if self._board.ready:
+            self._board.marker(StimulusPosition.Center.marker)
             self._board.start()
-            self._board.marker('T')
-            self._board.marker(StimulusPosition.Center.value)
 
     def _on_test_stopped(self):
         self._current_test = 0
@@ -276,6 +275,4 @@ class MainWindow(QtWidgets.QMainWindow):
                     )
 
     def _on_stimulus_refreshed(self, value: int):
-        self._board.marker(value)
-        if self._current_file is not None:
-            self._current_file.write(self._board.read())
+        self._board.marker(StimulusPosition(value).marker)

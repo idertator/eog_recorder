@@ -59,11 +59,11 @@ def main():
     declare_gui_running_pid()
     enable_faulthandler()
 
-    setup_i18n()
-
     app = QtWidgets.QApplication()
     app.setOrganizationName('idertator')
     app.setApplicationName('SaccRec')
+
+    setup_i18n()
 
     main_window = MainWindow()
     main_window.showMaximized()
