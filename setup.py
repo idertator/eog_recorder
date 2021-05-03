@@ -38,6 +38,9 @@ setup(
     entry_points={
         'gui_scripts': [
             'SaccRec = saccrec:main'
+        ],
+        'console_scripts': [
+            'TestOpenEOGRecordings = saccrec.recording.test_recording:main'
         ]
     },
     data_files=[

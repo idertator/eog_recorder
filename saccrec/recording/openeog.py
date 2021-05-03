@@ -43,15 +43,13 @@ class CytonBoard:
         self._ready = True
 
         self._serial = Serial(
-            port=port,
+            port='/dev/ttyUSB0',
             baudrate=115200
         )
 
         sleep(2)
 
         self._command('v', wait=2)       # Soft reset
-        self._command('~4', wait=0.6)    # 1000 SPS
-        # self._command('/4')              # Set Marker Mode
         self._command('!@345678')        # Activate first 2 channels
         self._command('N12')
 
@@ -62,30 +60,6 @@ class CytonBoard:
         if self._command('x2060110X') == 'Failure: too few chars$$$':
             self._ready = False
             logger.error('Error setting Cyton Channel 2')
-
-        # if self._command('x3160110X') == 'Failure: too few chars$$$':
-        #     self._ready = False
-        #     logger.error('Error setting Cyton Channel 3')
-
-        # if self._command('x4160110X') == 'Failure: too few chars$$$':
-        #     self._ready = False
-        #     logger.error('Error setting Cyton Channel 4')
-
-        # if self._command('x5160110X') == 'Failure: too few chars$$$':
-        #     self._ready = False
-        #     logger.error('Error setting Cyton Channel 5')
-
-        # if self._command('x6160110X') == 'Failure: too few chars$$$':
-        #     self._ready = False
-        #     logger.error('Error setting Cyton Channel 6')
-
-        # if self._command('x7160110X') == 'Failure: too few chars$$$':
-        #     self._ready = False
-        #     logger.error('Error setting Cyton Channel 7')
-
-        # if self._command('x8160110X') == 'Failure: too few chars$$$':
-        #     self._ready = False
-        #     logger.error('Error setting Cyton Channel 8')
 
         sleep(1)
         if msg := self._serial.read_all():
@@ -158,19 +132,17 @@ class CytonBoard:
         logger.info(f'SD File Closed')
 
     def start(self):
-        # self._command('b', wait=0)
         self._command('(', wait=2)
         self._recording = True
-        logger.info('Streaming started')
 
     def stop(self):
-        # self._command('s', wait=0)
-        self._command(')', wait=2)
+        answer = self._command(')', wait=1).strip()
+        while answer != '[MSG] Test ended$$$':
+            logger.error(f'Cannot close the test with the following answer: "{answer}". Trying again')
+            answer = self._command(')', wait=1).strip()
         self._recording = False
-        logger.info('Streaming stopped')
 
     def marker(self, label: str):
-        # self._command(f'`{label}', wait=0)
         self._command(f'O{label}', wait=0)
 
 
