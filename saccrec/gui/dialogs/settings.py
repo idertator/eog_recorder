@@ -3,7 +3,7 @@ from enum import Enum
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
-from saccrec.core.enums import Language
+from saccrec.core.enums import Language, Gain
 from saccrec.recording import CytonBoard
 from saccrec.gui.widgets import ColorButton
 
@@ -52,53 +52,81 @@ class _GUISettingsPage(QtWidgets.QWidget):
         return _('User Interface')
 
 
-class _OpenBCIChannelWidget(QtWidgets.QWidget):
+class _OpenBCIChannelWidget(QtWidgets.QFrame):
 
     def __init__(self, channel_number: int, parent=None):
         super(_OpenBCIChannelWidget, self).__init__(parent)
         self._channel_number = channel_number
-        self.setFixedSize(120, 100)
+        self.setFixedSize(140, 100)
+        self.setFrameShape(QtWidgets.QFrame.Box)
 
         self._activated_check = QtWidgets.QCheckBox()
         self._activated_check.stateChanged.connect(self._on_activated_changed)
 
         self._gain_label = QtWidgets.QLabel(_('Gain'))
 
-        self._gain_edit = QtWidgets.QSpinBox()
-        self._gain_edit.setFixedWidth(40)
+        self._gain_combo = QtWidgets.QComboBox()
+        self._gain_combo.setDuplicatesEnabled(False)
+
+        for gain in Gain:
+            self._gain_combo.addItem(gain.label, gain.value)
 
         gain_layout = QtWidgets.QHBoxLayout()
         gain_layout.addWidget(self._gain_label)
-        gain_layout.addWidget(self._gain_edit)
+        gain_layout.addWidget(self._gain_combo)
+
+        self._srb1_check = QtWidgets.QCheckBox('SRB1')
+        self._srb2_check = QtWidgets.QCheckBox('SRB2')
+
+        srb_layout = QtWidgets.QHBoxLayout()
+        srb_layout.addWidget(self._srb1_check)
+        srb_layout.addWidget(self._srb2_check)
 
         layout = QtWidgets.QFormLayout()
         layout.addRow(
-            '{channel} {number}    '.format(
+            '{channel} {number}         '.format(
                 channel=_('Channel'),
                 number=self._channel_number + 1
             ),
             self._activated_check
         )
         layout.addRow(gain_layout)
+        layout.addRow(srb_layout)
         layout.setSpacing(3)
 
         self.setLayout(layout)
 
     def _on_activated_changed(self):
-        self._gain_edit.setVisible(self._activated_check.checkState())
+        self._gain_combo.setVisible(self._activated_check.checkState())
         self._gain_label.setVisible(self._activated_check.checkState())
+        self._srb1_check.setVisible(self._activated_check.checkState())
+        self._srb2_check.setVisible(self._activated_check.checkState())
 
     def load(self):
         active = settings.hardware.channels[self._channel_number].active
+        srb1 = settings.hardware.channels[self._channel_number].srb1
+        srb2 = settings.hardware.channels[self._channel_number].srb2
 
         self._activated_check.setChecked(active)
+        self._srb1_check.setChecked(srb1)
+        self._srb2_check.setChecked(srb2)
+
+        gain = settings.hardware.channels[self._channel_number].gain
+        if gain > 6:
+            gain = 6
+
+        self._gain_combo.setCurrentText(Gain(gain).label)
+
         self._gain_label.setVisible(active)
-        self._gain_edit.setVisible(active)
-        self._gain_edit.setValue(settings.hardware.channels[self._channel_number].gain)
+        self._gain_combo.setVisible(active)
+        self._srb1_check.setVisible(active)
+        self._srb2_check.setVisible(active)
 
     def save(self):
         settings.hardware.channels[self._channel_number].active = self._activated_check.isChecked()
-        settings.hardware.channels[self._channel_number].gain = self._gain_edit.value()
+        settings.hardware.channels[self._channel_number].gain = self._gain_combo.value()
+        settings.hardware.channels[self._channel_number].srb1 = self._srb1_check.isChecked()
+        settings.hardware.channels[self._channel_number].srb2 = self._srb2_check.isChecked()
 
 
 class _HardwarePage(QtWidgets.QWidget):
@@ -112,10 +140,10 @@ class _HardwarePage(QtWidgets.QWidget):
         for port in CytonBoard.list_ports():
             self._ports_combo.addItem(port, port)
 
-        self._sample_rate_combo = QtWidgets.QComboBox()
-        self._sample_rate_combo.setDuplicatesEnabled(False)
-        for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
-            self._sample_rate_combo.addItem(f'{sr} Hz', sr)
+        # self._sample_rate_combo = QtWidgets.QComboBox()
+        # self._sample_rate_combo.setDuplicatesEnabled(False)
+        # for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
+        #     self._sample_rate_combo.addItem(f'{sr} Hz', sr)
 
         channels_group = QtWidgets.QGroupBox(_('Channels'))
         self._channel_list = []
@@ -131,7 +159,7 @@ class _HardwarePage(QtWidgets.QWidget):
 
         form_layout = QtWidgets.QFormLayout()
         form_layout.addRow(_('Port'), self._ports_combo)
-        form_layout.addRow(_('Sampling frequency'), self._sample_rate_combo)
+        # form_layout.addRow(_('Sampling frequency'), self._sample_rate_combo)
 
         channels_layout = QtWidgets.QVBoxLayout()
         channels_layout.addLayout(top_layout)
@@ -152,14 +180,14 @@ class _HardwarePage(QtWidgets.QWidget):
         else:
             self._ports_combo.setCurrentIndex(0)
 
-        self._sample_rate_combo.setCurrentText(f'{settings.hardware.sampling_rate} Hz')
+        # self._sample_rate_combo.setCurrentText(f'{settings.hardware.sampling_rate} Hz')
 
         for channel in self._channel_list:
             channel.load()
 
     def save(self):
         settings.hardware.port = str(self._ports_combo.currentData())
-        settings.hardware.sampling_rate = int(self._sample_rate_combo.currentData())
+        # settings.hardware.sampling_rate = int(self._sample_rate_combo.currentData())
 
         for channel in self._channel_list:
             channel.save()

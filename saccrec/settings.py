@@ -96,6 +96,22 @@ class _Channel:
         _settings.setValue(f'Hardware/Channels/{self._index}/Gain', value)
 
     @property
+    def srb1(self) -> bool:
+        return int(_settings.value(f'Hardware/Channels/{self._index}/SRB1', False))
+
+    @srb1.setter
+    def srb1(self, value: bool):
+        _settings.setValue(f'Hardware/Channels/{self._index}/SRB1', value)
+
+    @property
+    def srb2(self) -> bool:
+        return int(_settings.value(f'Hardware/Channels/{self._index}/SRB2', True))
+
+    @srb2.setter
+    def srb2(self, value: bool):
+        _settings.setValue(f'Hardware/Channels/{self._index}/SRB2', value)
+
+    @property
     def json(self) -> dict:
         return {
             'index': self._index,
