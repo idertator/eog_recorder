@@ -4,6 +4,7 @@ from typing import Optional
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
+from saccrec.core.enums import Gain
 from saccrec.core.screen import Screen
 
 _settings = QtCore.QSettings()
@@ -97,19 +98,19 @@ class _Channel:
 
     @property
     def srb1(self) -> bool:
-        return int(_settings.value(f'Hardware/Channels/{self._index}/SRB1', False))
+        return _settings.value(f'Hardware/Channels/{self._index}/SRB1', '0') == '1'
 
     @srb1.setter
     def srb1(self, value: bool):
-        _settings.setValue(f'Hardware/Channels/{self._index}/SRB1', value)
+        _settings.setValue(f'Hardware/Channels/{self._index}/SRB1', '1' if value else '0')
 
     @property
     def srb2(self) -> bool:
-        return int(_settings.value(f'Hardware/Channels/{self._index}/SRB2', True))
+        return _settings.value(f'Hardware/Channels/{self._index}/SRB2', '1') == '1'
 
     @srb2.setter
     def srb2(self, value: bool):
-        _settings.setValue(f'Hardware/Channels/{self._index}/SRB2', value)
+        _settings.setValue(f'Hardware/Channels/{self._index}/SRB2', '1' if value else '0')
 
     @property
     def json(self) -> dict:
@@ -117,13 +118,34 @@ class _Channel:
             'index': self._index,
             'active': self.active,
             'gain': self.gain,
+            'srb1': self.srb1,
+            'srb2': self.srb2,
         }
+
+    @property
+    def settings_command(self) -> str:
+        result = 'x'
+        result += str(self.index + 1)
+        result += '0' if self.active else '1'
+
+        gain = Gain(self.gain)
+        result += gain.settings
+
+        result += '01' # Input normal and include in bias generation
+
+        result += '1' if self.srb2 else '0'
+        result += '1' if self.srb1 else '0'
+
+        return result + 'X'
 
 
 class _Channels:
 
     def __init__(self, count: int = 8):
-        self._channels = [_Channel(index) for index in range(count)]
+        self._channels = [
+            _Channel(index)
+            for index in range(count)
+        ]
 
     def __getitem__(self, index: int) -> _Channel:
         return self._channels[index]
@@ -133,7 +155,22 @@ class _Channels:
 
     @property
     def json(self) -> list[dict]:
-        return [channel.json for channel in self._channels]
+        return [
+            channel.json
+            for channel in self._channels
+        ]
+
+    @property
+    def activation_command(self) -> str:
+        CHANNELS_ON = '!@#$%^&*'
+        CHANNELS_OFF = '12345678'
+        result = ''
+        for index, channel in enumerate(self._channels):
+            if channel.active:
+                result += CHANNELS_ON[index]
+            else:
+                result += CHANNELS_OFF[index]
+        return result
 
 
 class _HardwareSettings:
@@ -169,6 +206,26 @@ class _HardwareSettings:
     @sampling_rate.setter
     def sampling_rate(self, value: int):
         _settings.setValue('Hardware/SamplingRate', value)
+
+    @property
+    def horizontal_channel(self) -> int:
+        return int(_settings.value('Hardware/HorizontalChannel', 1))
+
+    @horizontal_channel.setter
+    def horizontal_channel(self, value: int):
+        _settings.setValue('Hardware/HorizontalChannel', value)
+
+    @property
+    def vertical_channel(self) -> int:
+        return int(_settings.value('Hardware/VerticalChannel', 2))
+
+    @vertical_channel.setter
+    def vertical_channel(self, value: int):
+        _settings.setValue('Hardware/VerticalChannel', value)
+
+    @property
+    def eog_channels_command(self) -> str:
+        return f'N{self.horizontal_channel}{self.vertical_channel}'
 
     @property
     def channels(self) -> _Channels:

@@ -34,9 +34,10 @@ class CytonBoard:
 
         return ports
 
-    def __init__(self, port: str = conf.port):
+    def __init__(self, port: str):
         logger.info('Initializing Cyton Board')
 
+        self._port = port
         self._recording = False
         self._sd_open = False
 
@@ -51,16 +52,27 @@ class CytonBoard:
         sleep(2)
 
         self._command('v', wait=2)       # Soft reset
-        self._command('!@345678')        # Activate first 2 channels
-        self._command('N12')
+        # self._command('!@345678')        # Activate first 2 channels
+        self._command(conf.channels.activation_command)
+        self._command(conf.eog_channels_command)
+        # self._command('N12')
 
-        if self._command('x1060110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 1')
+        for index, channel in enumerate(conf.channels):
+            if channel.active:
+                cmd = channel.settings_command
+                if self._command(cmd) == 'Failure: too few chars$$$':
+                    self._ready = False
+                    logger.error(_('Error setting OpenEOG Channel {index}').format(
+                        index=index+1
+                    ))
 
-        if self._command('x2060110X') == 'Failure: too few chars$$$':
-            self._ready = False
-            logger.error('Error setting Cyton Channel 2')
+        # if self._command('x1060110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 1')
+
+        # if self._command('x2060110X') == 'Failure: too few chars$$$':
+        #     self._ready = False
+        #     logger.error('Error setting Cyton Channel 2')
 
         sleep(1)
         if msg := self._serial.read_all():
@@ -69,13 +81,7 @@ class CytonBoard:
     board_instance = None
 
     @classmethod
-    def instance(cls, port: str = conf.port):
-        if cls.board_instance is None:
-            cls.board_instance = CytonBoard(port=port)
-        return cls.board_instance
-
-    @classmethod
-    def reset(cls, port: str = conf.port):
+    def reset(cls, port: str):
         if cls.board_instance is not None:
             cls.board_instance.close()
         cls.board_instance = CytonBoard(port=port)
@@ -99,6 +105,8 @@ class CytonBoard:
                 else:
                     logger.info(f'<strong>[{cmd}]</strong>: {decoded_message}')
                 return decoded_message
+            else:
+                logger.info(f'<strong>[{cmd}]</strong>')
 
         return ''
 

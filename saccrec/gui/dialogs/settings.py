@@ -4,7 +4,6 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
 from saccrec.core.enums import Language, Gain
-from saccrec.recording import CytonBoard
 from saccrec.gui.widgets import ColorButton
 
 
@@ -53,6 +52,7 @@ class _GUISettingsPage(QtWidgets.QWidget):
 
 
 class _OpenBCIChannelWidget(QtWidgets.QFrame):
+    activationChanged = QtCore.Signal()
 
     def __init__(self, channel_number: int, parent=None):
         super(_OpenBCIChannelWidget, self).__init__(parent)
@@ -101,6 +101,11 @@ class _OpenBCIChannelWidget(QtWidgets.QFrame):
         self._gain_label.setVisible(self._activated_check.checkState())
         self._srb1_check.setVisible(self._activated_check.checkState())
         self._srb2_check.setVisible(self._activated_check.checkState())
+        self.activationChanged.emit()
+
+    @property
+    def active(self) -> bool:
+        return self._activated_check.checkState()
 
     def load(self):
         active = settings.hardware.channels[self._channel_number].active
@@ -124,7 +129,7 @@ class _OpenBCIChannelWidget(QtWidgets.QFrame):
 
     def save(self):
         settings.hardware.channels[self._channel_number].active = self._activated_check.isChecked()
-        settings.hardware.channels[self._channel_number].gain = self._gain_combo.value()
+        settings.hardware.channels[self._channel_number].gain = int(self._gain_combo.currentData())
         settings.hardware.channels[self._channel_number].srb1 = self._srb1_check.isChecked()
         settings.hardware.channels[self._channel_number].srb2 = self._srb2_check.isChecked()
 
@@ -137,6 +142,7 @@ class _HardwarePage(QtWidgets.QWidget):
         self._ports_combo = QtWidgets.QComboBox()
         self._ports_combo.setDuplicatesEnabled(False)
 
+        from saccrec.recording import CytonBoard
         for port in CytonBoard.list_ports():
             self._ports_combo.addItem(port, port)
 
@@ -151,11 +157,32 @@ class _HardwarePage(QtWidgets.QWidget):
         bottom_layout = QtWidgets.QHBoxLayout()
         for i in range(8):
             channel = _OpenBCIChannelWidget(i)
+            channel.activationChanged.connect(self._reset_available_channels)
             self._channel_list.append(channel)
             if i < 4:
                 top_layout.addWidget(channel)
             else:
                 bottom_layout.addWidget(channel)
+
+        self._horizontal_channel_label = QtWidgets.QLabel(_('Horizontal Channel'))
+        self._horizontal_channel_combo = QtWidgets.QComboBox()
+        self._horizontal_channel_combo.setDuplicatesEnabled(False)
+        self._horizontal_channel_combo.setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed,
+            QtWidgets.QSizePolicy.Fixed
+        )
+
+        self._vertical_channel_label = QtWidgets.QLabel(_('Vertical Channel'))
+        self._vertical_channel_combo = QtWidgets.QComboBox()
+        self._vertical_channel_combo.setDuplicatesEnabled(False)
+        self._vertical_channel_combo.setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed,
+            QtWidgets.QSizePolicy.Fixed
+        )
+
+        eog_channels_layout = QtWidgets.QFormLayout()
+        eog_channels_layout.addRow(self._horizontal_channel_label, self._horizontal_channel_combo)
+        eog_channels_layout.addRow(self._vertical_channel_label, self._vertical_channel_combo)
 
         form_layout = QtWidgets.QFormLayout()
         form_layout.addRow(_('Port'), self._ports_combo)
@@ -169,10 +196,41 @@ class _HardwarePage(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout()
         layout.addLayout(form_layout)
         layout.addWidget(channels_group)
+        layout.addLayout(eog_channels_layout)
         layout.addStretch()
         self.setLayout(layout)
 
         self.load()
+
+    def _reset_available_channels(self):
+        self._horizontal_channel_combo.clear()
+        self._vertical_channel_combo.clear()
+
+        available_channels = []
+        for index, channel in enumerate(self._channel_list):
+            if channel.active:
+                available_channels.append(str(index + 1))
+
+        for channel in available_channels:
+            self._horizontal_channel_combo.addItem(channel)
+            self._vertical_channel_combo.addItem(channel)
+
+        horizontal_channel = str(settings.hardware.horizontal_channel)
+        vertical_channel = str(settings.hardware.vertical_channel)
+
+        if horizontal_channel in available_channels:
+            self._horizontal_channel_combo.setCurrentText(horizontal_channel)
+        elif available_channels:
+            self._horizontal_channel_combo.setCurrentText(available_channels[0])
+        else:
+            self._horizontal_channel_combo.setCurrentText('')
+
+        if vertical_channel in available_channels:
+            self._vertical_channel_combo.setCurrentText(vertical_channel)
+        elif available_channels:
+            self._vertical_channel_combo.setCurrentText(available_channels[-1])
+        else:
+            self._vertical_channel_combo.setCurrentText('')
 
     def load(self):
         if (port := settings.hardware.port) != '':
@@ -185,12 +243,17 @@ class _HardwarePage(QtWidgets.QWidget):
         for channel in self._channel_list:
             channel.load()
 
+        self._reset_available_channels()
+
     def save(self):
         settings.hardware.port = str(self._ports_combo.currentData())
         # settings.hardware.sampling_rate = int(self._sample_rate_combo.currentData())
 
         for channel in self._channel_list:
             channel.save()
+
+        settings.hardware.horizontal_channel = int(self._horizontal_channel_combo.currentText())
+        settings.hardware.vertical_channel = int(self._vertical_channel_combo.currentText())
 
     @property
     def title(self) -> str:
