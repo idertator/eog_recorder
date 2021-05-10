@@ -197,7 +197,7 @@ class _StimuliSettings:
 
     @screen_height.setter
     def screen_height(self, value: float):
-        _settings.value('Stimuli/ScreenHeight', value)
+        _settings.setValue('Stimuli/ScreenHeight', value)
 
 
 stimuli = _StimuliSettings()
