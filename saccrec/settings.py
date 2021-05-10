@@ -1,5 +1,5 @@
 from json import loads
-from os.path import expanduser, join
+from os.path import expanduser, join, exists
 from typing import Optional
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -127,7 +127,20 @@ class _HardwareSettings:
 
     @property
     def port(self) -> str:
-        return str(_settings.value('Hardware/Port', ''))
+        port = str(_settings.value('Hardware/Port', ''))
+        if port and exists(port):
+            return port
+
+        from saccrec.recording import CytonBoard
+        ports = CytonBoard.list_ports()
+        if ports and exists(ports[0]):
+            _settings.setValue('Hardware/Port', ports[0])
+            return ports[0]
+
+        if exists('/dev/ttyUSB0'):
+            return '/dev/ttyUSB0'
+
+        return ''
 
     @port.setter
     def port(self, value: str):

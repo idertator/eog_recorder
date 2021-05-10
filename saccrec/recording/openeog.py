@@ -7,6 +7,7 @@ from time import sleep, time
 from numpy import array, int32, uint8, ndarray
 from serial import Serial
 from serial.tools.list_ports import comports
+from saccrec.settings import hardware as conf
 
 logger = logging.getLogger('saccrec')
 
@@ -17,7 +18,7 @@ class CytonBoard:
 
     @staticmethod
     def list_ports() -> list[str]:
-        filter_regex = 'OpenBCI'
+        filter_regex = 'EOG Soft Reset'
         devices = [p.device for p in comports()]
 
         def _get_firmware_string(port, timeout=2):
@@ -33,7 +34,7 @@ class CytonBoard:
 
         return ports
 
-    def __init__(self, port: str = '/dev/ttyUSB0'):
+    def __init__(self, port: str = conf.port):
         logger.info('Initializing Cyton Board')
 
         self._recording = False
@@ -43,7 +44,7 @@ class CytonBoard:
         self._ready = True
 
         self._serial = Serial(
-            port='/dev/ttyUSB0',
+            port=port,
             baudrate=115200
         )
 
@@ -68,13 +69,13 @@ class CytonBoard:
     board_instance = None
 
     @classmethod
-    def instance(cls, port: str = '/dev/ttyUSB0'):
+    def instance(cls, port: str = conf.port):
         if cls.board_instance is None:
             cls.board_instance = CytonBoard(port=port)
         return cls.board_instance
 
     @classmethod
-    def reset(cls, port: str = '/dev/ttyUSB0'):
+    def reset(cls, port: str = conf.port):
         if cls.board_instance is not None:
             cls.board_instance.close()
         cls.board_instance = CytonBoard(port=port)

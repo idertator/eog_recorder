@@ -108,6 +108,7 @@ class _HardwarePage(QtWidgets.QWidget):
 
         self._ports_combo = QtWidgets.QComboBox()
         self._ports_combo.setDuplicatesEnabled(False)
+
         for port in CytonBoard.list_ports():
             self._ports_combo.addItem(port, port)
 
