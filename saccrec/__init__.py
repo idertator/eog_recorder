@@ -3,14 +3,13 @@ import gettext
 import sys
 from faulthandler import enable as enable_faulthandler
 from os import getpid, kill, remove, system
-from os.path import abspath, dirname, exists, join
-from tempfile import gettempdir
+from os.path import dirname, exists, join
 
 from PySide6 import QtWidgets
 
 from saccrec.gui.main import MainWindow
 
-from .settings import gui, hardware, initialize_screen
+from .settings import gui, initialize_screen
 
 _GUI_PID_FILE = '/tmp/saccrec_gui.pid'
 

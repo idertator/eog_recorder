@@ -1,4 +1,4 @@
-from PySide6 import QtCore, QtWidgets, QtSvgWidgets
+from PySide6 import QtWidgets, QtSvgWidgets
 
 from saccrec.core.templating import render
 

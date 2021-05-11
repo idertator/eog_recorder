@@ -70,7 +70,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
 
     def _default_protocol(self) -> Protocol:
         return Protocol(
-            stimuli = [
+            stimuli=[
                 SaccadicStimulus(
                     calibration=True,
                     angle=30,

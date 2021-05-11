@@ -5,7 +5,7 @@ from PySide6 import QtWidgets
 
 class LoggerWidget(Handler, QtWidgets.QPlainTextEdit):
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         QtWidgets.QPlainTextEdit.__init__(self, parent)
         Handler.__init__(self)
 
@@ -30,4 +30,3 @@ class LoggerWidget(Handler, QtWidgets.QPlainTextEdit):
         except ValueError as error:
             print(f'ValueError: {msg}')
             print(error)
-

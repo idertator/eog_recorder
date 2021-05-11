@@ -1,5 +1,3 @@
-from enum import Enum
-
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings

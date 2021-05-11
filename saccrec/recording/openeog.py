@@ -1,10 +1,8 @@
 import atexit
 import logging
 import re
-from struct import unpack
-from time import sleep, time
+from time import sleep
 
-from numpy import array, int32, ndarray, uint8
 from serial import Serial
 from serial.tools.list_ports import comports
 
@@ -64,7 +62,7 @@ class CytonBoard:
                 if self._command(cmd) == 'Failure: too few chars$$$':
                     self._ready = False
                     logger.error(_('Error setting OpenEOG Channel {index}').format(
-                        index=index+1
+                        index=index + 1
                     ))
 
         # if self._command('x1060110X') == 'Failure: too few chars$$$':
@@ -139,7 +137,7 @@ class CytonBoard:
     def close_sd_file(self):
         self._command('j', wait=2)
         self._sd_open = False
-        logger.info(f'SD File Closed')
+        logger.info('SD File Closed')
 
     def start(self):
         self._command('(', wait=2)

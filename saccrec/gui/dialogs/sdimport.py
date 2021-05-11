@@ -1,7 +1,7 @@
 from collections import defaultdict
 from os.path import exists, join
 
-from eoglib.io import load_openbci, load_eog, save_eog
+from eoglib.io import load_eog, load_openbci, save_eog
 from eoglib.models import Channel
 from PySide6 import QtGui, QtWidgets
 
@@ -96,7 +96,6 @@ class SDCardImport(QtWidgets.QDialog):
                         path = current_path
                         break
 
-
         if path is not None:
             return path
 
@@ -186,13 +185,12 @@ class SDCardImport(QtWidgets.QDialog):
 
                     save_eog(study_path, study)
 
-            percent = ((index + 1) / float(len(self._studies))) * 100
             self._progress_bar.setValue(index + 1)
 
         if errors:
             failed = len(errors)
             self._progress_bar.setFormat(_('Imported {success} studies, {failed} failed').format(
-                success=len(self._studies)-failed,
+                success=len(self._studies) - failed,
                 failed=failed
             ))
             error_message = _('The following studies present missing files:\n\n')
@@ -214,7 +212,6 @@ class SDCardImport(QtWidgets.QDialog):
             self._progress_bar.setFormat(_('Imported {success} studies').format(
                 success=len(self._studies)
             ))
-
 
     def _on_selection_changed(self):
         self._del_studies_button.setEnabled(len(self._studies_list.selectedItems()) > 0)

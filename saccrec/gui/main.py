@@ -1,21 +1,15 @@
 import logging
 
-from os.path import join
-
-from numpy import mean, std, hstack, int32
-from numpy.random import random
-
 from eoglib.models import Protocol, StimulusPosition, Subject
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtGui, QtWidgets
 
 from saccrec import settings
 from saccrec.core.formats import create_study
 from saccrec.gui import icons  # noqa: F401
-from saccrec.gui.dialogs import AboutDialog, SettingsDialog, SDCardImport
-from saccrec.gui.widgets import SignalsWidget, StimulusPlayer, LoggerWidget
+from saccrec.gui.dialogs import AboutDialog, SDCardImport, SettingsDialog
+from saccrec.gui.widgets import LoggerWidget, StimulusPlayer
 from saccrec.gui.wizards import RecordSetupWizard
 from saccrec.recording import CytonBoard
-
 
 logger = logging.getLogger('saccrec')
 logger.setLevel(logging.INFO)
@@ -258,13 +252,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._current_test = 0
                 self._stimulus_player.close()
 
-                if (study := create_study(
+                if create_study(
                     subject=self._subject,
                     protocol=self._protocol,
                     light_intensity=self._light_intensity,
                     output_path=self._output_path,
                     source_filename=self._filename
-                )) is not None:
+                ) is not None:
                     self._studies.append(self._output_path)
                     QtWidgets.QMessageBox.information(
                         self,

@@ -1,10 +1,9 @@
 from os import makedirs
-from os.path import join, exists
-
-from PySide6 import QtWidgets, QtCore
+from os.path import exists, join
 
 from eoglib.io import load_protocol, save_protocol
 from eoglib.models import Protocol, SaccadicStimulus
+from PySide6 import QtCore, QtWidgets
 
 from saccrec import settings
 
@@ -54,7 +53,6 @@ class ProtocolWidget(QtWidgets.QWidget):
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addLayout(self._top_layout)
         self.layout.addWidget(self._scroll_area)
-
 
     def _protocol_widgets(self, protocol: Protocol) -> list[SaccadicStimulusWidget]:
         widgets = []

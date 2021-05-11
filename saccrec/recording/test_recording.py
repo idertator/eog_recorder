@@ -1,8 +1,9 @@
 from saccrec.recording import CytonBoard
 from time import sleep
 
+
 def main():
-    board = CytonBoard(port = '/dev/ttyUSB0')
+    board = CytonBoard(port='/dev/ttyUSB0')
 
     filename = board.create_sd_file()
     print(f'Recording at {filename}')

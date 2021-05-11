@@ -43,8 +43,6 @@ class StimulusPlayer(QtWidgets.QWidget):
         self._distance_to_subject = None
 
     def _load_settings(self):
-        workspace = self._parent
-
         # Timer interval computing based on refresh rate
         timeout = floor(1000.0 / settings.screen.secondary_screen_refresh_rate)
         if timeout != self._timeout:
@@ -181,4 +179,3 @@ class StimulusPlayer(QtWidgets.QWidget):
         else:
             if event.key() == QtCore.Qt.Key_Space:
                 self._start_test()
-
