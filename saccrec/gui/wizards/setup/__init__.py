@@ -100,6 +100,7 @@ class RecordSetupWizard(QtWidgets.QWizard):
 
     def _on_protocol_loaded(self, protocol: Protocol):
         self._protocol = protocol
+        self._output_page.setProtocol(protocol)
 
     def _on_output_path_changed(self, output_path: str):
         self._output_path = output_path

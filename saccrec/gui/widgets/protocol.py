@@ -115,6 +115,8 @@ class ProtocolWidget(QtWidgets.QWidget):
             self._name_edit.setText(self._protocol.name)
             settings.gui.current_protocol = filename
 
+            self.protocolLoaded.emit(self._protocol)
+
     def _on_save_pressed(self):
         default_path = settings.gui.protocols_path
         if not exists(default_path):

@@ -58,6 +58,9 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         filepath = self._output_path_edit.text()
         return exists(dirname(filepath)) and filepath.lower().endswith('.eog')
 
+    def setProtocol(self, protocol: Protocol):
+        self._protocol = protocol
+
     def initializePage(self):
         filename = self._subject.initials + datetime.now().strftime('%d%m%Y%H%M') + '.eog'
         self._output_path = join(settings.gui.records_path, filename)
