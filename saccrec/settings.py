@@ -1,5 +1,5 @@
 from json import loads
-from os.path import expanduser, join, exists
+from os.path import exists, expanduser, join
 from typing import Optional
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -43,7 +43,6 @@ class _GUISettings:
 
     @property
     def protocols_path(self) -> str:
-        homedir = expanduser('~')
         default_path = join(self.records_path, 'protocols')
         return _settings.value('GUI/ProtocolsPath', default_path)
 
@@ -131,7 +130,7 @@ class _Channel:
         gain = Gain(self.gain)
         result += gain.settings
 
-        result += '01' # Input normal and include in bias generation
+        result += '01'  # Input normal and include in bias generation
 
         result += '1' if self.srb2 else '0'
         result += '1' if self.srb1 else '0'

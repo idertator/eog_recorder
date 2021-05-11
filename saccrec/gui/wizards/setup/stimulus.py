@@ -32,4 +32,4 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
 
     def _on_protocol_loaded(self, protocol: Protocol):
         self._protocol = protocol
-        this.protocolLoaded.emit(protocol)
+        self.protocolLoaded.emit(protocol)

@@ -4,9 +4,10 @@ import re
 from struct import unpack
 from time import sleep, time
 
-from numpy import array, int32, uint8, ndarray
+from numpy import array, int32, ndarray, uint8
 from serial import Serial
 from serial.tools.list_ports import comports
+
 from saccrec.settings import hardware as conf
 
 logger = logging.getLogger('saccrec')
