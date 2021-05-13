@@ -1,13 +1,14 @@
 import logging
 
 from eoglib.models import Protocol, StimulusPosition, Subject
-from PySide6 import QtGui, QtWidgets
+from numpy import array, float32
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from saccrec import settings
 from saccrec.core.formats import create_study
 from saccrec.gui import icons  # noqa: F401
 from saccrec.gui.dialogs import AboutDialog, SDCardImport, SettingsDialog
-from saccrec.gui.widgets import LoggerWidget, StimulusPlayer
+from saccrec.gui.widgets import LoggerWidget, SignalsWidget, StimulusPlayer
 from saccrec.gui.wizards import RecordSetupWizard
 from saccrec.recording import CytonBoard
 
@@ -32,6 +33,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self._current_file = None
         self._board = None
 
+        # Setting signals
+        self._signals_widget = SignalsWidget()
+        self._signals_widget.setVisible(False)
+
         # Setting logger
         self._logger = LoggerWidget()
 
@@ -43,10 +48,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self._about_dialog: AboutDialog = None
         self._settings_dialog = SettingsDialog(self)
 
-        # Local Widgets
-        self.setCentralWidget(self._logger)
+        # Setting Splitter
+        self._splitter = QtWidgets.QSplitter()
+        self._splitter.setOrientation(QtCore.Qt.Vertical)
+        self._splitter.addWidget(self._signals_widget)
+        self._splitter.addWidget(self._logger)
+        self._splitter.setCollapsible(0, True)
 
-        self._stimulus_player = StimulusPlayer(self)
+        # Local Widgets
+        self.setCentralWidget(self._splitter)
+
+        self._stimulus_player = StimulusPlayer(self, self._on_read_data)
+        self._stimulus_player.aboutToStart.connect(self._on_test_about_to_start)
         self._stimulus_player.started.connect(self._on_test_started)
         self._stimulus_player.stopped.connect(self._on_test_stopped)
         self._stimulus_player.finished.connect(self._on_test_finished)
@@ -195,7 +208,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._current_file = open(f'/tmp/{self._filename}.dat', 'wb')
 
             self._setup_gui_for_recording()
-            # self._signals_widget.setVisible(True)
+            self._signals_widget.setVisible(True)
 
             self._new_record_wizard.finished.disconnect(self._on_wizard_finished)
             self._new_record_wizard.destroy()
@@ -213,16 +226,20 @@ class MainWindow(QtWidgets.QMainWindow):
                 stimulus.generate_channel(sampling_rate)
 
             # Initialize Recorder
-
             self._current_test = 0
             stimulus = self._protocol[0]
             saccadic_distance = settings.stimuli.saccadic_distance
             distance_to_subject = self._protocol.distance_to_subject(saccadic_distance)
             self._stimulus_player.start(stimulus, distance_to_subject)
 
-    def _on_test_started(self, timestamp):
+    def _on_test_about_to_start(self):
+        self._signals_widget.reset_data()
+
         if self._board.ready:
             self._board.marker(StimulusPosition.Center.marker)
+
+    def _on_test_started(self, timestamp):
+        if self._board.ready:
             self._board.start()
 
     def _on_test_stopped(self):
@@ -270,3 +287,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_stimulus_refreshed(self, value: int):
         self._board.marker(StimulusPosition(value).marker)
+
+    def _on_read_data(self):
+        horizontal_list, vertical_list, position_list = [], [], []
+        for index, horizontal, vertical, position in self._board.read():
+            horizontal_list.append(horizontal)
+            vertical_list.append(vertical)
+            position_list.append({
+                0x01: 1,
+                0x02: -1,
+                0x10: 0,
+            }[position])
+
+        horizontal = array(horizontal_list, dtype=float32)
+        vertical = array(vertical_list, dtype=float32)
+        positions = array(position_list, dtype=float32)
+
+        self._signals_widget.plot(horizontal, vertical, positions)

@@ -13,12 +13,13 @@ logger = logging.getLogger('saccrec')
 
 
 class StimulusPlayer(QtWidgets.QWidget):
+    aboutToStart = QtCore.Signal()
     started = QtCore.Signal(float)
     stopped = QtCore.Signal()
     finished = QtCore.Signal()
     refreshed = QtCore.Signal(int)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, read_function: callable = None):
         super(StimulusPlayer, self).__init__()
 
         self._parent = parent
@@ -27,6 +28,8 @@ class StimulusPlayer(QtWidgets.QWidget):
 
         self._timer = QtCore.QTimer()
         self._timer.timeout.connect(self._on_timeout)
+
+        self._read_function = read_function
 
         self._sampling_step = None
 
@@ -115,10 +118,11 @@ class StimulusPlayer(QtWidgets.QWidget):
         self.finished.emit()
 
     def _start_test(self):
+        self.aboutToStart.emit()
         self._message = None
         self._ball_position, _ = self._screen_position(0)
+        self.repaint()
         self._start_time = time()
-        self.update()
         self._timer.start()
         self.started.emit(self._start_time)
 
@@ -135,8 +139,11 @@ class StimulusPlayer(QtWidgets.QWidget):
         previous_position = self._ball_position
         self._ball_position, side = self._screen_position(current_sample)
 
+        if self._read_function is not None:
+            self._read_function()
+
         if previous_position != self._ball_position:
-            self.update()
+            self.repaint()
 
         if self._ball_position is None:
             self.finish()
