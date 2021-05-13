@@ -294,8 +294,8 @@ class MainWindow(QtWidgets.QMainWindow):
             horizontal_list.append(horizontal)
             vertical_list.append(vertical)
             position_list.append({
-                0x01: 1,
-                0x02: -1,
+                0x01: -1,
+                0x02: 1,
                 0x10: 0,
             }[position])
 

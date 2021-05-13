@@ -81,11 +81,19 @@ class SignalsWidget(QtWidgets.QWidget):
         self._positions = hstack((self._positions, positions))[-WINDOW_LENGTH:]
 
         horizontal_mean, horizontal_std = self._horizontal.mean(), self._horizontal.std()
-        horizontal_scale = 10 ** log10(horizontal_std * 4)
+
+        try:
+            horizontal_scale = 10 ** log10(horizontal_std * 2)
+        except ValueError:
+            horizontal_scale = 1
 
         vertical_mean, vertical_std = self._vertical.mean(), self._vertical.std()
         self._vertical -= vertical_mean
-        vertical_scale = 10 ** log10(vertical_std * 4)
+
+        try:
+            vertical_scale = 10 ** log10(vertical_std * 2)
+        except ValueError:
+            vertical_scale = 1
 
         self._horizontal_plot.setData(
             self._time, self._horizontal - horizontal_mean,

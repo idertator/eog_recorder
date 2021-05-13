@@ -108,6 +108,7 @@ class StimulusPlayer(QtWidgets.QWidget):
             settings.screen.secondary_screen_rect.top()
         )
         self.showFullScreen()
+        self.repaint()
 
     def stop(self):
         self._stop_test()
