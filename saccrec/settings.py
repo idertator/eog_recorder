@@ -159,18 +159,6 @@ class _Channels:
             for channel in self._channels
         ]
 
-    @property
-    def activation_command(self) -> str:
-        CHANNELS_ON = '!@#$%^&*'
-        CHANNELS_OFF = '12345678'
-        result = ''
-        for index, channel in enumerate(self._channels):
-            if channel.active:
-                result += CHANNELS_ON[index]
-            else:
-                result += CHANNELS_OFF[index]
-        return result
-
 
 class _HardwareSettings:
 

@@ -53,7 +53,6 @@ class CytonBoard:
         sleep(2)
 
         self._command('v', wait=2)       # Soft reset
-        self._command(conf.channels.activation_command)
         self._command(conf.eog_channels_command)
 
         for index, channel in enumerate(conf.channels):
