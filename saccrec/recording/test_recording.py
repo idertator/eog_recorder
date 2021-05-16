@@ -13,11 +13,15 @@ def main():
     for i in range(10):
         sleep(1)
         board.marker('l')
+        board.read()
         sleep(1)
         board.marker('r')
+        board.read()
     sleep(1)
     board.marker('c')
+    board.read()
     sleep(1)
+    board.read()
     board.stop()
 
     board.marker('c')
@@ -25,11 +29,15 @@ def main():
     for i in range(20):
         sleep(1)
         board.marker('l')
+        board.read()
         sleep(1)
         board.marker('r')
+        board.read()
     sleep(1)
     board.marker('c')
+    board.read()
     sleep(1)
+    board.read()
     board.stop()
 
     board.marker('c')
@@ -37,11 +45,15 @@ def main():
     for i in range(10):
         sleep(1)
         board.marker('l')
+        board.read()
         sleep(1)
         board.marker('r')
+        board.read()
     sleep(1)
     board.marker('c')
+    board.read()
     sleep(1)
+    board.read()
     board.stop()
 
     board.close_sd_file()

@@ -11,7 +11,7 @@ from saccrec.settings import hardware as conf
 
 logger = logging.getLogger('saccrec')
 
-_COM_ERROR = 'Failure: Communications timeout - Device failed to poll Host'
+_COM_ERROR = 'Communications timeout - Device failed to poll Host'
 BUFFER_SIZE = 60
 
 
@@ -59,7 +59,7 @@ class CytonBoard:
         for index, channel in enumerate(conf.channels):
             if channel.active:
                 cmd = channel.settings_command
-                if self._command(cmd) == 'Failure: too few chars$$$':
+                if 'too few chars' in self._command(cmd):
                     self._ready = False
                     logger.error(_('Error setting OpenEOG Channel {index}').format(
                         index=index + 1

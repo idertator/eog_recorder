@@ -1,8 +1,7 @@
 from collections import defaultdict
-from os.path import exists, join
+from os.path import exists
 
-from eoglib.io import load_eog, load_openbci, save_eog
-from eoglib.models import Channel
+from eoglib.io import load_eog, save_eog
 from PySide6 import QtGui, QtWidgets
 
 from saccrec import settings
@@ -166,26 +165,13 @@ class SDCardImport(QtWidgets.QDialog):
         input_path = self._input_path
 
         for index, study_path in enumerate(self._studies):
-            study = load_eog(study_path)
-
-            filenames = study.parameters.get('filenames', None)
-            if filenames is not None:
-                have_errors = False
-                for filename in filenames:
-                    if not exists(join(input_path, filename)):
-                        errors[study_path].append(filename)
-                        have_errors = True
-
-                if not have_errors:
-                    for filename, test in zip(filenames, study):
-                        horizontal, vertical, stimulus = load_openbci(join(self._input_path, filename))
-                        test[Channel.Horizontal] = horizontal
-                        test[Channel.Vertical] = vertical
-                        test[Channel.Stimulus] = stimulus
-
-                    save_eog(study_path, study)
-
-            self._progress_bar.setValue(index + 1)
+            try:
+                study = load_eog(study_path, input_path)
+                save_eog(study_path, study)
+            except FileNotFoundError:
+                errors[study_path].append(_('Associated filename not found'))
+            finally:
+                self._progress_bar.setValue(index + 1)
 
         if errors:
             failed = len(errors)
