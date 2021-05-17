@@ -154,6 +154,7 @@ class CytonBoard:
             logger.error(f'Cannot close the test with the following answer: "{answer}". Trying again')
             answer = self._command(')', wait=1).strip()
         self._recording = False
+        self._serial.read_all()
 
     def read(self) -> tuple[int, int, int, int]:
         buff = self._serial.read(BUFFER_SIZE)
