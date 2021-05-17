@@ -19,13 +19,14 @@ class CytonBoard:
 
     @staticmethod
     def list_ports() -> list[str]:
-        filter_regex = 'EOG Soft Reset'
+        filter_regex = 'OpenEOG'
         devices = [p.device for p in comports()]
 
         def _get_firmware_string(port, timeout=0):
             with Serial(port=port, baudrate=115200, timeout=timeout) as ser:
                 ser.write(b'v')
-                return ser.read_until(b'$$$').decode('utf-8', errors='ignore')
+                sleep(1)
+                return ser.read_all().decode('utf-8', errors='ignore')
 
         ports = []
         for device in devices:
@@ -52,7 +53,7 @@ class CytonBoard:
 
         sleep(2)
 
-        self._command('v', wait=2)       # Soft reset
+        self._command('v', wait=1)
         self._command(conf.eog_channels_command)
 
         for index, channel in enumerate(conf.channels):

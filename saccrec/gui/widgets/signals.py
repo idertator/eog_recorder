@@ -68,6 +68,9 @@ class SignalsWidget(QtWidgets.QWidget):
         self._vertical_positions_plot.setData(self._time, self._positions)
 
     def plot(self, horizontal: array, vertical: array, positions: array):
+        if horizontal.size == 0 or vertical.size == 0 or positions.size == 0:
+            return
+
         if self._horizontal.size > 0 and self._first:
             self._horizontal = self._horizontal * horizontal.mean()
             self._vertical = self._vertical * vertical.mean()
