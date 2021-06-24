@@ -16,11 +16,10 @@ def requirements() -> list[str]:
 
 setup(
     name='saccrec',
-    version='1.0.0-beta',
+    version='1.0.0',
     description='Saccade Recorder',
     long_description=readme(),
     classifiers=[
-        'Development Status :: 3 - Alpha',
         'Environment :: X11 Applications',
         'Intended Audience :: Education',
         'Intended Audience :: Healthcare Industry',
@@ -30,6 +29,7 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Topic :: Scientific/Engineering :: Medical Science Apps.',
+        'Programming Language :: Python :: 3.9',
     ],
     url='https://git.topgroupexpress.com/eog/saccrec',
     author='Roberto Antonio Becerra García',
