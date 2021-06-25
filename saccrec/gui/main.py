@@ -23,7 +23,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Local State
         self._current_test = 0
-        self._current_position = 0
 
         self._subject: Subject = None
         self._protocol: Protocol = None
@@ -33,6 +32,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._studies: list[str] = []
         self._current_file = None
         self._board = None
+        self._last_position = 0
+
 
         # Setting signals
         self._signals_widget = SignalsWidget()
@@ -245,6 +246,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_test_stopped(self):
         self._current_test = 0
+        self._last_position = 0
         self._stimulus_player.stop()
         self._stimulus_player.close()
         self._board.stop()
@@ -252,6 +254,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_test_finished(self):
         self._current_test += 1
         self._board.stop()
+        self._last_position = 0
         if self._current_test < len(self._protocol):
             stimulus = self._protocol[self._current_test]
             saccadic_distance = settings.stimuli.saccadic_distance
@@ -294,12 +297,13 @@ class MainWindow(QtWidgets.QMainWindow):
         for index, horizontal, vertical, position in self._board.read():
             horizontal_list.append(horizontal)
             vertical_list.append(vertical)
-            self._current_position = {
+            self._last_position = {
                 0x01: -1,
                 0x02: 1,
                 0x10: 0,
-            }.get(position, self._current_position)
-            position_list.append(self._current_position)
+            }.get(position, self._last_position)
+
+            position_list.append(self._last_position)
 
         horizontal = array(horizontal_list, dtype=float32)
         vertical = array(vertical_list, dtype=float32)
