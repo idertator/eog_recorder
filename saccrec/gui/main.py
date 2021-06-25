@@ -23,6 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Local State
         self._current_test = 0
+        self._current_position = 0
 
         self._subject: Subject = None
         self._protocol: Protocol = None
@@ -293,11 +294,12 @@ class MainWindow(QtWidgets.QMainWindow):
         for index, horizontal, vertical, position in self._board.read():
             horizontal_list.append(horizontal)
             vertical_list.append(vertical)
-            position_list.append({
+            self._current_position = {
                 0x01: -1,
                 0x02: 1,
                 0x10: 0,
-            }[position])
+            }.get(position, self._current_position)
+            position_list.append(self._current_position)
 
         horizontal = array(horizontal_list, dtype=float32)
         vertical = array(vertical_list, dtype=float32)
