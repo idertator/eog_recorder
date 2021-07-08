@@ -4,7 +4,7 @@ from numpy import arange, array, float32, hstack, int32, ones, zeros
 from pyqtgraph import PlotCurveItem, PlotWidget, setConfigOption
 from PySide6 import QtGui, QtWidgets
 
-SAMPLING_STEP = 5
+SAMPLING_STEP = 16
 WINDOW_LENGTH = 3000
 
 
