@@ -16,7 +16,7 @@ def requirements() -> list[str]:
 
 setup(
     name='saccrec',
-    version='1.0.0',
+    version='1.0.1',
     description='Saccade Recorder',
     long_description=readme(),
     classifiers=[
