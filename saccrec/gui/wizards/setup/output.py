@@ -25,7 +25,7 @@ class OutputWizardPage(QtWidgets.QWizardPage):
         self._light_intensity_label = QtWidgets.QLabel(_('Light Intensity'))
 
         self._light_intensity_spinner = QtWidgets.QSpinBox()
-        self._light_intensity_spinner.setRange(0, 200)
+        self._light_intensity_spinner.setRange(0, 1000)
         self._light_intensity_spinner.setSuffix(' lux')
         self._light_intensity_spinner.setSingleStep(1)
         self._light_intensity_spinner.setValue(0)
