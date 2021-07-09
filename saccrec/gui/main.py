@@ -34,7 +34,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._board = None
         self._last_position = 0
 
-
         # Setting signals
         self._signals_widget = SignalsWidget()
         self._signals_widget.setVisible(False)
@@ -294,7 +293,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_read_data(self):
         horizontal_list, vertical_list, position_list = [], [], []
-        for index, horizontal, vertical, position in self._board.read():
+        data = self._board.read()
+        for index, horizontal, vertical, position in data:
             horizontal_list.append(horizontal)
             vertical_list.append(vertical)
             self._last_position = {
@@ -305,8 +305,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
             position_list.append(self._last_position)
 
-        horizontal = array(horizontal_list, dtype=float32)
-        vertical = array(vertical_list, dtype=float32)
-        positions = array(position_list, dtype=float32)
+        if horizontal_list:
+            horizontal = array(horizontal_list, dtype=float32)
+            vertical = array(vertical_list, dtype=float32)
+            positions = array(position_list, dtype=float32)
 
-        self._signals_widget.plot(horizontal, vertical, positions)
+            self._signals_widget.plot(horizontal, vertical, positions)

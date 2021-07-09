@@ -45,10 +45,12 @@ class CytonBoard:
 
         self._processed_samples = 0
         self._ready = True
+        self._buffer = b''
 
         self._serial = Serial(
             port=port,
-            baudrate=115200
+            baudrate=115200,
+            timeout=0
         )
 
         sleep(2)
@@ -142,37 +144,50 @@ class CytonBoard:
         logger.info('SD File Closed')
 
     def start(self):
+        self._buffer = b''
+        self._serial.reset_input_buffer()
         sleep(1)
-        self._serial.read_all()
-        self._command('(', wait=2)
-        self._recording = True
+        try:
+            self._command('(', wait=2)
+            self._recording = True
+        except ValueError:
+            self._recording = True
 
     def stop(self):
-        self._serial.read_all()
-        answer = self._command(')', wait=1).strip()
-        while 'Test ended' not in answer:
-            logger.error(f'Cannot close the test with the following answer: "{answer}". Trying again')
-            answer = self._command(')', wait=1).strip()
+        self._serial.reset_input_buffer()
+        self._command(')', wait=1).strip()
         self._recording = False
-        self._serial.read_all()
+        self._serial.reset_input_buffer()
+        self._buffer = b''
 
     def read(self) -> tuple[int, int, int, int]:
-        buff = self._serial.read(BUFFER_SIZE)
+        buff = self._serial.read(self._serial.in_waiting)
+
+        self._buffer += buff
+        index = 0
+        while index < len(self._buffer) and self._buffer[index] != 0:
+            index += 1
+
+        if index > 0:
+            self._buffer = self._buffer[index:]
+
+        if len(self._buffer) >= BUFFER_SIZE:
+            buff = self._buffer[:BUFFER_SIZE]
+            self._buffer = self._buffer[BUFFER_SIZE:]
 
         result = []
 
-        for i in range(BUFFER_SIZE // 10):
-            sample = buff[i * 10:i * 10 + 10]
+        if len(buff) == BUFFER_SIZE:
+            for i in range(BUFFER_SIZE // 10):
+                if sample := buff[i * 10:i * 10 + 10]:
+                    header = sample[0]
+                    if header == 0:
+                        if (position := sample[-1]) in {0x01, 0x02, 0x04, 0x08, 0x10}:
+                            index, horizontal, vertical = unpack('>H3s3s', sample[1:-1])
+                            horizontal = unpack('>I', b'\00' + horizontal)[0]
+                            vertical = unpack('>I', b'\00' + vertical)[0]
 
-            header = sample[0]
-            if header == 0:
-                index, horizontal, vertical = unpack('>H3s3s', sample[1:-1])
-                horizontal = unpack('>I', b'\00' + horizontal)[0]
-                vertical = unpack('>I', b'\00' + vertical)[0]
-
-                position = sample[-1]
-
-                result.append((index, horizontal, vertical, position))
+                            result.append((index, horizontal, vertical, position))
 
         return result
 
