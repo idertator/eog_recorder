@@ -7,11 +7,11 @@ from .stimulus import SaccadicStimulusWidget
 from .subject import SubjectWidget
 
 __all__ = [
-    'ColorButton',
-    'LoggerWidget',
-    'ProtocolWidget',
-    'SaccadicStimulusWidget',
-    'SignalsWidget',
-    'StimulusPlayer',
-    'SubjectWidget',
+    "ColorButton",
+    "LoggerWidget",
+    "ProtocolWidget",
+    "SaccadicStimulusWidget",
+    "SignalsWidget",
+    "StimulusPlayer",
+    "SubjectWidget",
 ]

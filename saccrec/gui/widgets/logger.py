@@ -4,7 +4,6 @@ from PySide6 import QtWidgets
 
 
 class LoggerWidget(Handler, QtWidgets.QPlainTextEdit):
-
     def __init__(self, parent=None):
         QtWidgets.QPlainTextEdit.__init__(self, parent)
         Handler.__init__(self)
@@ -14,7 +13,7 @@ class LoggerWidget(Handler, QtWidgets.QPlainTextEdit):
     def emit(self, record):
         msg = self.format(record)
 
-        fmt = '<span>{msg}</span><br>'
+        fmt = "<span>{msg}</span><br>"
         if record.levelno == ERROR:
             fmt = '<span style="color: red">{msg}</span><br>'
         elif record.levelno == INFO:
@@ -28,5 +27,5 @@ class LoggerWidget(Handler, QtWidgets.QPlainTextEdit):
             self.textCursor().insertHtml(fmt.format(msg=msg))
             self.repaint()
         except ValueError as error:
-            print(f'ValueError: {msg}')
+            print(f"ValueError: {msg}")
             print(error)

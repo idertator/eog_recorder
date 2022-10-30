@@ -9,7 +9,7 @@ from saccrec import settings
 from eoglib.models import SaccadicStimulus, StimulusPosition
 
 
-logger = logging.getLogger('saccrec')
+logger = logging.getLogger("saccrec")
 
 
 class StimulusPlayer(QtWidgets.QWidget):
@@ -51,13 +51,15 @@ class StimulusPlayer(QtWidgets.QWidget):
         if timeout != self._timeout:
             self._timeout = timeout
             self._timer.setInterval(timeout)
-            logger.info(f'Refresh Timeout: {timeout} ms')
+            logger.info(f"Refresh Timeout: {timeout} ms")
 
         # Sampling Step
         self._sampling_step = 1000 / settings.hardware.sampling_rate
 
         # Points Distance Computing
-        distance = (tan(radians(self._stimulus.angle / 2.0)) * self._distance_to_subject) * 2
+        distance = (
+            tan(radians(self._stimulus.angle / 2.0)) * self._distance_to_subject
+        ) * 2
 
         cm_width = settings.stimuli.screen_width
         cm_center, cm_delta = cm_width / 2, distance / 2
@@ -98,14 +100,11 @@ class StimulusPlayer(QtWidgets.QWidget):
 
         self._load_settings()
 
-        self._message = '\n'.join([
-            str(self._stimulus),
-            _('Press space to continue')
-        ])
+        self._message = "\n".join([str(self._stimulus), _("Press space to continue")])
 
         self.move(
             settings.screen.secondary_screen_rect.left(),
-            settings.screen.secondary_screen_rect.top()
+            settings.screen.secondary_screen_rect.top(),
         )
         self.showFullScreen()
         self.repaint()
@@ -169,20 +168,24 @@ class StimulusPlayer(QtWidgets.QWidget):
             painter.drawText(
                 self.rect(),
                 QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter,
-                self._message
+                self._message,
             )
             painter.restore()
 
         if self._ball_position is not None:
             painter.setPen(self._ball_color)
             painter.setBrush(self._ball_color)
-            painter.drawEllipse(self._ball_position, self._ball_radius, self._ball_radius)
+            painter.drawEllipse(
+                self._ball_position, self._ball_radius, self._ball_radius
+            )
 
         painter.end()
 
     def keyPressEvent(self, event):
         if self._timer.isActive():
-            if (event.modifiers() & QtCore.Qt.ControlModifier) and event.key() == QtCore.Qt.Key_C:
+            if (
+                event.modifiers() & QtCore.Qt.ControlModifier
+            ) and event.key() == QtCore.Qt.Key_C:
                 self.stop()
         else:
             if event.key() == QtCore.Qt.Key_Space:

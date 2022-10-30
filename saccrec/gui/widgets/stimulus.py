@@ -14,7 +14,7 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
         can_add: bool = False,
         can_remove: bool = False,
         enabled: bool = True,
-        parent=None
+        parent=None,
     ):
         super(SaccadicStimulusWidget, self).__init__(parent=parent)
 
@@ -35,41 +35,45 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
         self._angle_edit.setValue(stimulus.angle)
         self._angle_edit.setRange(10, 60)
         self._angle_edit.setSingleStep(1)
-        self._angle_edit.setSuffix(' \u00B0')
+        self._angle_edit.setSuffix(" \u00B0")
         self._angle_edit.setFixedWidth(60)
-        self._angle_edit.setToolTip(_('Angle'))
+        self._angle_edit.setToolTip(_("Angle"))
         self._angle_edit.setEnabled(self._enabled)
         self._angle_edit.valueChanged.connect(self._on_angle_value_changed)
 
         angle_layout = QtWidgets.QVBoxLayout()
-        angle_layout.addWidget(QtWidgets.QLabel(_('Angle')))
+        angle_layout.addWidget(QtWidgets.QLabel(_("Angle")))
         angle_layout.addWidget(self._angle_edit)
 
         self._fixation_mean_duration_edit = QtWidgets.QDoubleSpinBox(self)
         self._fixation_mean_duration_edit.setValue(stimulus.fixation_duration)
         self._fixation_mean_duration_edit.setSingleStep(0.01)
-        self._fixation_mean_duration_edit.setSuffix(_(' sec'))
+        self._fixation_mean_duration_edit.setSuffix(_(" sec"))
         self._fixation_mean_duration_edit.setFixedWidth(80)
-        self._fixation_mean_duration_edit.setToolTip(_('Fixation Mean Duration'))
+        self._fixation_mean_duration_edit.setToolTip(_("Fixation Mean Duration"))
         self._fixation_mean_duration_edit.setEnabled(self._enabled)
-        self._fixation_mean_duration_edit.valueChanged.connect(self._on_fixation_duration_changed)
+        self._fixation_mean_duration_edit.valueChanged.connect(
+            self._on_fixation_duration_changed
+        )
 
         duration_layout = QtWidgets.QVBoxLayout()
-        duration_layout.addWidget(QtWidgets.QLabel(_('F. Duration')))
+        duration_layout.addWidget(QtWidgets.QLabel(_("F. Duration")))
         duration_layout.addWidget(self._fixation_mean_duration_edit)
 
         self._fixation_variability_edit = QtWidgets.QDoubleSpinBox(self)
         self._fixation_variability_edit.setValue(stimulus.fixation_variability)
         self._fixation_variability_edit.setMinimum(0)
         self._fixation_variability_edit.setSingleStep(0.01)
-        self._fixation_variability_edit.setSuffix(' %')
+        self._fixation_variability_edit.setSuffix(" %")
         self._fixation_variability_edit.setFixedWidth(80)
-        self._fixation_variability_edit.setToolTip(_('Fixation Variability'))
+        self._fixation_variability_edit.setToolTip(_("Fixation Variability"))
         self._fixation_variability_edit.setEnabled(self._enabled)
-        self._fixation_variability_edit.valueChanged.connect(self._on_fixation_variability_changed)
+        self._fixation_variability_edit.valueChanged.connect(
+            self._on_fixation_variability_changed
+        )
 
         variability_layout = QtWidgets.QVBoxLayout()
-        variability_layout.addWidget(QtWidgets.QLabel(_('F. Variability')))
+        variability_layout.addWidget(QtWidgets.QLabel(_("F. Variability")))
         variability_layout.addWidget(self._fixation_variability_edit)
 
         self._saccades_count = QtWidgets.QSpinBox(self)
@@ -77,19 +81,19 @@ class SaccadicStimulusWidget(QtWidgets.QGroupBox):
         self._saccades_count.setRange(5, 100)
         self._saccades_count.setSingleStep(1)
         self._saccades_count.setFixedWidth(60)
-        self._saccades_count.setToolTip(_('Saccades Count'))
+        self._saccades_count.setToolTip(_("Saccades Count"))
         self._saccades_count.setEnabled(self._enabled)
         self._saccades_count.valueChanged.connect(self._on_saccades_count_changed)
 
         count_layout = QtWidgets.QVBoxLayout()
-        count_layout.addWidget(QtWidgets.QLabel(_('Cantidad')))
+        count_layout.addWidget(QtWidgets.QLabel(_("Cantidad")))
         count_layout.addWidget(self._saccades_count)
 
-        self._cancel_widget_button = QtWidgets.QPushButton('-')
+        self._cancel_widget_button = QtWidgets.QPushButton("-")
         self._cancel_widget_button.setFixedSize(20, 20)
         self._cancel_widget_button.pressed.connect(self._on_remove_pressed)
 
-        self._add_widget_button = QtWidgets.QPushButton('+')
+        self._add_widget_button = QtWidgets.QPushButton("+")
         self._add_widget_button.setFixedSize(20, 20)
         self._add_widget_button.pressed.connect(self._on_add_pressed)
 

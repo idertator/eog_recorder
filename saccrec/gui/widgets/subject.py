@@ -28,7 +28,7 @@ class SubjectWidget(QtWidgets.QWidget):
         self._borndate_edit = QtWidgets.QDateEdit()
         self._borndate_edit.setDate(QtCore.QDate(bd.year, bd.month, bd.day))
         self._borndate_edit.setCalendarPopup(True)
-        self._borndate_edit.setDisplayFormat('dd/MM/yyyy')
+        self._borndate_edit.setDisplayFormat("dd/MM/yyyy")
         self._borndate_edit.dateChanged.connect(self._on_borndate_changed)
 
         self._status_combo = QtWidgets.QComboBox()
@@ -38,10 +38,10 @@ class SubjectWidget(QtWidgets.QWidget):
         self._status_combo.currentIndexChanged.connect(self._on_status_changed)
 
         layout = QtWidgets.QFormLayout(self)
-        layout.addRow(_('Name'), self._name_edit)
-        layout.addRow(_('Gender'), self._gender_combo)
-        layout.addRow(_('Borndate'), self._borndate_edit)
-        layout.addRow(_('Status'), self._status_combo)
+        layout.addRow(_("Name"), self._name_edit)
+        layout.addRow(_("Gender"), self._gender_combo)
+        layout.addRow(_("Borndate"), self._borndate_edit)
+        layout.addRow(_("Status"), self._status_combo)
         self.layout = layout
 
     def _on_name_changed(self, value: str):
@@ -58,7 +58,7 @@ class SubjectWidget(QtWidgets.QWidget):
         self._subject.status = Status(self._status_combo.currentData())
 
     def reset(self):
-        self._name_edit.setText('')
+        self._name_edit.setText("")
         self._borndate_edit.setDate(QtCore.QDate(2000, 1, 1))
         self._gender_combo.setCurrentIndex(0)
         self._status_combo.setCurrentIndex(0)

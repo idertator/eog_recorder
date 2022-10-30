@@ -114,6 +114,8 @@ PruebasWilmer/
 # MacOs
 .DS_Store
 
-# Idertator Ignores
-.vim
+# Tools Ignores
+.vim/
+.scannerwork/
 tags
+

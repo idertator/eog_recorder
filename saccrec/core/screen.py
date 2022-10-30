@@ -2,7 +2,6 @@ from PySide6 import QtCore, QtWidgets
 
 
 class Screen(QtCore.QObject):
-
     def __init__(self, parent=None):
         super(Screen, self).__init__(parent=parent)
 
