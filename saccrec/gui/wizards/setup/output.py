@@ -1,12 +1,17 @@
 from datetime import datetime
-from os.path import join, exists, dirname
+from os.path import dirname, exists, join
 
+from eoglib.models import Protocol, Subject
 from PySide6 import QtCore, QtWidgets
-
-from eoglib.models import Subject, Protocol
 
 from saccrec import settings
 from saccrec.core.templating import render
+
+# Resource object code
+#
+# Created by: The Resource Compiler for PySide6 (Qt v5.13.0)
+#
+# WARNING! All changes made in this file will be lost!
 
 
 class OutputWizardPage(QtWidgets.QWizardPage):
