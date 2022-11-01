@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3.111
 import gettext
 import sys
 from faulthandler import enable as enable_faulthandler
@@ -60,6 +60,7 @@ def main():
 
     app = QtWidgets.QApplication()
     app.setOrganizationName("idertator")
+    app.setOrganizationDomain("idertator.com")
     app.setApplicationName("SaccRec")
 
     setup_i18n()
