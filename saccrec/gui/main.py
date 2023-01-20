@@ -12,11 +12,12 @@ from saccrec.gui.widgets import LoggerWidget, SignalsWidget, StimulusPlayer
 from saccrec.gui.wizards import RecordSetupWizard
 from saccrec.recording import CytonBoard
 
-logger = logging.getLogger("saccrec")
+logger = logging.getLogger('saccrec')
 logger.setLevel(logging.INFO)
 
 
 class MainWindow(QtWidgets.QMainWindow):
+
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
 
@@ -25,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._subject: Subject = None
         self._protocol: Protocol = None
-        self._output_path: str = ""
+        self._output_path: str = ''
         self._light_intensity: int = 0
         self._filename: str = None
         self._studies: list[str] = []
@@ -39,6 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting logger
         self._logger = LoggerWidget()
+        self._logger.logger_signal.signal.connect(self._on_logger_signal_emitted)
 
         logger.addHandler(self._logger)
 
@@ -68,50 +70,40 @@ class MainWindow(QtWidgets.QMainWindow):
         # Setting up top level menus
         menubar = self.menuBar()
 
-        file_menu = menubar.addMenu(_("&Study"))
-        help_menu = menubar.addMenu(_("&Help"))
+        file_menu = menubar.addMenu(_('&File'))
+        help_menu = menubar.addMenu(_('&Help'))
 
         # Setting up actions
-        self._connect_action = QtGui.QAction(
-            QtGui.QIcon(":/actions/plug.svg"), _("&Connect"), self
-        )
+        self._connect_action = QtGui.QAction(QtGui.QIcon(':/actions/power.svg'), _('&Connect'), self)
         self._connect_action.triggered.connect(self._on_connect_clicked)
 
-        self._new_action = QtGui.QAction(
-            QtGui.QIcon(":/actions/file.svg"), _("&New Recording"), self
-        )
+        self._clear_log_action = QtGui.QAction(QtGui.QIcon(':/actions/cleaning_services.svg'), _('&Clear log'), self)
+        self._clear_log_action.triggered.connect(self._on_clear_log_clicked)
+        self._clear_log_action.setEnabled(False)
+
+        self._new_action = QtGui.QAction(QtGui.QIcon(':/actions/draft.svg'), _('&New recording'), self)
         self._new_action.triggered.connect(self._on_new_action_clicked)
         self._new_action.setEnabled(False)
 
-        self._import_sd_action = QtGui.QAction(
-            QtGui.QIcon(":/actions/sd-card.svg"), _("&Import SD Data"), self
-        )
+        self._import_sd_action = QtGui.QAction(QtGui.QIcon(':/actions/sd_card.svg'), _('&Import SD data'), self)
         self._import_sd_action.triggered.connect(self._on_import_sd_action_clicked)
 
-        self._exit_action = QtGui.QAction(
-            QtGui.QIcon(":/actions/door-open.svg"), _("&Exit"), self
-        )
-        self._exit_action.setShortcut("Ctrl+Q")
-        self._exit_action.setStatusTip(_("Exit the app"))
+        self._exit_action = QtGui.QAction(QtGui.QIcon(':/actions/exit_to_app.svg'), _('&Exit'), self)
+        self._exit_action.setShortcut('Ctrl+Q')
+        self._exit_action.setStatusTip(_('Exit the app'))
         self._exit_action.triggered.connect(QtWidgets.QApplication.instance().quit)
 
-        self._settings_action = QtGui.QAction(
-            QtGui.QIcon(":/actions/cog.svg"), _("&Settings"), self
-        )
-        self._settings_action.setShortcut("Ctrl+P")
-        self._settings_action.setStatusTip(_("Configure the application"))
+        self._settings_action = QtGui.QAction(QtGui.QIcon(':/actions/settings.svg'), _('&Settings'), self)
+        self._settings_action.setShortcut('Ctrl+P')
+        self._settings_action.setStatusTip(_('Configure the application'))
         self._settings_action.triggered.connect(self._on_settings_action_clicked)
 
-        self._stop_action = QtGui.QAction(
-            QtGui.QIcon(":/actions/stop-circle.svg"), _("&Stop"), self
-        )
-        self._stop_action.setShortcut("Ctrl+D")
-        self._stop_action.setStatusTip(_("Stop recording"))
+        self._stop_action = QtGui.QAction(QtGui.QIcon(':/actions/stop_circle.svg'), _('&Stop'), self)
+        self._stop_action.setShortcut('Ctrl+D')
+        self._stop_action.setStatusTip(_('Stop recording'))
         self._stop_action.triggered.connect(self._on_stop_clicked)
 
-        self._about_action = QtGui.QAction(
-            QtGui.QIcon(":/actions/info-circle.svg"), _("&About ..."), self
-        )
+        self._about_action = QtGui.QAction(QtGui.QIcon(':/actions/info.svg'), _('&About ...'), self)
         self._about_action.triggered.connect(self._on_about_action_clicked)
 
         help_menu.addAction(self._about_action)
@@ -125,8 +117,9 @@ class MainWindow(QtWidgets.QMainWindow):
         file_menu.addAction(self._exit_action)
 
         # Setting up top toolbar
-        main_toolbar = self.addToolBar("Main Toolbar")
+        main_toolbar = self.addToolBar('Main Toolbar')
         main_toolbar.addAction(self._connect_action)
+        main_toolbar.addAction(self._clear_log_action)
         main_toolbar.addAction(self._new_action)
         main_toolbar.addAction(self._import_sd_action)
         main_toolbar.addAction(self._settings_action)
@@ -137,8 +130,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle("SaccRec")
-        self.setWindowIcon(QtGui.QIcon(":/brand/app.png"))
+        self.setWindowTitle('SaccRec')
+        self.setWindowIcon(QtGui.QIcon(':/brand/app.png'))
 
         self._setup_gui_for_non_recording()
 
@@ -156,7 +149,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self._stop_action.setEnabled(True)
 
     def _setup_gui_for_non_recording(self):
-        self._new_action.setEnabled(True)
+        if self._board is not None and self._board.ready:
+            self._new_action.setEnabled(True)
+        else:
+            self._new_action.setEnabled(False)
         self._import_sd_action.setEnabled(True)
         self._exit_action.setEnabled(True)
         self._settings_action.setEnabled(True)
@@ -176,6 +172,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self._new_action.setEnabled(True)
         else:
             self._new_action.setEnabled(False)
+
+    def _on_clear_log_clicked(self):
+        self._logger.clear()
+        self._clear_log_action.setEnabled(False)
 
     def _on_new_action_clicked(self):
         if self._new_record_wizard is None:
@@ -198,13 +198,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self._about_dialog.open()
 
     def _on_stop_clicked(self):
-        answer = QtWidgets.QMessageBox.critical(
-            self,
-            _("Test Interruption Confirmation"),
-            _("Are you sure to interrupt the test?"),
-            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.No,
-        )
-        if answer == QtWidgets.QMessageBox.Ok:
+        answer = QtWidgets.QMessageBox()
+        answer.setIcon(QtWidgets.QMessageBox.Critical)
+        answer.setWindowTitle(_('Interruption confirmation'))
+        answer.setText(_('Are you sure to interrupt the test?'))
+        answer.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        yes_button = answer.button(QtWidgets.QMessageBox.Yes)
+        yes_button.setText(_('Yes'))
+        no_button = answer.button(QtWidgets.QMessageBox.No)
+        no_button.setText(_('No'))
+        answer.exec()
+
+        if answer.clickedButton() == yes_button:
             self._setup_gui_for_non_recording()
 
             self._current_test = 0
@@ -214,12 +219,15 @@ class MainWindow(QtWidgets.QMainWindow):
     #        App Flow Event Handlers
     # ======================================
 
+    def _on_logger_signal_emitted(self):
+        self._clear_log_action.setEnabled(True)
+
     def _on_wizard_finished(self, record_setup: dict):
         if self._board.ready:
             self._filename = self._board.create_sd_file()
 
         if self._board.ready:
-            self._current_file = open(f"/tmp/{self._filename}.dat", "wb")
+            self._current_file = open(f'/tmp/{self._filename}.dat', 'wb')
 
             self._setup_gui_for_recording()
             self._signals_widget.setVisible(True)
@@ -228,10 +236,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self._new_record_wizard.destroy()
             self._new_record_wizard = None
 
-            self._subject = record_setup["subject"]
-            self._protocol = record_setup["protocol"]
-            self._output_path = record_setup["output_path"]
-            self._light_intensity = record_setup["light_intensity"]
+            self._subject = record_setup['subject']
+            self._protocol = record_setup['protocol']
+            self._output_path = record_setup['output_path']
+            self._light_intensity = record_setup['light_intensity']
 
             sampling_rate = settings.hardware.sampling_rate
 
@@ -285,23 +293,20 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._current_test = 0
                 self._stimulus_player.close()
 
-                if (
-                    create_study(
-                        subject=self._subject,
-                        protocol=self._protocol,
-                        light_intensity=self._light_intensity,
-                        output_path=self._output_path,
-                        source_filename=self._filename,
-                    )
-                    is not None
-                ):
+                if create_study(
+                    subject=self._subject,
+                    protocol=self._protocol,
+                    light_intensity=self._light_intensity,
+                    output_path=self._output_path,
+                    source_filename=self._filename
+                ) is not None:
                     self._studies.append(self._output_path)
                     QtWidgets.QMessageBox.information(
                         self,
-                        _("Success"),
-                        _("Your study was successfully writed to {path}").format(
+                        _('Success'),
+                        _('Your record was successfully writed to {path}').format(
                             path=self._output_path
-                        ),
+                        )
                     )
 
     def _on_stimulus_refreshed(self, value: int):

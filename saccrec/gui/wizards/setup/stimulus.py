@@ -12,19 +12,20 @@ class StimulusWizardPage(QtWidgets.QWizardPage):
         super(StimulusWizardPage, self).__init__(parent=parent)
         self._protocol = protocol
 
-        self.setTitle(_("Stimuli Setup"))
+        self.setTitle(_('Stimuli setup'))
 
-        self._protocol_widget = ProtocolWidget(protocol=self._protocol, parent=self)
-        self._protocol_widget.protocolNameChanged.connect(
-            self._on_protocol_name_changed
+        self._protocol_widget = ProtocolWidget(
+            protocol=self._protocol,
+            parent=self
         )
+        self._protocol_widget.protocolNameChanged.connect(self._on_protocol_name_changed)
         self._protocol_widget.protocolLoaded.connect(self._on_protocol_loaded)
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self._protocol_widget)
 
     def isComplete(self) -> bool:
-        return self._protocol.name.strip() != ""
+        return self._protocol.name.strip() != ''
 
     def _on_protocol_name_changed(self, value: str):
         self.completeChanged.emit()

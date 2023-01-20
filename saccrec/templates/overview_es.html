@@ -22,7 +22,8 @@ mujer nacida el
     <ol>
     {% for stimulus in protocol %}
         <li>
-            <strong>{{ stimulus }}</strong> con {{ stimulus.saccades_count }} sácadas. La duración media de las
+            <strong>{{ stimulus }}</strong> con {{ stimulus.saccades_count }} sácadas. La duración media de las fijaciones es <strong>{{
+                stimulus.fixation_duration }} segundos</strong> con una variabilidad del <strong>{{ stimulus.fixation_variability }}%</strong>.
         </li>
     {% endfor %}
     </ol>

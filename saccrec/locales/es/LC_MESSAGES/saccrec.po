@@ -1,17 +1,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: saccrec\n"
-"POT-Creation-Date: 2020-12-28 02:55+0100\n"
-"PO-Revision-Date: 2020-12-28 03:04+0100\n"
+"POT-Creation-Date: 2022-08-30 13:18-0400\n"
+"PO-Revision-Date: 2022-08-30 13:21-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.2\n"
-"X-Poedit-Basepath: ../../..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1.1\n"
+"X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #: core/enums.py:11
@@ -26,40 +26,44 @@ msgstr "Español"
 msgid "About DIATAX ..."
 msgstr "Acerca de DIATAX ..."
 
-#: gui/dialogs/sdimport.py:23
-msgid "Import OpenBCI SD Signals"
-msgstr "Importar Señales de la SD del OpenBCI"
+#: gui/dialogs/sdimport.py:22
+msgid "Import OpenBCI SD signals"
+msgstr "Importar señales de la SD del OpenBCI"
 
-#: gui/dialogs/sdimport.py:26
-msgid "Input Folder"
-msgstr "Carpeta de Entrada"
+#: gui/dialogs/sdimport.py:25
+msgid "Input folder"
+msgstr "Carpeta de entrada"
 
-#: gui/dialogs/sdimport.py:50
+#: gui/dialogs/sdimport.py:49
 msgid "Import"
 msgstr "Importar"
 
-#: gui/dialogs/sdimport.py:121
-msgid "Select SD Data Location"
-msgstr "Seleccione la Ubicación de los datos de la SD"
+#: gui/dialogs/sdimport.py:119
+msgid "Select SD data location"
+msgstr "Seleccione la ubicación de los datos de la SD"
 
-#: gui/dialogs/sdimport.py:134
+#: gui/dialogs/sdimport.py:132
 msgid "Select studies to set channels data"
 msgstr "Seleccione los estudios a establecer los datos de los canales"
 
-#: gui/dialogs/sdimport.py:136
-msgid "EOG Studies (*.eog)"
+#: gui/dialogs/sdimport.py:134
+msgid "EOG study (*.eog)"
 msgstr "Estudio de EOG (*.eog)"
 
-#: gui/dialogs/sdimport.py:162
+#: gui/dialogs/sdimport.py:160
 msgid "Importing %p%"
 msgstr "Importando %p%"
 
-#: gui/dialogs/sdimport.py:194
+#: gui/dialogs/sdimport.py:172
+msgid "Associated filename not found"
+msgstr "No se ha encontrado el nombre del archivo asociado"
+
+#: gui/dialogs/sdimport.py:178
 #, python-brace-format
 msgid "Imported {success} studies, {failed} failed"
 msgstr "{success} estudios importados, {failed} fallidos"
 
-#: gui/dialogs/sdimport.py:198
+#: gui/dialogs/sdimport.py:182
 msgid ""
 "The following studies present missing files:\n"
 "\n"
@@ -67,94 +71,105 @@ msgstr ""
 "Los siguientes estudios presentan ficheros no encontrados:\n"
 "\n"
 
-#: gui/dialogs/sdimport.py:203
+#: gui/dialogs/sdimport.py:187
 #, python-brace-format
 msgid " - {filename} missing!"
 msgstr " - {filename} no encontrado!"
 
-#: gui/dialogs/sdimport.py:210
+#: gui/dialogs/sdimport.py:194
 #, python-brace-format
 msgid "{failed} studies failed"
 msgstr "{failed} estudios fallidos"
 
-#: gui/dialogs/sdimport.py:214
+#: gui/dialogs/sdimport.py:198
 #, python-brace-format
 msgid "Imported {success} studies"
 msgstr "{success} estudios importados"
 
-#: gui/dialogs/settings.py:26
+#: gui/dialogs/settings.py:23
 msgid "Language"
 msgstr "Lenguaje"
 
-#: gui/dialogs/settings.py:43
+#: gui/dialogs/settings.py:40
 msgid "Alert"
 msgstr "Alerta"
 
-#: gui/dialogs/settings.py:44
+#: gui/dialogs/settings.py:41
 msgid ""
-"You need to restart the app in order to persist the changes. Do you really "
-"want to close the app?"
+"The app must be restarted to apply the changes. Do you want to close the app?"
 msgstr ""
-"Necesita reiniciar la aplicación para que se establezcan los cambios "
-"realizados. ¿Desea realmente cerrar la aplicación?"
+"La aplicación necesita reiniciarse para aplicar los cambios realizados. "
+"¿Desea cerrar la aplicación?"
 
-#: gui/dialogs/settings.py:52
-msgid "User Interface"
-msgstr "Interfaz de Usuario"
+#: gui/dialogs/settings.py:44 gui/main.py:204
+msgid "Yes"
+msgstr "Sí"
 
-#: gui/dialogs/settings.py:65
+#: gui/dialogs/settings.py:46 gui/main.py:206
+msgid "No"
+msgstr "No"
+
+#: gui/dialogs/settings.py:54
+msgid "User interface"
+msgstr "Interfaz de usuario"
+
+#: gui/dialogs/settings.py:69
 msgid "Gain"
 msgstr "Ganancia"
 
-#: gui/dialogs/settings.py:77
+#: gui/dialogs/settings.py:91
 msgid "Channel"
 msgstr "Canal"
 
-#: gui/dialogs/settings.py:119
+#: gui/dialogs/settings.py:157
 msgid "Channels"
 msgstr "Canales"
 
-#: gui/dialogs/settings.py:132
+#: gui/dialogs/settings.py:170 gui/widgets/signals.py:32
+msgid "Horizontal channel"
+msgstr "Canal horizontal"
+
+#: gui/dialogs/settings.py:178 gui/widgets/signals.py:42
+msgid "Vertical channel"
+msgstr "Canal vertical"
+
+#: gui/dialogs/settings.py:191
 msgid "Port"
 msgstr "Puerto"
 
-#: gui/dialogs/settings.py:133
-msgid "Sampling frequency"
-msgstr "Frecuencia de muestreo"
-
-#: gui/dialogs/settings.py:168
+#: gui/dialogs/settings.py:263
 msgid "Hardware"
-msgstr "Hardware"
+msgstr "Dispositivo físico"
 
-#: gui/dialogs/settings.py:201
+#: gui/dialogs/settings.py:296
 msgid "Width"
-msgstr "Ancho"
+msgstr "Anchura"
 
-#: gui/dialogs/settings.py:203
+#: gui/dialogs/settings.py:298
 msgid "Height"
 msgstr "Altura"
 
-#: gui/dialogs/settings.py:207
-msgid "Screen Size"
-msgstr "Tamaño de Pantalla"
+#: gui/dialogs/settings.py:302
+msgid "Screen size"
+msgstr "Tamaño de pantalla"
 
-#: gui/dialogs/settings.py:211
+#: gui/dialogs/settings.py:306
 msgid "Maximum distance to saccadic stimulus *"
 msgstr "Distancia máxima para el estímulo sacádico *"
 
-#: gui/dialogs/settings.py:212
+#: gui/dialogs/settings.py:307
 msgid "Saccadic stimulus radius"
 msgstr "Radio del estímulo sacádico"
 
-#: gui/dialogs/settings.py:213
+#: gui/dialogs/settings.py:308
 msgid "Stimulus color"
-msgstr "Color de estímulo"
+msgstr "Color del estímulo"
 
-#: gui/dialogs/settings.py:214
+#: gui/dialogs/settings.py:309
 msgid "Background color"
-msgstr "Color de fondo"
+msgstr "Color del fondo"
 
-#: gui/dialogs/settings.py:218
+#: gui/dialogs/settings.py:313
 msgid ""
 "* Define the distance between the points of stimulus for the test with the "
 "greatest angle of stimulation"
@@ -162,139 +177,126 @@ msgstr ""
 "* Define la distancia entre los puntos del estímulo de la prueba con mayor "
 "ángulo de estimulación"
 
-#: gui/dialogs/settings.py:246
+#: gui/dialogs/settings.py:341
 msgid "Stimuli"
 msgstr "Estímulos"
 
-#: gui/dialogs/settings.py:270
+#: gui/dialogs/settings.py:365
 msgid "Interface"
 msgstr "Interfaz"
 
-#: gui/dialogs/settings.py:275
+#: gui/dialogs/settings.py:370
 msgid "OpenBCI"
 msgstr "OpenBCI"
 
-#: gui/dialogs/settings.py:280
+#: gui/dialogs/settings.py:375
 msgid "Stimulus"
 msgstr "Estímulo"
 
-#: gui/dialogs/settings.py:288
+#: gui/dialogs/settings.py:383
 msgid "Apply"
 msgstr "Aplicar"
 
-#: gui/dialogs/settings.py:289
+#: gui/dialogs/settings.py:384 gui/wizards/setup/__init__.py:25
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: gui/main.py:54
-msgid "&Study"
-msgstr "&Estudio"
+#: gui/main.py:73
+msgid "&File"
+msgstr "&Archivo"
 
-#: gui/main.py:55
+#: gui/main.py:74
 msgid "&Help"
-msgstr "A&yuda"
+msgstr "&Ayuda"
 
-#: gui/main.py:58
-msgid "&New Recording"
-msgstr "&Nuevo Registro"
+#: gui/main.py:77
+msgid "&Connect"
+msgstr "&Conectar"
 
-#: gui/main.py:61
-msgid "&Import SD Data"
-msgstr "&Importar Datos SD"
+#: gui/main.py:80
+msgid "&Clear log"
+msgstr "&Limpiar registro"
 
-#: gui/main.py:64
+#: gui/main.py:84
+msgid "&New recording"
+msgstr "&Nueva grabación"
+
+#: gui/main.py:88
+msgid "&Import SD data"
+msgstr "&Importar datos de la SD"
+
+#: gui/main.py:91
 msgid "&Exit"
 msgstr "&Salir"
 
-#: gui/main.py:66
+#: gui/main.py:93
 msgid "Exit the app"
 msgstr "Salir de la aplicación"
 
-#: gui/main.py:69
+#: gui/main.py:96
 msgid "&Settings"
 msgstr "&Configuración"
 
-#: gui/main.py:71
+#: gui/main.py:98
 msgid "Configure the application"
 msgstr "Configure la aplicación"
 
-#: gui/main.py:74
+#: gui/main.py:101
 msgid "&Stop"
-msgstr "&Parar"
+msgstr "&Detener"
 
-#: gui/main.py:76
+#: gui/main.py:103
 msgid "Stop recording"
-msgstr "Parar la grabación"
+msgstr "Detener la grabación"
 
-#: gui/main.py:79
+#: gui/main.py:106
 msgid "&About ..."
 msgstr "&Acerca de ..."
 
-#: gui/main.py:117
-msgid "OpenBCI Cyton Not Detected"
-msgstr "El OpenBCI Cyton no ha sido detectado"
+#: gui/main.py:200
+msgid "Interruption confirmation"
+msgstr "Confirmación de interrupción"
 
-#: gui/main.py:118
-msgid "Please connect the recording device and restart this application"
-msgstr ""
-"Por favor conecte el dispositivo de adquisición y reinicie la aplicación"
-
-#: gui/main.py:173
-msgid "Test Interruption Confirmation"
-msgstr "Confirmación de Interrupción de Prueba"
-
-#: gui/main.py:174
+#: gui/main.py:201
 msgid "Are you sure to interrupt the test?"
 msgstr "¿Está seguro de interrumpir la prueba?"
 
-#: gui/main.py:231
-msgid "Error"
-msgstr "Error"
-
-#: gui/main.py:265
+#: gui/main.py:303
 msgid "Success"
 msgstr "Satisfactorio"
 
-#: gui/main.py:266
+#: gui/main.py:304
 #, python-brace-format
-msgid "Your study was successfully writed to {path}"
-msgstr "Su estudio fue satisfactoriamente grabado en {path}"
+msgid "Your record was successfully writed to {path}"
+msgstr "Su grabación fue escrita satisfactoriamente en {path}"
 
-#: gui/widgets/player.py:95
+#: gui/widgets/player.py:103
 msgid "Press space to continue"
 msgstr "Presione espacio para continuar"
 
-#: gui/widgets/protocol.py:24
-msgid "Protocol Name"
-msgstr "Nombre del Protocolo"
+#: gui/widgets/protocol.py:23
+msgid "Protocol name"
+msgstr "Nombre del protocolo"
 
-#: gui/widgets/protocol.py:31
+#: gui/widgets/protocol.py:30
 msgid "Open"
 msgstr "Abrir"
 
-#: gui/widgets/protocol.py:35
+#: gui/widgets/protocol.py:34
 msgid "Save"
 msgstr "Guardar"
 
-#: gui/widgets/protocol.py:108
-msgid "Open Protocol File"
-msgstr "Abrir Archivo de Protocolo"
+#: gui/widgets/protocol.py:106
+msgid "Open protocol file"
+msgstr "Abrir archivo de protocolo"
 
-#: gui/widgets/protocol.py:110 gui/widgets/protocol.py:130
-msgid "Protocol File (*.json)"
-msgstr "Archivo de Protocolo (*.json)"
+#: gui/widgets/protocol.py:108 gui/widgets/protocol.py:130
+msgid "Protocol file (*.json)"
+msgstr "Archivo de protocolo (*.json)"
 
 #: gui/widgets/protocol.py:128
-msgid "Save Protocol File"
-msgstr "Guardar Archivo de Protocolo"
-
-#: gui/widgets/signals.py:166
-msgid "Horizontal Channel"
-msgstr "Canal Horizontal"
-
-#: gui/widgets/signals.py:192
-msgid "Vertical Channel"
-msgstr "Canal Vertical"
+msgid "Save protocol file"
+msgstr "Guardar archivo de protocolo"
 
 #: gui/widgets/stimulus.py:40 gui/widgets/stimulus.py:45
 msgid "Angle"
@@ -305,84 +307,177 @@ msgid " sec"
 msgstr " seg"
 
 #: gui/widgets/stimulus.py:53
-msgid "Fixation Mean Duration"
-msgstr "Duración Media de Fijación"
+msgid "Fixation mean duration"
+msgstr "Duración media de fijación"
 
 #: gui/widgets/stimulus.py:58
-msgid "F. Duration"
-msgstr "F. Duración"
+msgid "F. duration"
+msgstr "F. duración"
 
 #: gui/widgets/stimulus.py:67
-msgid "Fixation Variability"
-msgstr "Variabilidad de Fijación"
+msgid "Fixation variability"
+msgstr "Variabilidad de fijación"
 
 #: gui/widgets/stimulus.py:72
-msgid "F. Variability"
-msgstr "F. Variabilidad"
+msgid "F. variability"
+msgstr "F. variabilidad"
 
 #: gui/widgets/stimulus.py:80
-msgid "Saccades Count"
-msgstr "Cantidad de Sácadas"
+msgid "Saccades count"
+msgstr "Cantidad de sácadas"
 
 #: gui/widgets/stimulus.py:85
-msgid "Cantidad"
-msgstr "Count"
+msgid "Quantity"
+msgstr "Cantidad"
 
-#: gui/widgets/subject.py:41
+#: gui/widgets/stimulus.py:135
+msgid "Horizontal calibration"
+msgstr "Calibración horizontal"
+
+#: gui/widgets/stimulus.py:137
+msgid "Horizontal saccadic"
+msgstr "Sacádica horizontal"
+
+#: gui/widgets/stimulus.py:139
+msgid "Vertical calibration"
+msgstr "Calibración vertical"
+
+#: gui/widgets/stimulus.py:141
+msgid "Vertical saccadic"
+msgstr "Sacádica vertical"
+
+#: gui/widgets/stimulus.py:143
+msgid "Saccadic calibration"
+msgstr "Calibración sacádica"
+
+#: gui/widgets/stimulus.py:145
+msgid "Unknown saccadic test"
+msgstr "Prueba sacádica desconocida"
+
+#: gui/widgets/stimulus.py:147
+msgid "Saccadic"
+msgstr "Sacádica"
+
+#: gui/widgets/subject.py:24 gui/widgets/subject.py:46
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: gui/widgets/subject.py:26
+msgid "Male"
+msgstr "Masculino"
+
+#: gui/widgets/subject.py:28
+msgid "Female"
+msgstr "Femenino"
+
+#: gui/widgets/subject.py:48
+msgid "Control"
+msgstr "Control"
+
+#: gui/widgets/subject.py:50
+msgid "Presymptomatic"
+msgstr "Presintomático"
+
+#: gui/widgets/subject.py:52
+msgid "Sick"
+msgstr "Enfermo"
+
+#: gui/widgets/subject.py:59
 msgid "Name"
 msgstr "Nombre"
 
-#: gui/widgets/subject.py:42
+#: gui/widgets/subject.py:60
 msgid "Gender"
 msgstr "Género"
 
-#: gui/widgets/subject.py:43
-msgid "Borndate"
-msgstr "Fecha de Nacimiento"
+#: gui/widgets/subject.py:61
+msgid "Born date"
+msgstr "Fecha de nacimiento"
 
-#: gui/widgets/subject.py:44
+#: gui/widgets/subject.py:62
 msgid "Status"
 msgstr "Estado"
 
 #: gui/wizards/setup/__init__.py:21
-msgid "New Record Wizard"
-msgstr "Ayudante de Nuevo Registro"
+msgid "New record wizard"
+msgstr "Asistente para nueva grabación"
 
-#: gui/wizards/setup/output.py:22
-msgid "Output Setup"
-msgstr "Configurar Salida"
+#: gui/wizards/setup/__init__.py:23
+msgid "Back"
+msgstr "Anterior"
 
-#: gui/wizards/setup/output.py:24
-msgid "Light Intensity"
-msgstr "Intensidad de la Luz"
+#: gui/wizards/setup/__init__.py:24
+msgid "Next"
+msgstr "Siguiente"
 
-#: gui/wizards/setup/output.py:37
+#: gui/wizards/setup/__init__.py:26
+msgid "Finish"
+msgstr "Finalizar"
+
+#: gui/wizards/setup/output.py:23
+msgid "Output setup"
+msgstr "Configurar salida"
+
+#: gui/wizards/setup/output.py:25
+msgid "Light intensity"
+msgstr "Intensidad de la luz"
+
+#: gui/wizards/setup/output.py:38
 msgid "Select"
 msgstr "Seleccionar"
 
-#: gui/wizards/setup/output.py:82
-msgid "Select Output File"
-msgstr "Seleccione Archivo de Salida"
+#: gui/wizards/setup/output.py:87
+msgid "Select output file"
+msgstr "Seleccione archivo de salida"
 
-#: gui/wizards/setup/output.py:84
-msgid "SaccRec File (*.eog)"
+#: gui/wizards/setup/output.py:89
+msgid "SaccRec file (*.eog)"
 msgstr "Archivo de SaccRec (*.eog)"
 
 #: gui/wizards/setup/stimulus.py:15
-msgid "Stimuli Setup"
-msgstr "Configurar Estímulos"
+msgid "Stimuli setup"
+msgstr "Configurar estímulos"
 
 #: gui/wizards/setup/subject.py:14
-msgid "Subject Info"
-msgstr "Información del Sujeto"
+msgid "Subject info"
+msgstr "Información del sujeto"
 
-#: recording/openbci.py:128
-msgid ""
-"The recorder is not working properly. Please check the batteries and restart "
-"the app."
+#: recording/openeog.py:66
+#, python-brace-format
+msgid "Error setting OpenEOG Channel {index}"
 msgstr ""
-"El dispositivo de adquisición no está trabajando correctamente. Por favor "
-"chequee las pilas y reinicie la aplicación."
+
+#~ msgid "&Study"
+#~ msgstr "&Estudio"
+
+#~ msgid "Test interruption"
+#~ msgstr "Confirmación de interrupción"
+
+#~ msgid "Ok"
+#~ msgstr "De acuerdo"
+
+#~ msgid "Cantidad"
+#~ msgstr "Cantidad"
+
+#~ msgid "Sampling frequency"
+#~ msgstr "Frecuencia de muestreo"
+
+#~ msgid "OpenBCI Cyton Not Detected"
+#~ msgstr "El OpenBCI Cyton no ha sido detectado"
+
+#~ msgid "Please connect the recording device and restart this application"
+#~ msgstr ""
+#~ "Por favor conecte el dispositivo de adquisición y reinicie la aplicación"
+
+#~ msgid "Error"
+#~ msgstr "Error"
+
+#~ msgid ""
+#~ "The recorder is not working properly. Please check the batteries and "
+#~ "restart the app."
+#~ msgstr ""
+#~ "El dispositivo de adquisición no está trabajando correctamente. Por favor "
+#~ "chequee las pilas y reinicie la aplicación."
 
 #, python-brace-format
 #~ msgid "Saccade: {onset} -> {offset}"

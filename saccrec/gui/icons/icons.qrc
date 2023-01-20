@@ -1,22 +1,23 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource>
-        <file>actions/cog.svg</file>
-        <file>actions/door-open.svg</file>
-        <file>actions/file.svg</file>
-        <file>actions/info-circle.svg</file>
-        <file>actions/plug.svg</file>
-        <file>actions/sd-card.svg</file>
-        <file>actions/stop-circle.svg</file>
+        <file>actions/settings.svg</file>
+        <file>actions/exit_to_app.svg</file>
+        <file>actions/draft.svg</file>
+        <file>actions/info.svg</file>
+        <file>actions/power.svg</file>
+        <file>actions/cleaning_services.svg</file>
+        <file>actions/sd_card.svg</file>
+        <file>actions/stop_circle.svg</file>
 
         <file>brand/app.png</file>
         <file>brand/diatax.svg</file>
         <file>brand/eyestracker.svg</file>
 
-        <file>common/file-import.svg</file>
-        <file>common/folder-open.svg</file>
-        <file>common/minus-square.svg</file>
-        <file>common/plus-square.svg</file>
+        <file>common/upload_file.svg</file>
+        <file>common/folder_open.svg</file>
+        <file>common/remove.svg</file>
+        <file>common/add.svg</file>
 
         <file>settings/gui.svg</file>
         <file>settings/openbci.png</file>

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.111
+#!/usr/bin/env python3.9
 import gettext
 import sys
 from faulthandler import enable as enable_faulthandler
@@ -11,12 +11,12 @@ from saccrec.gui.main import MainWindow
 
 from .settings import gui, initialize_screen
 
-_GUI_PID_FILE = "/tmp/saccrec_gui.pid"
+_GUI_PID_FILE = '/tmp/saccrec_gui.pid'
 
 
 def declare_gui_running_pid():
-    with open("/tmp/saccrec_gui.pid", "wt") as f:
-        f.write(f"{getpid()}\n")
+    with open('/tmp/saccrec_gui.pid', 'wt') as f:
+        f.write(f'{getpid()}\n')
 
 
 def clear_gui_running_pid():
@@ -26,28 +26,28 @@ def clear_gui_running_pid():
 
 def kill_hanged_processes():
     if exists(_GUI_PID_FILE):
-        with open(_GUI_PID_FILE, "rt") as f:
+        with open(_GUI_PID_FILE, 'rt') as f:
             pid = int(f.read().strip())
             try:
                 kill(pid, 0)
             except OSError:
                 pass
             else:
-                print("Killed hanged process")
+                print('Killed hanged process')
 
 
 def setup_i18n():
-    LOCALE_PATH = join(dirname(__file__), "locales")
+    LOCALE_PATH = join(dirname(__file__), 'locales')
 
-    tr = gettext.translation("saccrec", LOCALE_PATH, languages=[gui.lang])
-    tr.install("saccrec")
+    tr = gettext.translation('saccrec', LOCALE_PATH, languages=[gui.lang])
+    tr.install('saccrec')
 
 
 def improve_ftdi_latency():
     for i in range(4):
-        path = f"/dev/ttyUSB{i}"
+        path = f'/dev/ttyUSB{i}'
         if exists(path):
-            system(f"setserial {path} low_latency")
+            system(f'setserial {path} low_latency')
 
 
 def main():
@@ -59,9 +59,8 @@ def main():
     enable_faulthandler()
 
     app = QtWidgets.QApplication()
-    app.setOrganizationName("idertator")
-    app.setOrganizationDomain("idertator.com")
-    app.setApplicationName("SaccRec")
+    app.setOrganizationName('idertator')
+    app.setApplicationName('SaccRec')
 
     setup_i18n()
 
@@ -77,5 +76,5 @@ def main():
     sys.exit(retcode)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

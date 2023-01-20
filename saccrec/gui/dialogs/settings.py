@@ -6,6 +6,7 @@ from saccrec.gui.widgets import ColorButton
 
 
 class _GUISettingsPage(QtWidgets.QWidget):
+
     def __init__(self, parent=None):
         super(_GUISettingsPage, self).__init__(parent)
 
@@ -19,7 +20,7 @@ class _GUISettingsPage(QtWidgets.QWidget):
         for lang in Language:
             self._languages_combo.addItem(lang.label, lang.value)
 
-        layout.addRow(_("Language"), self._languages_combo)
+        layout.addRow(_('Language'), self._languages_combo)
         self.setLayout(layout)
 
         self.load()
@@ -34,20 +35,23 @@ class _GUISettingsPage(QtWidgets.QWidget):
         if lang != self._initial_lang:
             settings.gui.lang = lang
 
-            answer = QtWidgets.QMessageBox.question(
-                self,
-                _("Alert"),
-                _(
-                    "You need to restart the app in order to persist the changes. Do you really want to close the app?"
-                ),
-            )
+            answer = QtWidgets.QMessageBox()
+            answer.setIcon(QtWidgets.QMessageBox.Question)
+            answer.setWindowTitle(_('Alert'))
+            answer.setText(_('The app must be restarted to apply the changes. Do you want to close the app?'))
+            answer.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            yes_button = answer.button(QtWidgets.QMessageBox.Yes)
+            yes_button.setText(_('Yes'))
+            no_button = answer.button(QtWidgets.QMessageBox.No)
+            no_button.setText(_('No'))
+            answer.exec()
 
-            if answer == QtWidgets.QMessageBox.Yes:
+            if answer.clickedButton() == yes_button:
                 QtWidgets.QApplication.exit(0)
 
     @property
     def title(self) -> str:
-        return _("User Interface")
+        return _('User interface')
 
 
 class _OpenBCIChannelWidget(QtWidgets.QFrame):
@@ -62,7 +66,7 @@ class _OpenBCIChannelWidget(QtWidgets.QFrame):
         self._activated_check = QtWidgets.QCheckBox()
         self._activated_check.stateChanged.connect(self._on_activated_changed)
 
-        self._gain_label = QtWidgets.QLabel(_("Gain"))
+        self._gain_label = QtWidgets.QLabel(_('Gain'))
 
         self._gain_combo = QtWidgets.QComboBox()
         self._gain_combo.setDuplicatesEnabled(False)
@@ -74,8 +78,8 @@ class _OpenBCIChannelWidget(QtWidgets.QFrame):
         gain_layout.addWidget(self._gain_label)
         gain_layout.addWidget(self._gain_combo)
 
-        self._srb1_check = QtWidgets.QCheckBox("SRB1")
-        self._srb2_check = QtWidgets.QCheckBox("SRB2")
+        self._srb1_check = QtWidgets.QCheckBox('SRB1')
+        self._srb2_check = QtWidgets.QCheckBox('SRB2')
 
         srb_layout = QtWidgets.QHBoxLayout()
         srb_layout.addWidget(self._srb1_check)
@@ -83,10 +87,11 @@ class _OpenBCIChannelWidget(QtWidgets.QFrame):
 
         layout = QtWidgets.QFormLayout()
         layout.addRow(
-            "{channel} {number}         ".format(
-                channel=_("Channel"), number=self._channel_number + 1
+            '{channel} {number}         '.format(
+                channel=_('Channel'),
+                number=self._channel_number + 1
             ),
-            self._activated_check,
+            self._activated_check
         )
         layout.addRow(gain_layout)
         layout.addRow(srb_layout)
@@ -126,21 +131,14 @@ class _OpenBCIChannelWidget(QtWidgets.QFrame):
         self._srb2_check.setVisible(active)
 
     def save(self):
-        settings.hardware.channels[
-            self._channel_number
-        ].active = self._activated_check.isChecked()
-        settings.hardware.channels[self._channel_number].gain = int(
-            self._gain_combo.currentData()
-        )
-        settings.hardware.channels[
-            self._channel_number
-        ].srb1 = self._srb1_check.isChecked()
-        settings.hardware.channels[
-            self._channel_number
-        ].srb2 = self._srb2_check.isChecked()
+        settings.hardware.channels[self._channel_number].active = self._activated_check.isChecked()
+        settings.hardware.channels[self._channel_number].gain = int(self._gain_combo.currentData())
+        settings.hardware.channels[self._channel_number].srb1 = self._srb1_check.isChecked()
+        settings.hardware.channels[self._channel_number].srb2 = self._srb2_check.isChecked()
 
 
 class _HardwarePage(QtWidgets.QWidget):
+
     def __init__(self, parent=None):
         super(_HardwarePage, self).__init__(parent)
 
@@ -148,7 +146,6 @@ class _HardwarePage(QtWidgets.QWidget):
         self._ports_combo.setDuplicatesEnabled(False)
 
         from saccrec.recording import CytonBoard
-
         for port in CytonBoard.list_ports():
             self._ports_combo.addItem(port, port)
 
@@ -157,7 +154,7 @@ class _HardwarePage(QtWidgets.QWidget):
         # for sr in (250, 500, 1000, 2000, 4000, 8000, 16000):
         #     self._sample_rate_combo.addItem(f'{sr} Hz', sr)
 
-        channels_group = QtWidgets.QGroupBox(_("Channels"))
+        channels_group = QtWidgets.QGroupBox(_('Channels'))
         self._channel_list = []
         top_layout = QtWidgets.QHBoxLayout()
         bottom_layout = QtWidgets.QHBoxLayout()
@@ -170,30 +167,28 @@ class _HardwarePage(QtWidgets.QWidget):
             else:
                 bottom_layout.addWidget(channel)
 
-        self._horizontal_channel_label = QtWidgets.QLabel(_("Horizontal Channel"))
+        self._horizontal_channel_label = QtWidgets.QLabel(_('Horizontal channel'))
         self._horizontal_channel_combo = QtWidgets.QComboBox()
         self._horizontal_channel_combo.setDuplicatesEnabled(False)
         self._horizontal_channel_combo.setSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
+            QtWidgets.QSizePolicy.Fixed,
+            QtWidgets.QSizePolicy.Fixed
         )
 
-        self._vertical_channel_label = QtWidgets.QLabel(_("Vertical Channel"))
+        self._vertical_channel_label = QtWidgets.QLabel(_('Vertical channel'))
         self._vertical_channel_combo = QtWidgets.QComboBox()
         self._vertical_channel_combo.setDuplicatesEnabled(False)
         self._vertical_channel_combo.setSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
+            QtWidgets.QSizePolicy.Fixed,
+            QtWidgets.QSizePolicy.Fixed
         )
 
         eog_channels_layout = QtWidgets.QFormLayout()
-        eog_channels_layout.addRow(
-            self._horizontal_channel_label, self._horizontal_channel_combo
-        )
-        eog_channels_layout.addRow(
-            self._vertical_channel_label, self._vertical_channel_combo
-        )
+        eog_channels_layout.addRow(self._horizontal_channel_label, self._horizontal_channel_combo)
+        eog_channels_layout.addRow(self._vertical_channel_label, self._vertical_channel_combo)
 
         form_layout = QtWidgets.QFormLayout()
-        form_layout.addRow(_("Port"), self._ports_combo)
+        form_layout.addRow(_('Port'), self._ports_combo)
         # form_layout.addRow(_('Sampling frequency'), self._sample_rate_combo)
 
         channels_layout = QtWidgets.QVBoxLayout()
@@ -231,17 +226,17 @@ class _HardwarePage(QtWidgets.QWidget):
         elif available_channels:
             self._horizontal_channel_combo.setCurrentText(available_channels[0])
         else:
-            self._horizontal_channel_combo.setCurrentText("")
+            self._horizontal_channel_combo.setCurrentText('')
 
         if vertical_channel in available_channels:
             self._vertical_channel_combo.setCurrentText(vertical_channel)
         elif available_channels:
             self._vertical_channel_combo.setCurrentText(available_channels[-1])
         else:
-            self._vertical_channel_combo.setCurrentText("")
+            self._vertical_channel_combo.setCurrentText('')
 
     def load(self):
-        if (port := settings.hardware.port) != "":
+        if (port := settings.hardware.port) != '':
             self._ports_combo.setCurrentText(port)
         else:
             self._ports_combo.setCurrentIndex(0)
@@ -260,78 +255,62 @@ class _HardwarePage(QtWidgets.QWidget):
         for channel in self._channel_list:
             channel.save()
 
-        settings.hardware.horizontal_channel = int(
-            self._horizontal_channel_combo.currentText()
-        )
-        settings.hardware.vertical_channel = int(
-            self._vertical_channel_combo.currentText()
-        )
+        settings.hardware.horizontal_channel = int(self._horizontal_channel_combo.currentText())
+        settings.hardware.vertical_channel = int(self._vertical_channel_combo.currentText())
 
     @property
     def title(self) -> str:
-        return _("Hardware")
+        return _('Hardware')
 
 
 class _StimulusSettingsPage(QtWidgets.QWidget):
+
     def __init__(self, parent=None):
         super(_StimulusSettingsPage, self).__init__(parent)
 
         self._stimulus_screen_width_edit = QtWidgets.QDoubleSpinBox()
         self._stimulus_screen_width_edit.setRange(10.0, 200.0)
         self._stimulus_screen_width_edit.setFixedWidth(85)
-        self._stimulus_screen_width_edit.setSuffix(" cm")
+        self._stimulus_screen_width_edit.setSuffix(' cm')
 
         self._stimulus_screen_height_edit = QtWidgets.QDoubleSpinBox()
         self._stimulus_screen_height_edit.setRange(10.0, 200.0)
         self._stimulus_screen_height_edit.setFixedWidth(85)
-        self._stimulus_screen_height_edit.setSuffix(" cm")
+        self._stimulus_screen_height_edit.setSuffix(' cm')
 
         self._stimulus_saccadic_distance_edit = QtWidgets.QDoubleSpinBox()
         self._stimulus_saccadic_distance_edit.setFixedWidth(85)
         self._stimulus_saccadic_distance_edit.setRange(5.0, 198.0)
-        self._stimulus_saccadic_distance_edit.setSuffix(" cm")
+        self._stimulus_saccadic_distance_edit.setSuffix(' cm')
 
         self._stimulus_saccadic_ball_radius_edit = QtWidgets.QDoubleSpinBox()
         self._stimulus_saccadic_ball_radius_edit.setFixedWidth(85)
         self._stimulus_saccadic_ball_radius_edit.setRange(0.1, 1.0)
-        self._stimulus_saccadic_ball_radius_edit.setSuffix(" cm")
+        self._stimulus_saccadic_ball_radius_edit.setSuffix(' cm')
 
         self._stimulus_saccadic_ball_color_select = ColorButton()
 
         self._stimulus_saccadic_background_color_select = ColorButton()
 
         screen_size_layout = QtWidgets.QHBoxLayout()
-        screen_size_layout.addWidget(QtWidgets.QLabel(_("Width")))
+        screen_size_layout.addWidget(QtWidgets.QLabel(_('Width')))
         screen_size_layout.addWidget(self._stimulus_screen_width_edit)
-        screen_size_layout.addWidget(QtWidgets.QLabel(_("Height")))
+        screen_size_layout.addWidget(QtWidgets.QLabel(_('Height')))
         screen_size_layout.addWidget(self._stimulus_screen_height_edit)
         screen_size_layout.addStretch()
 
-        screen_size_group = QtWidgets.QGroupBox(_("Screen Size"))
+        screen_size_group = QtWidgets.QGroupBox(_('Screen size'))
         screen_size_group.setLayout(screen_size_layout)
 
         form_layout = QtWidgets.QFormLayout()
-        form_layout.addRow(
-            _("Maximum distance to saccadic stimulus *"),
-            self._stimulus_saccadic_distance_edit,
-        )
-        form_layout.addRow(
-            _("Saccadic stimulus radius"), self._stimulus_saccadic_ball_radius_edit
-        )
-        form_layout.addRow(
-            _("Stimulus color"), self._stimulus_saccadic_ball_color_select
-        )
-        form_layout.addRow(
-            _("Background color"), self._stimulus_saccadic_background_color_select
-        )
-        form_layout.addRow("", QtWidgets.QLabel())
-        form_layout.addRow("", QtWidgets.QLabel())
-        form_layout.addRow(
-            QtWidgets.QLabel(
-                _(
-                    "* Define the distance between the points of stimulus for the test with the greatest angle of stimulation"
-                )
-            )
+        form_layout.addRow(_('Maximum distance to saccadic stimulus *'), self._stimulus_saccadic_distance_edit)
+        form_layout.addRow(_('Saccadic stimulus radius'), self._stimulus_saccadic_ball_radius_edit)
+        form_layout.addRow(_('Stimulus color'), self._stimulus_saccadic_ball_color_select)
+        form_layout.addRow(_('Background color'), self._stimulus_saccadic_background_color_select)
+        form_layout.addRow('', QtWidgets.QLabel())
+        form_layout.addRow('', QtWidgets.QLabel())
+        form_layout.addRow(QtWidgets.QLabel(
+            _('* Define the distance between the points of stimulus for the test with the greatest angle of stimulation'))
         )
 
         layout = QtWidgets.QVBoxLayout()
@@ -344,33 +323,26 @@ class _StimulusSettingsPage(QtWidgets.QWidget):
     def load(self):
         self._stimulus_screen_width_edit.setValue(settings.stimuli.screen_width)
         self._stimulus_screen_height_edit.setValue(settings.stimuli.screen_height)
-        self._stimulus_saccadic_distance_edit.setValue(
-            settings.stimuli.saccadic_distance
-        )
+        self._stimulus_saccadic_distance_edit.setValue(settings.stimuli.saccadic_distance)
         self._stimulus_saccadic_ball_radius_edit.setValue(settings.stimuli.ball_radius)
         self._stimulus_saccadic_ball_color_select.setColor(settings.stimuli.ball_color)
-        self._stimulus_saccadic_background_color_select.setColor(
-            settings.stimuli.back_color
-        )
+        self._stimulus_saccadic_background_color_select.setColor(settings.stimuli.back_color)
 
     def save(self):
         settings.stimuli.screen_width = self._stimulus_screen_width_edit.value()
         settings.stimuli.screen_height = self._stimulus_screen_height_edit.value()
-        settings.stimuli.saccadic_distance = (
-            self._stimulus_saccadic_distance_edit.value()
-        )
+        settings.stimuli.saccadic_distance = self._stimulus_saccadic_distance_edit.value()
         settings.stimuli.ball_radius = self._stimulus_saccadic_ball_radius_edit.value()
         settings.stimuli.ball_color = self._stimulus_saccadic_ball_color_select.value()
-        settings.stimuli.back_color = (
-            self._stimulus_saccadic_background_color_select.value()
-        )
+        settings.stimuli.back_color = self._stimulus_saccadic_background_color_select.value()
 
     @property
     def title(self):
-        return _("Stimuli")
+        return _('Stimuli')
 
 
 class SettingsDialog(QtWidgets.QDialog):
+
     def __init__(self, parent=None):
         super(SettingsDialog, self).__init__(parent=parent)
 
@@ -390,23 +362,17 @@ class SettingsDialog(QtWidgets.QDialog):
         self._contents_widget.setCurrentRow(0)
 
         # MENUS
-        gui_button = QtWidgets.QListWidgetItem(
-            QtGui.QIcon(":/settings/gui.svg"), _("Interface")
-        )
+        gui_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':/settings/gui.svg'), _('Interface'))
         self._contents_widget.addItem(gui_button)
         gui_button.setTextAlignment(QtCore.Qt.AlignHCenter)
         gui_button.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
-        openbci_button = QtWidgets.QListWidgetItem(
-            QtGui.QIcon(":/settings/openbci.png"), _("OpenBCI")
-        )
+        openbci_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':/settings/openbci.png'), _('OpenBCI'))
         self._contents_widget.addItem(openbci_button)
         openbci_button.setTextAlignment(QtCore.Qt.AlignHCenter)
         openbci_button.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
-        stimulus_button = QtWidgets.QListWidgetItem(
-            QtGui.QIcon(":/settings/stimuli.svg"), _("Stimulus")
-        )
+        stimulus_button = QtWidgets.QListWidgetItem(QtGui.QIcon(':/settings/stimuli.svg'), _('Stimulus'))
         self._contents_widget.addItem(stimulus_button)
         stimulus_button.setTextAlignment(QtCore.Qt.AlignHCenter)
         stimulus_button.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
@@ -414,8 +380,8 @@ class SettingsDialog(QtWidgets.QDialog):
         self._contents_widget.currentItemChanged.connect(self.change_page)
 
         dialog_buttons = QtWidgets.QDialogButtonBox()
-        dialog_buttons.addButton(_("Apply"), QtWidgets.QDialogButtonBox.AcceptRole)
-        dialog_buttons.addButton(_("Cancel"), QtWidgets.QDialogButtonBox.RejectRole)
+        dialog_buttons.addButton(_('Apply'), QtWidgets.QDialogButtonBox.AcceptRole)
+        dialog_buttons.addButton(_('Cancel'), QtWidgets.QDialogButtonBox.RejectRole)
         dialog_buttons.accepted.connect(self._on_accepted)
         dialog_buttons.rejected.connect(self._on_rejected)
 

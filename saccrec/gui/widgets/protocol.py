@@ -20,18 +20,18 @@ class ProtocolWidget(QtWidgets.QWidget):
         self._protocol = protocol
         self._stimuli = self._protocol_widgets(self._protocol)
 
-        self._name_label = QtWidgets.QLabel(_("Protocol Name"))
+        self._name_label = QtWidgets.QLabel(_('Protocol name'))
 
         self._name_edit = QtWidgets.QLineEdit()
         self._name_edit.setText(self._protocol.name)
         self._name_edit.textChanged.connect(self._on_protocol_name_changed)
 
         self._load_button = QtWidgets.QPushButton()
-        self._load_button.setText(_("Open"))
+        self._load_button.setText(_('Open'))
         self._load_button.pressed.connect(self._on_load_pressed)
 
         self._save_button = QtWidgets.QPushButton()
-        self._save_button.setText(_("Save"))
+        self._save_button.setText(_('Save'))
         self._save_button.pressed.connect(self._on_save_pressed)
 
         self._top_layout = QtWidgets.QHBoxLayout()
@@ -63,7 +63,7 @@ class ProtocolWidget(QtWidgets.QWidget):
                     stimulus=stimulus,
                     can_add=index < len(protocol) - 1,
                     can_remove=not stimulus.calibration,
-                    enabled=not stimulus.calibration,
+                    enabled=not stimulus.calibration
                 )
 
                 if widget.can_add:
@@ -93,7 +93,7 @@ class ProtocolWidget(QtWidgets.QWidget):
 
     def _on_protocol_name_changed(self, value: str):
         self._protocol.name = value
-        self._save_button.setEnabled(value.strip() != "")
+        self._save_button.setEnabled(value.strip() != '')
         self.protocolNameChanged.emit(value)
 
     def _on_load_pressed(self):
@@ -103,9 +103,9 @@ class ProtocolWidget(QtWidgets.QWidget):
 
         filename, selected_filter = QtWidgets.QFileDialog.getOpenFileName(
             self,
-            _("Open Protocol File"),
+            _('Open protocol file'),
             default_path,
-            filter=_("Protocol File (*.json)"),
+            filter=_('Protocol file (*.json)')
         )
         if filename:
             self._clear_stimulus_widgets(disconnect=True)
@@ -121,13 +121,13 @@ class ProtocolWidget(QtWidgets.QWidget):
         default_path = settings.gui.protocols_path
         if not exists(default_path):
             makedirs(default_path)
-        default_path = join(default_path, f"{self._protocol.name}.json")
+        default_path = join(default_path, f'{self._protocol.name}.json')
 
         filename, selected_filter = QtWidgets.QFileDialog.getSaveFileName(
             self,
-            _("Save Protocol File"),
+            _('Save protocol file'),
             default_path,
-            filter=_("Protocol File (*.json)"),
+            filter=_('Protocol file (*.json)')
         )
         if filename:
             save_protocol(filename, self._protocol)
@@ -143,7 +143,7 @@ class ProtocolWidget(QtWidgets.QWidget):
             fixation_duration=current_stimulus.fixation_duration,
             fixation_variability=current_stimulus.fixation_variability,
             saccades_count=current_stimulus.saccades_count,
-            orientation=current_stimulus.orientation,
+            orientation=current_stimulus.orientation
         )
 
         stimulus_widget = SaccadicStimulusWidget(
@@ -151,7 +151,7 @@ class ProtocolWidget(QtWidgets.QWidget):
             stimulus=stimulus,
             can_add=True,
             can_remove=True,
-            enabled=True,
+            enabled=True
         )
 
         stimulus_widget.addPressed.connect(self._on_stimulus_add_pressed)
