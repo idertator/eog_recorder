@@ -9,7 +9,6 @@ WINDOW_LENGTH = 3000
 
 
 class SignalsWidget(QtWidgets.QWidget):
-
     def __init__(self, parent=None):
         super(SignalsWidget, self).__init__(parent=parent)
 
@@ -22,14 +21,14 @@ class SignalsWidget(QtWidgets.QWidget):
         self._vertical = None
         self._positions = None
 
-        setConfigOption('background', background_color)
-        setConfigOption('foreground', 'k')
+        setConfigOption("background", background_color)
+        setConfigOption("foreground", "k")
 
         self._horizontal_plot = PlotCurveItem()
         self._horizontal_positions_plot = PlotCurveItem()
 
         self._horizontal_widget = PlotWidget()
-        self._horizontal_widget.setTitle(_('Horizontal channel'))
+        self._horizontal_widget.setTitle(_("Horizontal channel"))
         self._horizontal_widget.setMouseEnabled(False, False)
         self._horizontal_widget.enableAutoRange(True, True)
         self._horizontal_widget.addItem(self._horizontal_plot)
@@ -39,7 +38,7 @@ class SignalsWidget(QtWidgets.QWidget):
         self._vertical_positions_plot = PlotCurveItem()
 
         self._vertical_widget = PlotWidget()
-        self._vertical_widget.setTitle(_('Vertical channel'))
+        self._vertical_widget.setTitle(_("Vertical channel"))
         self._vertical_widget.setMouseEnabled(False, False)
         self._vertical_widget.enableAutoRange(True, True)
         self._vertical_widget.addItem(self._vertical_plot)
@@ -76,14 +75,19 @@ class SignalsWidget(QtWidgets.QWidget):
             self._vertical = self._vertical * vertical.mean()
             self._first = False
 
-        time = (arange(1, len(horizontal) + 1, dtype=int32) * SAMPLING_STEP) + self._time[-1]
+        time = (
+            arange(1, len(horizontal) + 1, dtype=int32) * SAMPLING_STEP
+        ) + self._time[-1]
 
         self._time = hstack((self._time, time))[-WINDOW_LENGTH:]
         self._horizontal = hstack((self._horizontal, horizontal))[-WINDOW_LENGTH:]
         self._vertical = hstack((self._vertical, vertical))[-WINDOW_LENGTH:]
         self._positions = hstack((self._positions, positions))[-WINDOW_LENGTH:]
 
-        horizontal_mean, horizontal_std = self._horizontal.mean(), self._horizontal.std()
+        horizontal_mean, horizontal_std = (
+            self._horizontal.mean(),
+            self._horizontal.std(),
+        )
 
         try:
             horizontal_scale = 10 ** log10(horizontal_std * 2)
@@ -99,22 +103,16 @@ class SignalsWidget(QtWidgets.QWidget):
             vertical_scale = 1
 
         self._horizontal_plot.setData(
-            self._time, self._horizontal - horizontal_mean,
-            pen='b',
-            antialias=True
+            self._time, self._horizontal - horizontal_mean, pen="b", antialias=True
         )
         self._horizontal_positions_plot.setData(
-            self._time, self._positions * horizontal_scale,
-            pen='r'
+            self._time, self._positions * horizontal_scale, pen="r"
         )
 
         self._vertical_plot.setData(
-            self._time, self._vertical - vertical_mean,
-            pen='b',
-            antialias=True
+            self._time, self._vertical - vertical_mean, pen="b", antialias=True
         )
 
         self._vertical_positions_plot.setData(
-            self._time, self._positions * vertical_scale,
-            pen='r'
+            self._time, self._positions * vertical_scale, pen="r"
         )

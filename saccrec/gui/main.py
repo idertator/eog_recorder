@@ -7,17 +7,16 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from saccrec import settings
 from saccrec.core.formats import create_study
 from saccrec.gui import icons  # noqa: F401
-from saccrec.gui.dialogs import AboutDialog, SDCardImport, SettingsDialog
+from saccrec.gui.dialogs import AboutDialog, SettingsDialog
 from saccrec.gui.widgets import LoggerWidget, SignalsWidget, StimulusPlayer
 from saccrec.gui.wizards import RecordSetupWizard
 from saccrec.recording import CytonBoard
 
-logger = logging.getLogger('saccrec')
+logger = logging.getLogger("saccrec")
 logger.setLevel(logging.INFO)
 
 
 class MainWindow(QtWidgets.QMainWindow):
-
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
 
@@ -26,7 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._subject: Subject = None
         self._protocol: Protocol = None
-        self._output_path: str = ''
+        self._output_path: str = ""
         self._light_intensity: int = 0
         self._filename: str = None
         self._studies: list[str] = []
@@ -46,7 +45,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Related Widgets
         self._new_record_wizard: RecordSetupWizard = None
-        self._sd_import_dialog: SDCardImport = None
         self._about_dialog: AboutDialog = None
         self._settings_dialog = SettingsDialog(self)
 
@@ -70,40 +68,51 @@ class MainWindow(QtWidgets.QMainWindow):
         # Setting up top level menus
         menubar = self.menuBar()
 
-        file_menu = menubar.addMenu(_('&File'))
-        help_menu = menubar.addMenu(_('&Help'))
+        file_menu = menubar.addMenu(_("&File"))
+        help_menu = menubar.addMenu(_("&Help"))
 
         # Setting up actions
-        self._connect_action = QtGui.QAction(QtGui.QIcon(':/actions/power.svg'), _('&Connect'), self)
+        self._connect_action = QtGui.QAction(
+            QtGui.QIcon(":/actions/power.svg"), _("&Connect"), self
+        )
         self._connect_action.triggered.connect(self._on_connect_clicked)
 
-        self._clear_log_action = QtGui.QAction(QtGui.QIcon(':/actions/cleaning_services.svg'), _('&Clear log'), self)
+        self._clear_log_action = QtGui.QAction(
+            QtGui.QIcon(":/actions/cleaning_services.svg"), _("&Clear log"), self
+        )
         self._clear_log_action.triggered.connect(self._on_clear_log_clicked)
         self._clear_log_action.setEnabled(False)
 
-        self._new_action = QtGui.QAction(QtGui.QIcon(':/actions/draft.svg'), _('&New recording'), self)
+        self._new_action = QtGui.QAction(
+            QtGui.QIcon(":/actions/draft.svg"), _("&New recording"), self
+        )
         self._new_action.triggered.connect(self._on_new_action_clicked)
         self._new_action.setEnabled(False)
 
-        self._import_sd_action = QtGui.QAction(QtGui.QIcon(':/actions/sd_card.svg'), _('&Import SD data'), self)
-        self._import_sd_action.triggered.connect(self._on_import_sd_action_clicked)
-
-        self._exit_action = QtGui.QAction(QtGui.QIcon(':/actions/exit_to_app.svg'), _('&Exit'), self)
-        self._exit_action.setShortcut('Ctrl+Q')
-        self._exit_action.setStatusTip(_('Exit the app'))
+        self._exit_action = QtGui.QAction(
+            QtGui.QIcon(":/actions/exit_to_app.svg"), _("&Exit"), self
+        )
+        self._exit_action.setShortcut("Ctrl+Q")
+        self._exit_action.setStatusTip(_("Exit the app"))
         self._exit_action.triggered.connect(QtWidgets.QApplication.instance().quit)
 
-        self._settings_action = QtGui.QAction(QtGui.QIcon(':/actions/settings.svg'), _('&Settings'), self)
-        self._settings_action.setShortcut('Ctrl+P')
-        self._settings_action.setStatusTip(_('Configure the application'))
+        self._settings_action = QtGui.QAction(
+            QtGui.QIcon(":/actions/settings.svg"), _("&Settings"), self
+        )
+        self._settings_action.setShortcut("Ctrl+P")
+        self._settings_action.setStatusTip(_("Configure the application"))
         self._settings_action.triggered.connect(self._on_settings_action_clicked)
 
-        self._stop_action = QtGui.QAction(QtGui.QIcon(':/actions/stop_circle.svg'), _('&Stop'), self)
-        self._stop_action.setShortcut('Ctrl+D')
-        self._stop_action.setStatusTip(_('Stop recording'))
+        self._stop_action = QtGui.QAction(
+            QtGui.QIcon(":/actions/stop_circle.svg"), _("&Stop"), self
+        )
+        self._stop_action.setShortcut("Ctrl+D")
+        self._stop_action.setStatusTip(_("Stop recording"))
         self._stop_action.triggered.connect(self._on_stop_clicked)
 
-        self._about_action = QtGui.QAction(QtGui.QIcon(':/actions/info.svg'), _('&About ...'), self)
+        self._about_action = QtGui.QAction(
+            QtGui.QIcon(":/actions/info.svg"), _("&About ..."), self
+        )
         self._about_action.triggered.connect(self._on_about_action_clicked)
 
         help_menu.addAction(self._about_action)
@@ -117,11 +126,10 @@ class MainWindow(QtWidgets.QMainWindow):
         file_menu.addAction(self._exit_action)
 
         # Setting up top toolbar
-        main_toolbar = self.addToolBar('Main Toolbar')
+        main_toolbar = self.addToolBar("Main Toolbar")
         main_toolbar.addAction(self._connect_action)
         main_toolbar.addAction(self._clear_log_action)
         main_toolbar.addAction(self._new_action)
-        main_toolbar.addAction(self._import_sd_action)
         main_toolbar.addAction(self._settings_action)
         main_toolbar.addSeparator()
         main_toolbar.addAction(self._stop_action)
@@ -130,8 +138,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting up window
         self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle('SaccRec')
-        self.setWindowIcon(QtGui.QIcon(':/brand/app.png'))
+        self.setWindowTitle("SaccRec")
+        self.setWindowIcon(QtGui.QIcon(":/brand/app.png"))
 
         self._setup_gui_for_non_recording()
 
@@ -141,7 +149,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _setup_gui_for_recording(self):
         self._new_action.setEnabled(False)
-        self._import_sd_action.setEnabled(False)
         self._exit_action.setEnabled(False)
         self._settings_action.setEnabled(False)
         self._about_action.setEnabled(False)
@@ -153,7 +160,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self._new_action.setEnabled(True)
         else:
             self._new_action.setEnabled(False)
-        self._import_sd_action.setEnabled(True)
         self._exit_action.setEnabled(True)
         self._settings_action.setEnabled(True)
         self._about_action.setEnabled(True)
@@ -183,12 +189,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self._new_record_wizard.finished.connect(self._on_wizard_finished)
         self._new_record_wizard.open()
 
-    def _on_import_sd_action_clicked(self):
-        if self._sd_import_dialog is None:
-            self._sd_import_dialog = SDCardImport(self)
-        self._sd_import_dialog.open(self._studies)
-        self._studies = []
-
     def _on_settings_action_clicked(self):
         self._settings_dialog.open()
 
@@ -200,13 +200,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_stop_clicked(self):
         answer = QtWidgets.QMessageBox()
         answer.setIcon(QtWidgets.QMessageBox.Critical)
-        answer.setWindowTitle(_('Interruption confirmation'))
-        answer.setText(_('Are you sure to interrupt the test?'))
+        answer.setWindowTitle(_("Interruption confirmation"))
+        answer.setText(_("Are you sure to interrupt the test?"))
         answer.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         yes_button = answer.button(QtWidgets.QMessageBox.Yes)
-        yes_button.setText(_('Yes'))
+        yes_button.setText(_("Yes"))
         no_button = answer.button(QtWidgets.QMessageBox.No)
-        no_button.setText(_('No'))
+        no_button.setText(_("No"))
         answer.exec()
 
         if answer.clickedButton() == yes_button:
@@ -224,10 +224,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_wizard_finished(self, record_setup: dict):
         if self._board.ready:
-            self._filename = self._board.create_sd_file()
-
-        if self._board.ready:
-            self._current_file = open(f'/tmp/{self._filename}.dat', 'wb')
+            self._current_file = open(f"/tmp/{self._filename}.dat", "wb")
 
             self._setup_gui_for_recording()
             self._signals_widget.setVisible(True)
@@ -236,10 +233,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self._new_record_wizard.destroy()
             self._new_record_wizard = None
 
-            self._subject = record_setup['subject']
-            self._protocol = record_setup['protocol']
-            self._output_path = record_setup['output_path']
-            self._light_intensity = record_setup['light_intensity']
+            self._subject = record_setup["subject"]
+            self._protocol = record_setup["protocol"]
+            self._output_path = record_setup["output_path"]
+            self._light_intensity = record_setup["light_intensity"]
 
             sampling_rate = settings.hardware.sampling_rate
 
@@ -286,27 +283,28 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._current_file = None
 
             if self._board.ready:
-                self._board.close_sd_file()
-
                 self._setup_gui_for_non_recording()
 
                 self._current_test = 0
                 self._stimulus_player.close()
 
-                if create_study(
-                    subject=self._subject,
-                    protocol=self._protocol,
-                    light_intensity=self._light_intensity,
-                    output_path=self._output_path,
-                    source_filename=self._filename
-                ) is not None:
+                if (
+                    create_study(
+                        subject=self._subject,
+                        protocol=self._protocol,
+                        light_intensity=self._light_intensity,
+                        output_path=self._output_path,
+                        source_filename=self._filename,
+                    )
+                    is not None
+                ):
                     self._studies.append(self._output_path)
                     QtWidgets.QMessageBox.information(
                         self,
-                        _('Success'),
-                        _('Your record was successfully writed to {path}').format(
+                        _("Success"),
+                        _("Your record was successfully writed to {path}").format(
                             path=self._output_path
-                        )
+                        ),
                     )
 
     def _on_stimulus_refreshed(self, value: int):

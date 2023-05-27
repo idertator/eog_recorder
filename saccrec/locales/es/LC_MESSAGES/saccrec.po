@@ -26,66 +26,6 @@ msgstr "Español"
 msgid "About DIATAX ..."
 msgstr "Acerca de DIATAX ..."
 
-#: gui/dialogs/sdimport.py:22
-msgid "Import OpenBCI SD signals"
-msgstr "Importar señales de la SD del OpenBCI"
-
-#: gui/dialogs/sdimport.py:25
-msgid "Input folder"
-msgstr "Carpeta de entrada"
-
-#: gui/dialogs/sdimport.py:49
-msgid "Import"
-msgstr "Importar"
-
-#: gui/dialogs/sdimport.py:119
-msgid "Select SD data location"
-msgstr "Seleccione la ubicación de los datos de la SD"
-
-#: gui/dialogs/sdimport.py:132
-msgid "Select studies to set channels data"
-msgstr "Seleccione los estudios a establecer los datos de los canales"
-
-#: gui/dialogs/sdimport.py:134
-msgid "EOG study (*.eog)"
-msgstr "Estudio de EOG (*.eog)"
-
-#: gui/dialogs/sdimport.py:160
-msgid "Importing %p%"
-msgstr "Importando %p%"
-
-#: gui/dialogs/sdimport.py:172
-msgid "Associated filename not found"
-msgstr "No se ha encontrado el nombre del archivo asociado"
-
-#: gui/dialogs/sdimport.py:178
-#, python-brace-format
-msgid "Imported {success} studies, {failed} failed"
-msgstr "{success} estudios importados, {failed} fallidos"
-
-#: gui/dialogs/sdimport.py:182
-msgid ""
-"The following studies present missing files:\n"
-"\n"
-msgstr ""
-"Los siguientes estudios presentan ficheros no encontrados:\n"
-"\n"
-
-#: gui/dialogs/sdimport.py:187
-#, python-brace-format
-msgid " - {filename} missing!"
-msgstr " - {filename} no encontrado!"
-
-#: gui/dialogs/sdimport.py:194
-#, python-brace-format
-msgid "{failed} studies failed"
-msgstr "{failed} estudios fallidos"
-
-#: gui/dialogs/sdimport.py:198
-#, python-brace-format
-msgid "Imported {success} studies"
-msgstr "{success} estudios importados"
-
 #: gui/dialogs/settings.py:23
 msgid "Language"
 msgstr "Lenguaje"
@@ -220,10 +160,6 @@ msgstr "&Limpiar registro"
 #: gui/main.py:84
 msgid "&New recording"
 msgstr "&Nueva grabación"
-
-#: gui/main.py:88
-msgid "&Import SD data"
-msgstr "&Importar datos de la SD"
 
 #: gui/main.py:91
 msgid "&Exit"
